@@ -8,6 +8,15 @@
         "48": "icon_48.png",
         "128": "icon_128.png"
     },
+    "permissions": [
+        "contextMenus"
+    ],
+    "background": {
+        "scripts": [
+            "contextMenu.js"
+        ],
+        "persistent": false
+    },
     "content_scripts": [
         {
             "matches": [
