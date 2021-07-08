@@ -24,6 +24,7 @@ const actionConfigs = [
     getSimpleHide('#chrome > div.cc_banner-wrapper > div.cc_banner.cc_container.cc_container--open'),
     getSimpleHide('#qc-cmp2-container.qc-cmp2-container'),
     getSimpleHide('.snigel-cmp-framework#snigel-cmp-framework'),
+    getSimpleHide('#onetrust-consent-sdk'),
     [
         getHide('#CybotCookiebotDialog[name=CybotCookiebotDialog]'),
         getRemove('#CybotCookiebotDialogBodyUnderlay')
