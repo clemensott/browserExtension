@@ -14,8 +14,25 @@ function getRemove(selector) {
     };
 }
 
+function getRemoveClasses(selector, ...removeClasses) {
+    return {
+        selector,
+        removeClasses,
+    };
+}
+
 function getSimpleHide(selector) {
     return [getHide(selector)];
+}
+
+function clearOverflow(selector) {
+    return {
+        selector,
+        delay: 500,
+        style: {
+            overflow: 'initial'
+        },
+    };
 }
 
 const actionConfigs = [
@@ -30,18 +47,17 @@ const actionConfigs = [
         getRemove('#CybotCookiebotDialogBodyUnderlay')
     ],
     [
+        getHide('div[class*=ConsentManager__Overlay]'),
+        clearOverflow('html'),
+        clearOverflow('body'),
+    ],
+    [
         getHide('#cookiebanner.modal'),
-        {
-            selector: 'body',
-            removeClasses: ['cookiebanner-modal-open'],
-        }
+        getRemoveClasses('body', 'cookiebanner-modal-open'),
     ],
     [
         getRemove('div[id*=sp_message_container_]'),
-        {
-            selector: 'html',
-            removeClasses: ['sp-message-open'],
-        }
+        getRemoveClasses('html', 'sp-message-open'),
     ],
 ];
 
@@ -66,7 +82,10 @@ function getElement(selectors) {
     return selectors.reduce((element, selector) => element || document.querySelector(selector), null);
 }
 
-function handleElement({ element, config }) {
+async function handleElement({ element, config }) {
+    if (config.delay) {
+        await new Promise(resolve => setTimeout(resolve, config.delay));
+    }
     if (config.style) {
         Object.keys(config.style).forEach(key => element.style[key] = config.style[key]);
     }
