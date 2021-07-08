@@ -1,0 +1,38 @@
+{
+    "name": "Customize Websites",
+    "version": "1.0",
+    "description": "does usefull stuff on websites",
+    "manifest_version": 2,
+    "icons": {
+        "16": "icon_16.png",
+        "48": "icon_48.png",
+        "128": "icon_128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://neue.radkersburger-bahn.at/*"
+            ],
+            "js": [
+                "nrb_content.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://www.instagram.com/*/"
+            ],
+            "js": [
+                "instagram_content.js"
+            ]
+        },
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "remove_cookie_banners.js"
+            ]
+        }
+    ]
+}

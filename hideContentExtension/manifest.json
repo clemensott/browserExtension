@@ -1,0 +1,42 @@
+{
+    "name": "Hider",
+    "version": "1.0",
+    "description": "Hides stuff from webpage",
+    "manifest_version": 2,
+    "icons": {
+        "16": "657564_eraser_16x16.png",
+        "48": "657564_eraser_48x48.png",
+        "128": "657564_eraser_128x128.png"
+    },
+    "permissions": [
+        "contextMenus",
+        "activeTab"
+    ],
+    "background": {
+        "scripts": [
+            "contextMenu.js"
+        ],
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "main.js"
+            ]
+        },
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "sub.js"
+            ],
+            "all_frames": true
+        }
+    ]
+}
