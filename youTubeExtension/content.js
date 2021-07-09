@@ -6,13 +6,14 @@ const cachedElements = {};
 console.log('init:', autoMuted);
 
 function getCachedElement(elementKey, path, callback) {
-    if (!cachedElements[elementKey]?.parentNode) {
-        const element = document.querySelector(path);
+    let element = cachedElements[elementKey];
+    if (!element || !document.body.contains(element)) {
+        element = document.querySelector(path);
         if (element) {
             console.log('search element to cache:', elementKey, !!cachedElements[elementKey]);
         }
         cachedElements[elementKey] = element;
-        callback && callback(cachedElements[elementKey]);
+        callback && callback(element);
     }
     return cachedElements[elementKey];
 }
@@ -24,8 +25,8 @@ function getVideoElement() {
         videoPlayer => {
             if (videoPlayer) {
                 videoPlayer.ondurationchange = checkIsAddChanged;
+                checkIsAddChanged(true);
             }
-            checkIsAddChanged();
         });
 }
 
@@ -57,10 +58,10 @@ function isAdvertisingPlayling() {
     return moviePlayerElement && moviePlayerElement.classList.contains('ad-interrupting');
 }
 
-function checkIsAddChanged() {
+function checkIsAddChanged(trigger) {
     const isAdPlayling = isAdvertisingPlayling();
 
-    if (isAdPlayling !== wasAdPlayling) onIsAdChange(isAdPlayling);
+    if (trigger || isAdPlayling !== wasAdPlayling) onIsAdChange(isAdPlayling);
     wasAdPlayling = isAdPlayling;
 }
 
