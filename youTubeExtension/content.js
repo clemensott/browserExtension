@@ -24,8 +24,8 @@ function getVideoElement() {
         '#movie_player > div.html5-video-container > video',
         videoPlayer => {
             if (videoPlayer) {
-                videoPlayer.ondurationchange = checkIsAddChanged;
-                checkIsAddChanged(true);
+                videoPlayer.ondurationchange = () => checkIsAdChanged(videoPlayer);
+                checkIsAdChanged(videoPlayer, true);
             }
         });
 }
@@ -58,15 +58,14 @@ function isAdvertisingPlayling() {
     return moviePlayerElement && moviePlayerElement.classList.contains('ad-interrupting');
 }
 
-function checkIsAddChanged(trigger) {
+function checkIsAdChanged(videoPlayer, trigger) {
     const isAdPlayling = isAdvertisingPlayling();
 
-    if (trigger || isAdPlayling !== wasAdPlayling) onIsAdChange(isAdPlayling);
+    if (trigger || isAdPlayling !== wasAdPlayling) onIsAdChange(isAdPlayling, videoPlayer);
     wasAdPlayling = isAdPlayling;
 }
 
-function onIsAdChange(isAdPlayling) {
-    const videoElement = getVideoElement();
+function onIsAdChange(isAdPlayling, videoPlayer) {
     if (!videoElement) return;
 
     if (isAdPlayling) {
