@@ -44,7 +44,13 @@ const actionConfigs = [
     getSimpleHide('#onetrust-consent-sdk'),
     [
         getHide('#CybotCookiebotDialog[name=CybotCookiebotDialog]'),
-        getRemove('#CybotCookiebotDialogBodyUnderlay')
+        getRemove('#CybotCookiebotDialogBodyUnderlay'),
+    ],
+    [
+        getHide('body > .tp-modal'),
+        getRemove('body > .tp-backdrop.tp-active'),
+        getRemoveClasses('html', 'tp-modal-open'),
+        getRemoveClasses('body', 'tp-modal-open'),
     ],
     [
         getHide('div[class*=ConsentManager__Overlay]'),
