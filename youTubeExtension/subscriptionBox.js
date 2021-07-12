@@ -221,7 +221,10 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     );
 
     if (!await api.init()) {
-        console.warn('API init error');
+        console.warn('API init error. You may need to update credentials:\n' +
+            'localStorage.setItem("subscriptionBoxUsername", "");\n' +
+            'localStorage.setItem("subscriptionBoxPassword", "");\n' +
+            'localStorage.setItem("subscriptionBoxBaseUrl", "");');
         return;
     }
 
@@ -363,7 +366,10 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         const subBoxSections =
             tryIgonore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
                 map(t => t.tabRenderer).find(t => t?.tabIdentifier === 'FEsubscriptions')?.
-                content?.sectionListRenderer?.contents?.filter(Boolean));
+                content?.sectionListRenderer?.contents?.filter(Boolean)) ||
+            tryIgonore(() => data?.onResponseReceivedActions?.
+                map(a => a?.appendContinuationItemsAction?.continuationItems).filter(Boolean).flat());
+
         if (subBoxSections) {
             const subBoxVideos = subBoxSections
                 .map(s => s?.itemSectionRenderer?.contents.map(c => c?.shelfRenderer.content.gridRenderer.items).filter(Boolean).flat())
@@ -497,8 +503,10 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                     position: 'absolute',
                     top: '0',
                     left: '0',
-                    padding: '2px',
-                    background: 'white'
+                    padding: '1px 1px 2px 1px',
+                    margin: '2px',
+                    background: 'white',
+                    'border-radius': '3px'
                 });
             });
         } catch (e) {
