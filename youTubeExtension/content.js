@@ -65,7 +65,7 @@ function checkIsAdChanged(videoPlayer, trigger) {
     wasAdPlayling = isAdPlayling;
 }
 
-function onIsAdChange(isAdPlayling, videoPlayer) {
+function onIsAdChange(isAdPlayling, videoElement) {
     if (!videoElement) return;
 
     if (isAdPlayling) {
