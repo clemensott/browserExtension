@@ -43,6 +43,11 @@ const actionConfigs = [
     getSimpleHide('.snigel-cmp-framework#snigel-cmp-framework'),
     getSimpleHide('#onetrust-consent-sdk'),
     [
+        getHide('div.i-amphtml-consent-ui-mask'),
+        getHide('body > amp-consent'),
+        getRemoveClasses('html', 'i-amphtml-scroll-disabled'),
+    ],
+    [
         getHide('#CybotCookiebotDialog[name=CybotCookiebotDialog]'),
         getRemove('#CybotCookiebotDialogBodyUnderlay'),
     ],
