@@ -109,6 +109,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                     items: updates.get(videoId),
                 };
             });
+            return videoIds;
         }
 
         async createChannel(channelId) {
@@ -141,7 +142,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 }
                 const sources = Array.from(channels.keys()).map(channelId => {
                     const sourceId = this.sources.get(channelId);
-                    const videos = channels.get(channelId);
+                    const videos = Array.from(groupBy(channels.get(channelId), v => v.id).values()).map(g => g[0]).filter(Boolean);
                     const channelTitle = videos.map(v => v.channelTitle).find(Boolean);
                     return sourceId && {
                         id: sourceId,
@@ -266,7 +267,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         try {
             return raw?.videoId && {
                 id: raw.videoId,
-                title: raw.title?.runs?.map(r => r?.text).find(Boolean),
+                title: raw.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelTitle,
                 channelId,
                 duration: parseDuration(raw.thumbnailOverlays?.map(o => o?.thumbnailOverlayTimeStatusRenderer?.text.simpleText).find(Boolean)),
@@ -284,7 +285,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             const commentSection = raw.map(c => c?.itemSectionRenderer).find(Boolean);
             return videoSection && channelSection && {
                 id: videoId,
-                title: videoSection?.title?.runs?.map(r => r?.text).find(Boolean),
+                title: videoSection?.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelTitle: channelSection?.owner?.videoOwnerRenderer?.title?.runs?.map(r => r?.text).find(Boolean),
                 channelId: channelSection?.owner?.videoOwnerRenderer?.navigationEndpoint?.browseEndpoint?.browseId,
                 views: parseViews(videoSection?.viewCount?.videoViewCountRenderer?.viewCount?.simpleText),
@@ -304,7 +305,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         try {
             return raw?.videoId && {
                 id: raw.videoId,
-                title: raw.title?.runs?.map(r => r?.text).find(Boolean),
+                title: raw.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelTitle: raw.shortBylineText?.runs?.map(r => r?.text).find(Boolean),
                 channelId: raw.shortBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
                 duration: parseDuration(raw.thumbnailOverlays?.map(o => o?.thumbnailOverlayTimeStatusRenderer?.text.simpleText).find(Boolean)),
@@ -360,7 +361,8 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         const watchVideo = tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
         const watchVideoId = tryIgonore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
         if (watchVideo && watchVideoId) {
-            await handleVideosUpdates([getWatchVideoData(watchVideo, watchVideoId)], fetchTime);
+            const videos = [getWatchVideoData(watchVideo, watchVideoId)].filter(Boolean);
+            await handleVideosUpdates(videos, fetchTime);
         }
 
         const subBoxSections =
@@ -381,14 +383,14 @@ const subBoxJsCode = (async function mainSubBoxFun() {
 
     async function handleFetchPromise(promise) {
         const response = await promise;
-        const textPromise = response.text();
-        response.text = () => textPromise;
 
-        if (response.ok && (
-            response.url.startsWith('https://www.youtube.com/youtubei/v1/next') ||
-            response.url.startsWith('https://www.youtube.com/youtubei/v1/browse') ||
-            response.url.startsWith('https://www.youtube.com/youtubei/v1/player')
-        )) {
+        if (response.ok && [
+            'https://www.youtube.com/youtubei/v1/next',
+            'https://www.youtube.com/youtubei/v1/browse',
+            'https://www.youtube.com/youtubei/v1/player'
+        ].some(url => response.url.startsWith(url))) {
+            const textPromise = response.text();
+            response.text = () => textPromise;
             try {
                 const text = await textPromise;
                 window.handleData(JSON.parse(text));
@@ -444,6 +446,13 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             container.appendChild(element);
         }
 
+        const timestamp = videoUserState?.timestamp || 0;
+        if (element.dataset.id === videoId && element.dataset.timestamp >= timestamp) {
+            return;
+        }
+        element.dataset.id = videoId;
+        element.dataset.timestamp = timestamp;
+
         if (!videoUserState?.items?.length) {
             element.innerText = '\u2370';
             element.style.cursor = null;
@@ -484,31 +493,42 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
             const currentVideoId = getVideoIdFromUrl(window.location.href);
             const videoContainers = getVideoContainers();
+            updateUI();
+
             const videoIds = videoContainers.map(getVideoIdFromVideoContainer);
             if (currentVideoId) {
                 videoIds.push(currentVideoId);
             }
 
-            await api.updateUserStateOfVideos(videoIds);
+            const updatedVideoIds = await api.updateUserStateOfVideos(videoIds);
+            updateUI(updatedVideoIds);
 
-            if (currentVideoUserStateContainer && currentVideoId) {
-                updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, {
-                    'padding-left': '5px',
+            function updateUI(videoIdsToUpdate) {
+                function updateVideoId(videoId) {
+                    return (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(videoId));
+                }
+
+                if (currentVideoUserStateContainer && currentVideoId && updateVideoId(currentVideoId)) {
+                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, {
+                        'padding-left': '5px',
+                    });
+                }
+
+                videoContainers.forEach(container => {
+                    const videoId = getVideoIdFromVideoContainer(container);
+                    if (updateVideoId(currentVideoId)) {
+                        updateVideoUserStateUI(container, videoId, {
+                            position: 'absolute',
+                            top: '0',
+                            left: '0',
+                            padding: '1px 1px 2px 1px',
+                            margin: '2px',
+                            background: 'white',
+                            'border-radius': '3px'
+                        });
+                    }
                 });
             }
-
-            videoContainers.forEach(container => {
-                const videoId = getVideoIdFromVideoContainer(container);
-                updateVideoUserStateUI(container, videoId, {
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    padding: '1px 1px 2px 1px',
-                    margin: '2px',
-                    background: 'white',
-                    'border-radius': '3px'
-                });
-            });
         } catch (e) {
             console.error('loop error', e)
         }
