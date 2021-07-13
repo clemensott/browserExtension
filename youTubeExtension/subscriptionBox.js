@@ -147,7 +147,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                     return sourceId && {
                         id: sourceId,
                         title: this.getUpdate(channelTitle),
-                        type: 1,
+                        type: 3,
                         videos: videos.map(video => ({
                             id: video.id,
                             localizedTitle: this.getUpdate(video.title),
@@ -191,22 +191,24 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             this.promise = null;
         }
 
-        async runInternal(lastPromise) {
+        async runInternal(lastPromise, params) {
             try {
                 await lastPromise;
             } catch { }
-
-            return this.func();
+            return this.func(...(params || []));
         }
 
-        async run(optional = false) {
+        async run({
+            optional = false,
+            params,
+        } = {}) {
             if (optional && this.promise) {
                 return;
             }
 
             let promise = null;
             try {
-                return await (this.promise = promise = this.runInternal(this.promise));
+                return await (this.promise = promise = this.runInternal(this.promise, params));
             } finally {
                 if (this.promise === promise) {
                     this.promise = null;
@@ -488,7 +490,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         }
     }
 
-    const loop = new Mutex(async function () {
+    const loop = new Mutex(async function (forceUserStateUpdate = false) {
         try {
             const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
             const currentVideoId = getVideoIdFromUrl(window.location.href);
@@ -500,7 +502,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 videoIds.push(currentVideoId);
             }
 
-            const updatedVideoIds = await api.updateUserStateOfVideos(videoIds);
+            const updatedVideoIds = await api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
             updateUI(updatedVideoIds);
 
             function updateUI(videoIdsToUpdate) {
@@ -534,7 +536,11 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         }
     });
 
-    setInterval(() => loop.run(true), 5000);
+    setInterval(() => loop.run({ optional: true }), 5000);
+
+    window.onfocus = async () => {
+        await loop.run({ params: [true] });
+    };
 
     const initIntervalId = setInterval(() => {
         if (getVideoContainers().length) {
