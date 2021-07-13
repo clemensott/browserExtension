@@ -3,7 +3,7 @@ let autoMuted = !!localStorage.getItem(autoMutedKey);
 let wasAdPlayling = false;
 const cachedElements = {};
 
-console.log('init:', autoMuted);
+console.log('init youtube helper. autoMuted:', autoMuted);
 
 function getCachedElement(elementKey, path, callback) {
     let element = cachedElements[elementKey];
