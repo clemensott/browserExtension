@@ -17,6 +17,14 @@
                 "content.js",
                 "subscriptionBox.js"
             ]
+        },
+        {
+            "matches": [
+                "https://www.youtube.com/feed/subscriptions"
+            ],
+            "js": [
+                "reloadSubscriptionSite.js"
+            ]
         }
     ]
 }
