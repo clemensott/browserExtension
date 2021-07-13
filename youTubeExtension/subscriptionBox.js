@@ -23,10 +23,11 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     }
 
     class API {
-        constructor(username, password, baseUrl) {
+        constructor(username, password, baseUrl, videoUserStateUpdateInterval) {
             this.username = username;
             this.password = password;
             this.baseUrl = baseUrl;
+            this.videoUserStateUpdateInterval = videoUserStateUpdateInterval || 60;
             this.sources = new Map();
             this.videoUserStates = {};
         }
@@ -78,7 +79,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
 
         isVideoToUpdateUserState(videoId) {
             const userState = this.videoUserStates[videoId];
-            return !userState?.timestamp || (Date.now() - userState.timestamp > 60 * 1000);
+            return !userState?.timestamp || (Date.now() - userState.timestamp > this.videoUserStateUpdateInterval * 1000);
         }
 
         async updateUserStateOfVideos(videoIds, forceUpdate = false) {
@@ -221,6 +222,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         localStorage.getItem('subscriptionBoxUsername'),
         localStorage.getItem('subscriptionBoxPassword'),
         localStorage.getItem('subscriptionBoxBaseUrl'),
+        Number(localStorage.getItem('subscriptionBoxVideoUserStateUpdateInterval')),
     );
 
     if (!await api.init()) {
