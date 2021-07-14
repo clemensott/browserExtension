@@ -433,7 +433,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         return getVideoIdFromUrl(a.href);
     }
 
-    function updateVideoUserStateUI(container, videoId, additionalStyles) {
+    function updateVideoUserStateUI(container, videoId, additionalClassName) {
         if (!container) {
             return;
         }
@@ -443,10 +443,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         if (!element) {
             element = document.createElement('span');
             element.classList.add(videoUserStateClassName);
-            element.style['font-size'] = '13px';
-            if (additionalStyles) {
-                Object.keys(additionalStyles).forEach(key => element.style[key] = additionalStyles[key]);
-            }
+            element.classList.add(additionalClassName);
             container.appendChild(element);
         }
 
@@ -459,22 +456,28 @@ const subBoxJsCode = (async function mainSubBoxFun() {
 
         if (!videoUserState?.items?.length) {
             element.innerText = '\u2370';
-            element.style.cursor = null;
-            return;
+            element.classList.add('yt-video-user-state-unkown');
+            element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-inactive', 'yt-video-user-state-count');
         } else {
             const inactiveCount = videoUserState && videoUserState.items.filter(vus => !vus.isActive).length;
             if (inactiveCount === videoUserState.items.length) {
                 element.innerText = '\u2705';
+                element.classList.add('yt-video-user-state-inactive');
+                element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-unkown', 'yt-video-user-state-count');
             } else if (videoUserState.items.length === 1) {
                 element.innerText = '\u274C';
+                element.classList.add('yt-video-user-state-active');
+                element.classList.remove('yt-video-user-state-unkown', 'yt-video-user-state-inactive', 'yt-video-user-state-count');
             } else {
                 element.innerText = `${inactiveCount} / ${videoUserState.items.length} `;
+                element.classList.add('yt-video-user-state-count');
+                element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-inactive', 'yt-video-user-state-unkown');
             }
         }
 
         const activeSourceIds = videoUserState?.items?.filter(vus => vus.isActive)?.map(vus => vus.sourceId);
         if (activeSourceIds?.length === 1) {
-            element.style.cursor = 'pointer';
+            element.classList.add('yt-video-user-state-deletable');
             element.title = 'Delete Video';
             element.onclick = async () => {
                 try {
@@ -486,7 +489,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 }
             };
         } else {
-            element.style.cursor = 'default';
+            element.classList.remove('yt-video-user-state-deletable');
             element.title = '';
             element.onclick = null;
         }
@@ -513,23 +516,13 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 }
 
                 if (currentVideoUserStateContainer && currentVideoId && updateVideoId(currentVideoId)) {
-                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, {
-                        'padding-left': '5px',
-                    });
+                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, 'yt-video-user-state-watch');
                 }
 
                 videoContainers.forEach(container => {
                     const videoId = getVideoIdFromVideoContainer(container);
                     if (updateVideoId(currentVideoId)) {
-                        updateVideoUserStateUI(container, videoId, {
-                            position: 'absolute',
-                            top: '0',
-                            left: '0',
-                            padding: '1px 1px 2px 1px',
-                            margin: '2px',
-                            background: 'white',
-                            'border-radius': '3px'
-                        });
+                        updateVideoUserStateUI(container, videoId, 'yt-video-user-state-list-item');
                     }
                 });
             }

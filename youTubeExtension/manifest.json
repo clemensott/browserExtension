@@ -16,6 +16,9 @@
             "js": [
                 "content.js",
                 "subscriptionBox.js"
+            ],
+            "css":[
+                "subscriptionBox.css"
             ]
         },
         {
