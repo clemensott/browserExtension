@@ -1,0 +1,30 @@
+/* document.querySelector("td.content").style.setProperty('background-image','initial')
+document.querySelector("#maincontent").style.setProperty('height','initial') */
+
+body {
+    /* height: 100vh; */
+    /* overflow: hidden; */
+    /* margin: 0!important; */
+    display: flex;
+    justify-content: center;
+    padding-bottom: 50px;
+}
+
+body > form{
+    flex-grow: 1;
+    margin-bottom: 50px;
+}
+
+.page, #ctl01 > div.page > table > tbody > tr:nth-child(2) {
+    height: 100%!important;
+}
+
+td.content {
+    background-image: initial!important;
+    height: 100%!important;
+    display: flex;
+}
+
+#maincontent {
+    height: initial!important;
+}

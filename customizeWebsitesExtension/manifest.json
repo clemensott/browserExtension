@@ -22,8 +22,8 @@
             "matches": [
                 "http://neue.radkersburger-bahn.at/*"
             ],
-            "js": [
-                "nrb_content.js"
+            "css": [
+                "nrb_content.css"
             ]
         },
         {
