@@ -70,6 +70,11 @@ const actionConfigs = [
         getRemove('div[id*=sp_message_container_]'),
         getRemoveClasses('html', 'sp-message-open'),
     ],
+    [
+        getRemove('.fc-consent-root'),
+        clearOverflow('html'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
@@ -116,7 +121,7 @@ function checkSimpleContainers(actions) {
         }));
         if (elements.every(element => element.element)) {
             elements.forEach(handleElement);
-            clearBannerInterval();
+            setTimeout(() => clearBannerInterval(), 1000);
             break;
         }
     }
