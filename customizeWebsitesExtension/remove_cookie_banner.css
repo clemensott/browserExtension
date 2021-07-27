@@ -25,3 +25,7 @@
 #didomi-notice {
     display: none!important;
 }
+
+div.cookie-alert.t-dark {
+    display: none!important;
+}
