@@ -44,6 +44,10 @@
             ],
             "js": [
                 "remove_cookie_banners.js"
+            ],
+            "css": [
+                "remove_cookie_banner.css",
+                "remove_ad.css"
             ]
         }
     ]

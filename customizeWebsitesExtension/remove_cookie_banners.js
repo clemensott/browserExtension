@@ -36,12 +36,6 @@ function clearOverflow(selector) {
 }
 
 const actionConfigs = [
-    getSimpleHide('.cmp_app.cmp_overwriteLevel1#consentDialog'),
-    getSimpleHide('#gdpr-consent-tool-wrapper'),
-    getSimpleHide('#chrome > div.cc_banner-wrapper > div.cc_banner.cc_container.cc_container--open'),
-    getSimpleHide('#qc-cmp2-container.qc-cmp2-container'),
-    getSimpleHide('.snigel-cmp-framework#snigel-cmp-framework'),
-    getSimpleHide('#onetrust-consent-sdk'),
     [
         getHide('div.i-amphtml-consent-ui-mask'),
         getHide('body > amp-consent'),

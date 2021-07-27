@@ -1,0 +1,27 @@
+#gdpr-consent-tool-wrapper {
+    display: none;
+}
+
+.cmp_app.cmp_overwriteLevel1#consentDialog {
+    display: none;
+}
+
+#chrome > div.cc_banner-wrapper > div.cc_banner.cc_container.cc_container--open {
+    display: none;
+}
+
+#qc-cmp2-container.qc-cmp2-container {
+    display: none;
+}
+
+.snigel-cmp-framework#snigel-cmp-framework {
+    display: none;
+}
+
+#onetrust-consent-sdk {
+    display: none;
+}
+
+#didomi-notice {
+    display: none!important;
+}
