@@ -90,19 +90,9 @@ function loop() {
     const isAdPlayling = isAdvertisingPlayling();
     const videoElement = getVideoElement();
     if (videoElement && isAdPlayling) {
-        if (videoElement.currentTime > 30) {
+        if (videoElement.currentTime > 32) {
             skipAdvertisement();
         }
-    }
-
-    const container = getAdvertisingContainer();
-    if (!container || container.children.length === 0) {
-        return false;
-    }
-    const closeOverlayAdButton = container.querySelector("div.ytp-ad-overlay-slot > div > div.ytp-ad-image-overlay > div.ytp-ad-overlay-close-container > button");
-    if (closeOverlayAdButton) {
-        closeOverlayAdButton.click();
-        return false;
     }
 }
 

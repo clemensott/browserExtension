@@ -1,0 +1,11 @@
+#movie_player.ad-interrupting > div.html5-video-container > video {
+    opacity: 0;
+}
+
+div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
+    display: none;
+}
+
+#movie_player > div.video-ads.ytp-ad-module {
+    opacity: 0;
+}
