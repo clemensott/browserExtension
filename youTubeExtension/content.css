@@ -9,3 +9,7 @@ div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
 #movie_player > div.video-ads.ytp-ad-module {
     opacity: 0;
 }
+
+#companion > ytd-action-companion-ad-renderer {
+    display: none;
+}
