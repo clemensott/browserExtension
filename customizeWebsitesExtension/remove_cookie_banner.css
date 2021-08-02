@@ -29,3 +29,11 @@
 div.cookie-alert.t-dark {
     display: none!important;
 }
+
+div#BorlabsCookieBoxWrap {
+    display: none!important;
+}
+
+div#BorlabsCookieBox {
+    display: none!important;
+}
