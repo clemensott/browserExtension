@@ -37,3 +37,15 @@ div#BorlabsCookieBoxWrap {
 div#BorlabsCookieBox {
     display: none!important;
 }
+
+div#cookiebanner {
+    display: none!important;
+}
+
+amp-consent#ampforwpConsent {
+    display: none!important;
+}
+
+cmp-banner {
+    display: none!important;
+}
