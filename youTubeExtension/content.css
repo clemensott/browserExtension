@@ -11,5 +11,21 @@ div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
 }
 
 #companion > ytd-action-companion-ad-renderer {
-    display: none;
+    display: none!important;
+}
+
+#movie_player > div.ytp-cued-thumbnail-overlay {
+    display: none!important;
+}
+
+#movie_player > div.ytp-chrome-top {
+    display: none!important;
+}
+
+#player-ads {
+    display: none!important;
+}
+
+ytd-promoted-sparkles-web-renderer {
+    display: none!important;
 }
