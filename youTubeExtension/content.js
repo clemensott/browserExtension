@@ -25,7 +25,7 @@ function getVideoElement() {
         videoPlayer => {
             if (videoPlayer) {
                 videoPlayer.ondurationchange = () => checkIsAdChanged(videoPlayer);
-                checkIsAdChanged(videoPlayer, true);
+                checkIsAdChanged(videoPlayer);
             }
         });
 }
@@ -58,11 +58,8 @@ function isAdvertisingPlayling() {
     return moviePlayerElement && moviePlayerElement.classList.contains('ad-interrupting');
 }
 
-function checkIsAdChanged(videoPlayer, trigger) {
-    const isAdPlayling = isAdvertisingPlayling();
-
-    if (trigger || isAdPlayling !== wasAdPlayling) onIsAdChange(isAdPlayling, videoPlayer);
-    wasAdPlayling = isAdPlayling;
+function checkIsAdChanged(videoPlayer) {
+    onIsAdChange(isAdvertisingPlayling(), videoPlayer);
 }
 
 function onIsAdChange(isAdPlayling, videoElement) {
