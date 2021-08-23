@@ -20,11 +20,16 @@
     cursor: default;
 }
 
+.yt-video-user-state-watched {
+    background: white;
+}
+
 .yt-video-user-state-active {
     background: white;
 }
 
 .yt-video-user-state-inactive {
+    background: orange;
     cursor: default;
 }
 

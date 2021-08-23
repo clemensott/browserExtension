@@ -47,17 +47,10 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 }
 
                 const response = await this.call({
-                    url: '/api/sources',
+                    url: '/api/ping',
+                    method: 'GET'
                 });
-                if (!response.ok) {
-                    return false;
-                }
-                JSON.parse(await response.text()).forEach(({ id, youTubeId }) => {
-                    if (youTubeId) {
-                        this.sources.set(youTubeId, id);
-                    }
-                });
-                return true;
+                return response.ok;
             } catch (e) {
                 return false;
             }
@@ -69,11 +62,11 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
+                body: method !== 'GET' ? JSON.stringify({
                     username: this.username,
                     password: this.password,
                     ...body,
-                }),
+                }) : undefined,
             });
         }
 
@@ -102,34 +95,55 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 array = JSON.parse(await response.text());
             }
 
-            const updates = groupBy(array, videoUserState => videoUserState.id);
             videoIds.forEach(videoId => {
                 this.videoUserStates[videoId] = {
                     videoId,
                     timestamp: Date.now(),
-                    items: updates.get(videoId),
+                    ...array.find(item => item.videoId === videoId),
                 };
             });
             return videoIds;
         }
 
-        async createChannel(channelId) {
+        async createChannels(channelIds) {
             try {
-                if (!this.sources.has(channelId)) {
-                    const response = await this.call({
-                        url: '/api/sources/add',
-                        body: {
-                            youTubeId: channelId,
-                            isActive: false,
-                        }
-                    });
+                let missingChannelIds = channelIds.filter(id => !this.sources.has(id));
+                if (!missingChannelIds.length) {
+                    return;
+                }
 
-                    if (response.ok) {
-                        const { id, youTubeId } = JSON.parse(await response.text());
-                        if (youTubeId) {
-                            this.sources.set(youTubeId, id);
+                const fetchChannelsResponse = await this.call({
+                    url: '/api/sources/fromYoutubeIds',
+                    body: {
+                        youTubeIds: missingChannelIds,
+                    },
+                });
+                if (!fetchChannelsResponse.ok) {
+                    return;
+                }
+
+                const fetchedChannels = JSON.parse(await fetchChannelsResponse.text());
+                fetchedChannels.forEach(channel => this.sources.set(channel.youTubeId, channel));
+
+                missingChannelIds = channelIds.filter(id => !this.sources.has(id));
+                if (missingChannelIds.length) {
+                    await missingChannelIds.reduce(async (promise, channelId) => {
+                        await promise;
+                        const response = await this.call({
+                            url: '/api/sources/add',
+                            body: {
+                                youTubeId: channelId,
+                                isActive: false,
+                            }
+                        });
+
+                        if (response.ok) {
+                            const source = JSON.parse(await response.text());
+                            if (source?.youTubeId) {
+                                this.sources.set(source.youTubeId, source);
+                            }
                         }
-                    }
+                    }, Promise.resolve());
                 }
             } catch (e) {
                 console.error('createChannel error', e);
@@ -142,7 +156,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                     fetchTime = new Date().toISOString();
                 }
                 const sources = Array.from(channels.keys()).map(channelId => {
-                    const sourceId = this.sources.get(channelId);
+                    const sourceId = this.sources.get(channelId)?.id;
                     const videos = Array.from(groupBy(channels.get(channelId), v => v.id).values()).map(g => g[0]).filter(Boolean);
                     const channelTitle = videos.map(v => v.channelTitle).find(Boolean);
                     return sourceId && {
@@ -176,13 +190,23 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         }
 
         async deleteVideo(videoId, sourceIds) {
-            return this.call({
-                url: `/api/videos/${videoId}`,
-                method: 'DELETE',
+            await this.call({
+                url: `/api/videos/userState/${videoId}`,
+                method: 'PUT',
                 body: {
-                    sourceIds,
+                    isWatched: true,
                 },
             });
+
+            if (sourceIds && sourceIds.length) {
+                await this.call({
+                    url: `/api/videos/${videoId}`,
+                    method: 'DELETE',
+                    body: {
+                        sourceIds,
+                    },
+                });
+            }
         }
     }
 
@@ -321,21 +345,18 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     }
 
     async function handleVideosUpdates(videos, fetchTime) {
+        console.log('handleVideosUpdates1:', videos, fetchTime);
         await loop.run();
         const channels = groupBy(videos, video => video.channelId);
 
-        await Array.from(channels.keys()).reduce(async (promise, channelId) => {
-            await promise;
-            return api.createChannel(channelId);
-        }, Promise.resolve());
-
+        await api.createChannels(Array.from(channels.keys()));
         await api.updateChannels(channels, fetchTime);
-        await api.init();
         await api.updateUserStateOfVideos(videos.map(video => video.id), true);
         await loop.run();
     }
 
     window.handleData = async function (data) {
+        console.log('handleData');
         const fetchTime = new Date().toISOString();
         const recommendationVideos =
             tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
@@ -454,33 +475,46 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         element.dataset.id = videoId;
         element.dataset.timestamp = timestamp;
 
-        if (!videoUserState?.items?.length) {
-            element.innerText = '\u2370';
-            element.classList.add('yt-video-user-state-unkown');
-            element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-inactive', 'yt-video-user-state-count');
+        const classNames = {
+            unkown: 'yt-video-user-state-unkown',
+            watched: 'yt-video-user-state-watched',
+            active: 'yt-video-user-state-active',
+            inactive: 'yt-video-user-state-inactive',
+            count: 'yt-video-user-state-count',
+        }
+        let className = '';
+        let innerText = '';
+
+        if (!videoUserState?.sources?.length) {
+            innerText = '\u2370';
+            className = classNames.unkown;
         } else {
-            const inactiveCount = videoUserState && videoUserState.items.filter(vus => !vus.isActive).length;
-            if (inactiveCount === videoUserState.items.length) {
-                element.innerText = '\u2705';
-                element.classList.add('yt-video-user-state-inactive');
-                element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-unkown', 'yt-video-user-state-count');
-            } else if (videoUserState.items.length === 1) {
-                element.innerText = '\u274C';
-                element.classList.add('yt-video-user-state-active');
-                element.classList.remove('yt-video-user-state-unkown', 'yt-video-user-state-inactive', 'yt-video-user-state-count');
+            const inactiveCount = videoUserState.sources.filter(vus => !vus.isActive).length;
+            if (videoUserState.isWatched === true) {
+                innerText = '\u2705';
+                className = classNames.watched;
+            } else if (inactiveCount === videoUserState.sources.length) {
+                innerText = '\u2370';
+                className = classNames.inactive;
+            } else if (videoUserState.isWatched === false) {
+                innerText = '\u274C';
+                className = classNames.active;
             } else {
-                element.innerText = `${inactiveCount} / ${videoUserState.items.length} `;
-                element.classList.add('yt-video-user-state-count');
-                element.classList.remove('yt-video-user-state-active', 'yt-video-user-state-inactive', 'yt-video-user-state-unkown');
+                innerText = `${inactiveCount} / ${videoUserState.items.length} `;
+                className = classNames.count;
             }
         }
 
-        const activeSourceIds = videoUserState?.items?.filter(vus => vus.isActive)?.map(vus => vus.sourceId);
-        if (activeSourceIds?.length === 1) {
+        element.innerText = innerText;
+        element.classList.remove(...Object.values(classNames));
+        element.classList.add(className);
+
+        if (videoUserState?.isWatched === false) {
             element.classList.add('yt-video-user-state-deletable');
-            element.title = 'Delete Video';
+            element.title = 'Set Video Watched';
             element.onclick = async () => {
                 try {
+                    const activeSourceIds = videoUserState?.sources?.filter(vus => vus.isActive)?.map(vus => vus.sourceId);
                     await api.deleteVideo(videoId, activeSourceIds);
                     await api.updateUserStateOfVideos([videoId], true);
                     await loop.run();
