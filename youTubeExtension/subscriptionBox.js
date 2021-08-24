@@ -579,6 +579,20 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     }, 100);
 
     window.handleData(ytInitialData);
+
+    function addDisableUi() {
+        const dot = document.querySelector('#dot');
+        if (dot) {
+            const disableStyle = `.${videoUserStateClassName} { display:none }`;
+            const disableStyleElement = document.createElement('style');
+            document.body.appendChild(disableStyleElement);
+
+            dot.onclick = () => {
+                disableStyleElement.innerHTML = disableStyleElement.innerHTML ? '' : disableStyle;
+            };
+        }
+    }
+    setTimeout(addDisableUi, 1000);
 }).toString();
 
 (function () {
