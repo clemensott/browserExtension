@@ -39,6 +39,15 @@
         },
         {
             "matches": [
+                "https://twitter.com/*",
+                "https://www.twitter.com/*"
+            ],
+            "js": [
+                "twitter_content.js"
+            ]
+        },
+        {
+            "matches": [
                 "http://*/*",
                 "https://*/*"
             ],
