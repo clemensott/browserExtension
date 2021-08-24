@@ -489,7 +489,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             innerText = '\u2370';
             className = classNames.unkown;
         } else {
-            const inactiveCount = videoUserState.sources.filter(vus => !vus.isActive).length;
+            const inactiveCount = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated).length;
             if (videoUserState.isWatched === true) {
                 innerText = '\u2705';
                 className = classNames.watched;
