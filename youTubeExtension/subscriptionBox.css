@@ -1,43 +1,101 @@
 .yt-video-user-state-container {
     font-size: 13px;
+    display: flex;
+}
+
+ytd-grid-video-renderer > .yt-video-user-state-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 114px;
+    height: 4px;
+}
+
+ytd-grid-video-renderer:hover > .yt-video-user-state-container {
+    top: 93px;
+}
+
+ytd-compact-video-renderer > .yt-video-user-state-container {
+    position: absolute;
+    left: 0;
+    top: calc(100% - 4px);
+    width: 168px;
+    height: 4px;
+}
+
+ytd-compact-video-renderer:hover > .yt-video-user-state-container {
+    top: calc(100% - 25px);
+}
+
+ytd-grid-video-renderer:hover > .yt-video-user-state-container,
+ytd-compact-video-renderer:hover > .yt-video-user-state-container {
+    height: initial;
+    padding-top: initial;
+}
+
+div#info-text > .yt-video-user-state-container {
+    width: 200px;
+}
+
+.yt-video-user-state-action-button {
+    flex-grow: 1;
+    text-align: center;
+    margin: 2px;
+    color: white;
+    border: 2px solid #BBBBBB;
+    cursor: pointer;
+}
+
+ytd-grid-video-renderer > .yt-video-user-state-container > .yt-video-user-state-action-button,
+ytd-compact-video-renderer > .yt-video-user-state-container > .yt-video-user-state-action-button {
+    display: none;
+}
+
+ytd-grid-video-renderer:hover > .yt-video-user-state-container > .yt-video-user-state-action-button,
+ytd-compact-video-renderer:hover > .yt-video-user-state-container > .yt-video-user-state-action-button {
+    display: initial;
+}
+
+.yt-video-user-state-action-button:hover {
+    flex-grow: 1;
+    text-align: center;
+    margin: 2px;
+    color: black;
+    background: white;
+}
+
+.yt-video-user-state-action-button-count {
+    cursor: default;
 }
 
 .yt-video-user-state-watch {
     margin-left: 5px;
+    width: 200px;
 }
 
 .yt-video-user-state-list-item {
     position: absolute;
     top: 0;
     left: 0;
-    padding: 1px 1px 2px 1px;
-    margin: 2px;
-    border-radius: 3px;
 }
 
 .yt-video-user-state-unkown {
     background: white;
-    cursor: default;
+    display: none;
 }
 
 .yt-video-user-state-watched {
-    background: white;
+    background: #009900;
 }
 
 .yt-video-user-state-active {
-    background: white;
+    background: #990000;
 }
 
 .yt-video-user-state-inactive {
-    background: orange;
-    cursor: default;
+    background: #CC7600;
 }
 
 .yt-video-user-state-count {
-    background: white;
-    cursor: default;
-}
-
-.yt-video-user-state-deletable {
-    cursor: pointer;
+    background: grey;
 }

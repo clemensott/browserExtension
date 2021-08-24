@@ -189,24 +189,36 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             }
         }
 
-        async deleteVideo(videoId, sourceIds) {
-            await this.call({
+        updateUserVideo(videoId, isWatched) {
+            return this.call({
                 url: `/api/videos/userState/${videoId}`,
                 method: 'PUT',
                 body: {
-                    isWatched: true,
+                    isWatched,
                 },
             });
+        }
 
-            if (sourceIds && sourceIds.length) {
-                await this.call({
-                    url: `/api/videos/${videoId}`,
-                    method: 'DELETE',
-                    body: {
-                        sourceIds,
-                    },
-                });
-            }
+        updateVideoSourcesState({ videoId, sourceIds, isActive, isActiveDeprecated }) {
+            return sourceIds && sourceIds.length ? this.call({
+                url: `/api/videos/sourcesState/${videoId}`,
+                method: 'PUT',
+                body: {
+                    sourceIds,
+                    isActive,
+                    isActiveDeprecated,
+                },
+            }) : Promise.resolve();
+        }
+
+        deactivateVideo(videoId, sourceIds) {
+            return sourceIds && sourceIds.length ? this.call({
+                url: `/api/videos/${videoId}`,
+                method: 'DELETE',
+                body: {
+                    sourceIds,
+                },
+            }) : Promise.resolve();
         }
     }
 
@@ -434,7 +446,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     }
 
     function getCurrentVideoUserStateContainer() {
-        return document.querySelector('#info-text');
+        return document.querySelector('ytd-video-primary-info-renderer #info');
     }
 
     function getVideoContainers() {
@@ -454,7 +466,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
         return getVideoIdFromUrl(a.href);
     }
 
-    function updateVideoUserStateUI(container, videoId, additionalClassName) {
+    function updateVideoUserStateUI(container, videoId, additionalClassName, insertReferenceNodeSelector = null) {
         if (!container) {
             return;
         }
@@ -465,7 +477,9 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             element = document.createElement('span');
             element.classList.add(videoUserStateClassName);
             element.classList.add(additionalClassName);
-            container.appendChild(element);
+            const refNode = insertReferenceNodeSelector && container.querySelector(insertReferenceNodeSelector);
+            if (insertReferenceNodeSelector) console.log('ref node:', insertReferenceNodeSelector, refNode);
+            container.insertBefore(element, refNode);
         }
 
         const timestamp = videoUserState?.timestamp || 0;
@@ -489,44 +503,132 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             innerText = '\u2370';
             className = classNames.unkown;
         } else {
-            const inactiveCount = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated).length;
-            if (videoUserState.isWatched === true) {
-                innerText = '\u2705';
+            function addButtonToElement({ innerText, title, className, onclick }) {
+                const button = document.createElement('div');
+                if (innerText) button.innerText = innerText;
+                if (title) button.title = title;
+                button.classList.add('yt-video-user-state-action-button');
+                if (className) button.classList.add(className);
+                button.onclick = onclick;
+                element.appendChild(button);
+            }
+
+            const wrapFunction = func => {
+                return async () => {
+                    try {
+                        await func();
+                        await api.updateUserStateOfVideos([videoId], true);
+                        await loop.run();
+                    } catch (e) {
+                        console.error('delete video error', e);
+                    }
+                };
+            }
+
+            const buttonOptions = {
+                setWatchedAndInactive: sourceIds => addButtonToElement({
+                    innerText: '\u2705',
+                    title: 'Set watched and inactive!',
+                    onclick: wrapFunction(() => {
+                        return Promise.all([
+                            api.updateUserVideo(videoId, true),
+                            api.deactivateVideo(videoId, sourceIds),
+                        ]);
+                    }),
+                }),
+                setWatched: () => addButtonToElement({
+                    innerText: '\u2713',
+                    title: 'Set watched!',
+                    onclick: wrapFunction(() => {
+                        return api.updateUserVideo(videoId, true);
+                    }),
+                }),
+                setNotWatched: () => addButtonToElement({
+                    innerText: '\u274C',
+                    title: 'Set not watched!',
+                    onclick: wrapFunction(() => {
+                        return api.updateUserVideo(videoId, false);
+                    }),
+                }),
+                setActive: sourceIds => addButtonToElement({
+                    innerText: '\u2716',
+                    title: 'Set active!',
+                    onclick: wrapFunction(() => {
+                        return api.updateVideoSourcesState({
+                            videoId,
+                            sourceIds,
+                            isActive: true,
+                        });
+                    }),
+                }),
+                setInactive: sourceIds => addButtonToElement({
+                    innerText: '\u2713',
+                    title: 'Set inactive!',
+                    onclick: wrapFunction(() => {
+                        return api.deactivateVideo(videoId, sourceIds);
+                    }),
+                }),
+                setDisableDeprecated: sourceIds => addButtonToElement({
+                    innerText: '\u2716',
+                    title: 'Remove deprecated inactive!',
+                    onclick: wrapFunction(() => {
+                        return api.updateVideoSourcesState({
+                            videoId,
+                            sourceIds,
+                            isActiveDeprecated: false,
+                        });
+                    }),
+                }),
+            };
+
+            const activeSources = videoUserState.sources.filter(vus => vus.isActive);
+            const isSingleActive = activeSources.length === 1;
+            const inactiveSources = videoUserState.sources.filter(vus => !vus.isActive);
+            const isSingleInactive = inactiveSources.length === 1;
+            const inactiveDeprecatedSources = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated);
+            const isSingleDeprecatedInactive = inactiveDeprecatedSources.length === 1;
+
+            element.innerHTML = '';
+            if (videoUserState.isWatched) {
+                buttonOptions.setNotWatched();
+                if (isSingleActive) buttonOptions.setInactive(activeSources.map(s => s.sourceId));
+                if (isSingleInactive) buttonOptions.setActive(inactiveSources.map(s => s.sourceId));
+
                 className = classNames.watched;
-            } else if (inactiveCount === videoUserState.sources.length) {
-                innerText = '\u2370';
+            } else if (isSingleDeprecatedInactive && videoUserState.sources.length === 1) {
+                buttonOptions.setWatched();
+                buttonOptions.setDisableDeprecated(inactiveDeprecatedSources.map(s => s.sourceId));
+
                 className = classNames.inactive;
-            } else if (videoUserState.isWatched === false) {
-                innerText = '\u274C';
+            } else if (videoUserState.sources.length === 1) {
+                buttonOptions.setWatchedAndInactive(videoUserState.sources.map(s => s.sourceId));
+                if (isSingleActive) buttonOptions.setInactive(activeSources.map(s => s.sourceId));
+                if (isSingleInactive) buttonOptions.setActive(inactiveSources.map(s => s.sourceId));
+
+                className = classNames.active;
+            } else if (activeSources.length === 1){
+                buttonOptions.setWatchedAndInactive();
+                buttonOptions.setInactive(activeSources.map(s => s.sourceId));
+                addButtonToElement({
+                    innerText: `${inactiveSources.length} / ${videoUserState.sources.length}`,
+                    className: 'yt-video-user-state-action-button-count',
+                });
+
                 className = classNames.active;
             } else {
-                innerText = `${inactiveCount} / ${videoUserState.items.length} `;
+                buttonOptions.setWatched();
+                addButtonToElement({
+                    innerText: `${inactiveSources.length} / ${videoUserState.sources.length}`,
+                    className: 'yt-video-user-state-action-button-count',
+                });
+
                 className = classNames.count;
             }
         }
 
-        element.innerText = innerText;
+        if (innerText) element.innerText = innerText;
         element.classList.remove(...Object.values(classNames));
         element.classList.add(className);
-
-        if (videoUserState?.isWatched === false) {
-            element.classList.add('yt-video-user-state-deletable');
-            element.title = 'Set Video Watched';
-            element.onclick = async () => {
-                try {
-                    const activeSourceIds = videoUserState?.sources?.filter(vus => vus.isActive)?.map(vus => vus.sourceId);
-                    await api.deleteVideo(videoId, activeSourceIds);
-                    await api.updateUserStateOfVideos([videoId], true);
-                    await loop.run();
-                } catch (e) {
-                    console.error('delete video error', e);
-                }
-            };
-        } else {
-            element.classList.remove('yt-video-user-state-deletable');
-            element.title = '';
-            element.onclick = null;
-        }
     }
 
     const loop = new Mutex(async function (forceUserStateUpdate = false) {
@@ -550,7 +652,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
                 }
 
                 if (currentVideoUserStateContainer && currentVideoId && updateVideoId(currentVideoId)) {
-                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, 'yt-video-user-state-watch');
+                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, 'yt-video-user-state-watch', '#flex');
                 }
 
                 videoContainers.forEach(container => {
