@@ -370,6 +370,14 @@ const subBoxJsCode = (async function mainSubBoxFun() {
     window.handleData = async function (data) {
         console.log('handleData');
         const fetchTime = new Date().toISOString();
+       
+        const watchVideo = tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
+        const watchVideoId = tryIgonore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
+        if (watchVideo && watchVideoId) {
+            const videos = [getWatchVideoData(watchVideo, watchVideoId)].filter(Boolean);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
         const recommendationVideos =
             tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
             tryIgonore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems);
@@ -392,13 +400,6 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             tryIgonore(() => data?.metadata?.channelMetadataRenderer?.externalId);
         if (channelVideos && channelTitle && channelId) {
             const videos = channelVideos.map(v => getChannelVideosData(v, channelTitle, channelId)).filter(Boolean)
-            await handleVideosUpdates(videos, fetchTime);
-        }
-
-        const watchVideo = tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
-        const watchVideoId = tryIgonore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
-        if (watchVideo && watchVideoId) {
-            const videos = [getWatchVideoData(watchVideo, watchVideoId)].filter(Boolean);
             await handleVideosUpdates(videos, fetchTime);
         }
 
