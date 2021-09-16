@@ -37,7 +37,7 @@
         container.style['text-align'] = 'right';
         container.appendChild(checkBoxContainer);
         container.appendChild(infoText);
-        document.querySelector('#title-container').insertBefore(container, document.querySelector('#spacer'));
+        document.querySelector('#title-container')?.insertBefore(container, document.querySelector('#spacer'));
     }
 
     function updateTimeoutUI() {
