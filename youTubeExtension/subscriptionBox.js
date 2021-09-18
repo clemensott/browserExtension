@@ -495,6 +495,7 @@ const subBoxJsCode = (async function mainSubBoxFun() {
             watched: 'yt-video-user-state-watched',
             active: 'yt-video-user-state-active',
             inactive: 'yt-video-user-state-inactive',
+            inactiveDepricated: 'yt-video-user-state-inactive-depricated',
             count: 'yt-video-user-state-count',
         }
         let className = '';
@@ -597,6 +598,11 @@ const subBoxJsCode = (async function mainSubBoxFun() {
 
                 className = classNames.watched;
             } else if (isSingleDeprecatedInactive && videoUserState.sources.length === 1) {
+                buttonOptions.setWatched();
+                buttonOptions.setDisableDeprecated(inactiveDeprecatedSources.map(s => s.sourceId));
+
+                className = classNames.inactiveDepricated;
+            } else if (isSingleInactive && videoUserState.sources.length === 1) {
                 buttonOptions.setWatched();
                 buttonOptions.setDisableDeprecated(inactiveDeprecatedSources.map(s => s.sourceId));
 

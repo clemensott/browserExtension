@@ -93,6 +93,10 @@ ytd-compact-video-renderer:hover > .yt-video-user-state-container > .yt-video-us
 }
 
 .yt-video-user-state-inactive {
+    background: purple;
+}
+
+.yt-video-user-state-inactive-depricated {
     background: #CC7600;
 }
 
