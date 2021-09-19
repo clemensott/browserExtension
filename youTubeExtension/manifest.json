@@ -14,8 +14,14 @@
                 "https://www.youtube.com/*"
             ],
             "js": [
-                "content.js",
-                "subscriptionBox.js"
+                "importIntoWebsite.js",
+                "utils.js",
+                "mutex.js",
+                "api.js",
+                "createAPI.js",
+                "updateSources.js",
+                "displayVideoState.js",
+                "content.js"
             ],
             "css":[
                 "content.css",
