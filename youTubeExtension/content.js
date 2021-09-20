@@ -34,18 +34,26 @@ function getMoviePlayerContainerElement() {
     return getCachedElement('moviePlayerElement', '#movie_player');
 }
 
-function toggleMute() {
+function toggleMuteButton() {
     const muteButton = getCachedElement('muteButton', '#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > span > button');
     if (muteButton) {
         muteButton.click();
     }
 }
 
+function isUiMuted() {
+    const volumeIndicator = getCachedElement('volumeIndicator', '#movie_player div.ytp-volume-slider-handle');
+    return volumeIndicator ? volumeIndicator.style.left === '0px' : null;
+}
+
 function setMuteState(mute, videoElement) {
-    if ((!videoElement.muted) !== (!mute)) {
-        toggleMute();
-        autoMuted = mute;
-        localStorage.setItem(autoMutedKey, autoMuted ? '1' : '');
+    const isMuted = isUiMuted();
+    if (typeof isMuted === 'boolean') {
+        if (isMuted && !mute) {
+            videoElement.muted = false;
+        } else if (!isMuted && mute) {
+            videoElement.muted = true;
+        }
     }
 }
 
@@ -68,7 +76,7 @@ function onIsAdChange(isAdPlayling, videoElement) {
     if (isAdPlayling) {
         videoElement.playbackRate = 8;
         setMuteState(true, videoElement);
-    } else if (autoMuted) {
+    } else {
         setMuteState(false, videoElement);
     }
 }
