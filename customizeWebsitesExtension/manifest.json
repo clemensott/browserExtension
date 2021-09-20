@@ -28,7 +28,7 @@
         },
         {
             "matches": [
-                "https://www.instagram.com/*/"
+                "https://www.instagram.com/*"
             ],
             "js": [
                 "instagram_content.js"
