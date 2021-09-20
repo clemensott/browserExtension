@@ -27,14 +27,51 @@ ytd-compact-video-renderer:hover > .yt-video-user-state-container {
     top: calc(100% - 25px);
 }
 
-ytd-grid-video-renderer:hover > .yt-video-user-state-container,
-ytd-compact-video-renderer:hover > .yt-video-user-state-container {
-    height: initial;
-    padding-top: initial;
+ytd-rich-item-renderer > .yt-video-user-state-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 4px;
+    margin-top: calc(56.25% - 4px);
 }
 
-div#info-text > .yt-video-user-state-container {
-    width: 200px;
+ytd-rich-item-renderer:hover > .yt-video-user-state-container {
+    margin-top: calc(56.25% - 25px);
+}
+
+ytd-video-renderer > .yt-video-user-state-container {
+    position: absolute;
+    left: 0;
+    top: calc(100% - 4px);
+    width: 360px;
+    max-width: 48.7%;
+    height: 4px;
+}
+
+ytd-video-renderer:hover > .yt-video-user-state-container {
+    top: calc(100% - 25px);
+}
+
+ytd-playlist-panel-video-renderer {
+    position: relative;
+}
+
+ytd-playlist-panel-video-renderer > .yt-video-user-state-container {
+    position: absolute;
+    left: 24px;
+    top: 56px;
+    width: 100px;
+    height: 4px;
+}
+
+ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
+    top: 35px;
+}
+
+*:hover > .yt-video-user-state-list-item {
+    height: initial;
+    padding-top: initial;
 }
 
 .yt-video-user-state-action-button {
@@ -46,13 +83,11 @@ div#info-text > .yt-video-user-state-container {
     cursor: pointer;
 }
 
-ytd-grid-video-renderer > .yt-video-user-state-container > .yt-video-user-state-action-button,
-ytd-compact-video-renderer > .yt-video-user-state-container > .yt-video-user-state-action-button {
+.yt-video-user-state-list-item > .yt-video-user-state-action-button {
     display: none;
 }
 
-ytd-grid-video-renderer:hover > .yt-video-user-state-container > .yt-video-user-state-action-button,
-ytd-compact-video-renderer:hover > .yt-video-user-state-container > .yt-video-user-state-action-button {
+*:hover > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
     display: initial;
 }
 
@@ -71,12 +106,6 @@ ytd-compact-video-renderer:hover > .yt-video-user-state-container > .yt-video-us
 .yt-video-user-state-watch {
     margin-left: 5px;
     width: 200px;
-}
-
-.yt-video-user-state-list-item {
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .yt-video-user-state-unkown {

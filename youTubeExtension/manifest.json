@@ -25,7 +25,7 @@
             ],
             "css":[
                 "content.css",
-                "subscriptionBox.css"
+                "displayVideoState.css"
             ]
         },
         {

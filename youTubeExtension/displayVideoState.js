@@ -11,13 +11,6 @@ importIntoWebsite(async function () {
         return document.querySelector('ytd-video-primary-info-renderer #info');
     }
 
-    function getVideoContainers() {
-        return [
-            ...document.querySelectorAll('#items > ytd-compact-video-renderer'),
-            ...document.querySelectorAll('#items > ytd-grid-video-renderer')
-        ];
-    }
-
     function getVideoIdFromUrl(url) {
         const { searchParams } = new URL(url);
         return searchParams.get('v');
@@ -25,11 +18,40 @@ importIntoWebsite(async function () {
 
     function getVideoIdFromVideoContainer(container) {
         const a = container.querySelector('a#thumbnail');
-        return getVideoIdFromUrl(a.href);
+        return a && getVideoIdFromUrl(a.href);
     }
 
-    function updateVideoUserStateUI(container, videoId, additionalClassName, insertReferenceNodeSelector = null) {
-        if (!container) {
+    function getVideoContainers() {
+        const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
+
+        const watchVideos = [{
+            container: currentVideoUserStateContainer,
+            getVideoId: () => getVideoIdFromUrl(window.location.href),
+            additionalClassName: 'yt-video-user-state-watch',
+            insertReferenceNodeSelector: '#flex',
+        }];
+
+        const listVideos = [
+            ...document.querySelectorAll('#items > ytd-compact-video-renderer'),
+            ...document.querySelectorAll('#items > ytd-grid-video-renderer'),
+            ...document.querySelectorAll('#contents > ytd-rich-item-renderer'),
+            ...document.querySelectorAll('#contents > ytd-video-renderer'),
+            ...document.querySelectorAll('#items > ytd-video-renderer'),
+            ...document.querySelectorAll('#items > ytd-playlist-panel-video-renderer'),
+        ].map(container => ({
+            container,
+            getVideoId: () => getVideoIdFromVideoContainer(container),
+            additionalClassName: 'yt-video-user-state-list-item',
+        }));
+
+        return [
+            ...watchVideos,
+            ...listVideos,
+        ];
+    }
+
+    function updateVideoUserStateUI({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
+        if (!container || !document.contains(container)) {
             return;
         }
 
@@ -198,34 +220,23 @@ importIntoWebsite(async function () {
         element.classList.add(className);
     }
 
-    const loop = new Mutex(async function (forceUserStateUpdate = false) {
+    let videoContainers = null;
+    const loop = new Mutex(async function (fast = false, forceUserStateUpdate = false) {
         try {
-            const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
-            const currentVideoId = getVideoIdFromUrl(window.location.href);
-            const videoContainers = getVideoContainers();
+            if (!fast || !videoContainers) {
+                videoContainers = getVideoContainers();
+            }
+            videoContainers.forEach(container => container.videoId = container.getVideoId());
             updateUI();
 
-            const videoIds = videoContainers.map(getVideoIdFromVideoContainer);
-            if (currentVideoId) {
-                videoIds.push(currentVideoId);
-            }
-
+            const videoIds = videoContainers.map(c => c.videoId).filter(Boolean);
             const updatedVideoIds = await api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
             updateUI(updatedVideoIds);
 
             function updateUI(videoIdsToUpdate) {
-                function updateVideoId(videoId) {
-                    return (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(videoId));
-                }
-
-                if (currentVideoUserStateContainer && currentVideoId && updateVideoId(currentVideoId)) {
-                    updateVideoUserStateUI(currentVideoUserStateContainer, currentVideoId, 'yt-video-user-state-watch', '#flex');
-                }
-
                 videoContainers.forEach(container => {
-                    const videoId = getVideoIdFromVideoContainer(container);
-                    if (updateVideoId(currentVideoId)) {
-                        updateVideoUserStateUI(container, videoId, 'yt-video-user-state-list-item');
+                    if (container.videoId && (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(container.videoId))) {
+                        updateVideoUserStateUI(container);
                     }
                 });
             }
@@ -234,10 +245,11 @@ importIntoWebsite(async function () {
         }
     });
 
+    setInterval(() => loop.run({ optional: true, params: [false] }), 200);
     setInterval(() => loop.run({ optional: true }), 5000);
 
     window.onfocus = async () => {
-        await loop.run({ params: [true] });
+        await loop.run({ params: [false, true] });
     };
 
     const initIntervalId = setInterval(() => {

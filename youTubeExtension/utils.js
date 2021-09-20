@@ -12,7 +12,7 @@ importIntoWebsite(function () {
         return map;
     }
 
-    function tryIgonore(func) {
+    function tryIgnore(func) {
         try {
             return func();
         } catch {
@@ -22,6 +22,6 @@ importIntoWebsite(function () {
 
     return {
         groupBy,
-        tryIgonore,
+        tryIgnore,
     };
 });

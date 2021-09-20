@@ -1,5 +1,5 @@
 importIntoWebsite(async function () {
-    const { createAPI, groupBy, tryIgonore } = window.subscriptionBox;
+    const { createAPI, groupBy, tryIgnore } = window.subscriptionBox;
     const api = await createAPI();
 
     if (!api) {
@@ -83,6 +83,20 @@ importIntoWebsite(async function () {
         }
     }
 
+    function getWatchPlaylistVideoData({ playlistPanelVideoRenderer: raw }) {
+        try {
+            return raw?.videoId && {
+                id: raw?.videoId,
+                title: raw?.title?.simpleText,
+                channelTitle: raw?.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelId: raw?.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+                duration: parseDuration(raw?.lengthText?.simpleText),
+            };
+        } catch {
+            return null;
+        }
+    }
+
     function getSubBoxVideoData({ gridVideoRenderer: raw }) {
         try {
             return raw?.videoId && {
@@ -92,6 +106,60 @@ importIntoWebsite(async function () {
                 channelId: raw.shortBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
                 duration: parseDuration(raw.thumbnailOverlays?.map(o => o?.thumbnailOverlayTimeStatusRenderer?.text.simpleText).find(Boolean)),
                 views: parseViews(raw.viewCountText?.simpleText),
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    function getSearchPrimaryExtendedVideo(raw) {
+        return tryIgnore(() => raw?.shelfRenderer?.content?.verticalListRenderer?.items) || raw;
+    }
+
+    function getSearchPrimaryVideoData({ videoRenderer: raw }) {
+        try {
+            return raw?.videoId && {
+                id: raw.videoId,
+                title: raw.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelTitle: raw.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelId: raw.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+                duration: parseDuration(raw?.lengthText?.simpleText),
+                views: parseViews(raw.viewCountText?.simpleText),
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    function getSearchSecondaryVideoData({ watchCardCompactVideoRenderer: raw }) {
+        try {
+            const videoId = raw?.navigationEndpoint?.watchEndpoint?.videoId;
+            return videoId && {
+                id: videoId,
+                title: raw.title?.simpleText,
+                channelTitle: raw.byline?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelId: raw.byline?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+                duration: parseDuration(raw?.lengthText?.simpleText),
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    function getHomeExtendedVideo(raw) {
+        return tryIgnore(() => raw?.richSectionRenderer?.content?.richShelfRenderer?.contents) || raw;
+    }
+
+    function getHomeVideoData({ richItemRenderer: raw }) {
+        try {
+            const video = raw?.content?.videoRenderer;
+            return video?.videoId && {
+                id: video?.videoId,
+                title: video.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelTitle: video?.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelId: video?.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+                duration: parseDuration(video?.lengthText?.simpleText),
+                views: parseViews(video.viewCountText?.simpleText),
             };
         } catch {
             return null;
@@ -112,51 +180,96 @@ importIntoWebsite(async function () {
     window.handleData = async function (data) {
         console.log('handleData');
         const fetchTime = new Date().toISOString();
+        window.lastHandleData = data;
 
-        const watchVideo = tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
-        const watchVideoId = tryIgonore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
+        const watchVideo = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
+        const watchVideoId = tryIgnore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
         if (watchVideo && watchVideoId) {
             const videos = [getWatchVideoData(watchVideo, watchVideoId)].filter(Boolean);
+            console.log('handle watch video:', videos.length);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
+        const watchPlaylistVideos = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.playlist?.playlist?.contents);
+        if (watchPlaylistVideos) {
+            const videos = watchPlaylistVideos.map(getWatchPlaylistVideoData).filter(Boolean);
+            console.log('handle watch playlist videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
         }
 
         const recommendationVideos =
-            tryIgonore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
-            tryIgonore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems);
+            tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
+            tryIgnore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems);
         if (recommendationVideos) {
             const videos = recommendationVideos.map(getRecommendationVideosData).filter(Boolean);
+            console.log('handle recommendation videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
         }
 
         const channelVideos =
-            tryIgonore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
+            tryIgnore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
                 map(t => t.tabRenderer).filter(Boolean).find(r => r.title === 'Videos')?.content?.sectionListRenderer?.contents?.
                 map(c1 => c1.itemSectionRenderer?.contents?.map(c2 => c2?.gridRenderer?.items).find(Boolean)).find(Boolean)) ||
-            tryIgonore(() => data?.onResponseReceivedActions?.
+            tryIgnore(() => data?.onResponseReceivedActions?.
                 map(a => a?.appendContinuationItemsAction?.continuationItems).find(Boolean));
         const channelTitle =
-            tryIgonore(() => data?.header?.c4TabbedHeaderRenderer?.title) ||
-            tryIgonore(() => data?.metadata?.channelMetadataRenderer?.title);
+            tryIgnore(() => data?.header?.c4TabbedHeaderRenderer?.title) ||
+            tryIgnore(() => data?.metadata?.channelMetadataRenderer?.title);
         const channelId =
-            tryIgonore(() => data?.header?.c4TabbedHeaderRenderer?.channelId) ||
-            tryIgonore(() => data?.metadata?.channelMetadataRenderer?.externalId);
+            tryIgnore(() => data?.header?.c4TabbedHeaderRenderer?.channelId) ||
+            tryIgnore(() => data?.metadata?.channelMetadataRenderer?.externalId);
         if (channelVideos && channelTitle && channelId) {
-            const videos = channelVideos.map(v => getChannelVideosData(v, channelTitle, channelId)).filter(Boolean)
+            const videos = channelVideos.map(v => getChannelVideosData(v, channelTitle, channelId)).filter(Boolean);
+            console.log('handle channel videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
         }
 
         const subBoxSections =
-            tryIgonore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
+            tryIgnore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
                 map(t => t.tabRenderer).find(t => t?.tabIdentifier === 'FEsubscriptions')?.
                 content?.sectionListRenderer?.contents?.filter(Boolean)) ||
-            tryIgonore(() => data?.onResponseReceivedActions?.
+            tryIgnore(() => data?.onResponseReceivedActions?.
                 map(a => a?.appendContinuationItemsAction?.continuationItems).filter(Boolean).flat());
-
         if (subBoxSections) {
             const subBoxVideos = subBoxSections
                 .map(s => s?.itemSectionRenderer?.contents.map(c => c?.shelfRenderer.content.gridRenderer.items).filter(Boolean).flat())
                 .filter(Boolean).flat();
             const videos = subBoxVideos.map(getSubBoxVideoData).filter(Boolean);
+            console.log('handle sub box videos:', videos.length);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
+        const searchPrimaryVideos =
+            tryIgnore(() => data?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.
+                contents?.map(c => c?.itemSectionRenderer?.contents).flat().filter(Boolean)) ||
+            tryIgnore(() => data?.onResponseReceivedCommands?.map(r => r?.appendContinuationItemsAction?.continuationItems?.
+                map(i => i?.itemSectionRenderer?.contents).flat()).flat().filter(Boolean));
+        if (searchPrimaryVideos) {
+            const videos = searchPrimaryVideos.map(getSearchPrimaryExtendedVideo).flat()
+                .map(getSearchPrimaryVideoData).filter(Boolean);
+            console.log('handle primary search videos:', videos.length);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
+        const searchSecondaryVideos = tryIgnore(() => data?.contents?.twoColumnSearchResultsRenderer?.
+            secondaryContents?.secondarySearchContainerRenderer?.contents?.map(c => c?.universalWatchCardRenderer?.sections?.
+                map(s => s?.watchCardSectionSequenceRenderer?.lists?.
+                    map(l => l?.verticalWatchCardListRenderer?.items).filter(Boolean).flat()).
+                filter(Boolean).flat()).filter(Boolean).flat());
+        if (searchSecondaryVideos) {
+            const videos = searchSecondaryVideos.map(getSearchSecondaryVideoData).filter(Boolean);
+            console.log('handle secondary search videos:', videos.length);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
+        const homeVideos =
+            tryIgnore(() => data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.
+                map(t => t?.tabRenderer.content.richGridRenderer.contents).flat().filter(Boolean)) ||
+            tryIgnore(() => data?.onResponseReceivedActions?.
+                map(r => r?.appendContinuationItemsAction?.continuationItems).flat().filter(Boolean));
+        if (homeVideos) {
+            const videos = homeVideos.map(getHomeExtendedVideo).flat().map(getHomeVideoData).filter(Boolean);
+            console.log('handle home videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
         }
     }
@@ -167,13 +280,14 @@ importIntoWebsite(async function () {
         if (response.ok && [
             'https://www.youtube.com/youtubei/v1/next',
             'https://www.youtube.com/youtubei/v1/browse',
-            'https://www.youtube.com/youtubei/v1/player'
+            'https://www.youtube.com/youtubei/v1/player',
+            'https://www.youtube.com/youtubei/v1/search',
         ].some(url => response.url.startsWith(url))) {
             const textPromise = response.text();
             response.text = () => textPromise;
             try {
                 const text = await textPromise;
-                window.handleData(JSON.parse(text));
+                await window.handleData(JSON.parse(text));
             } catch (e) {
                 console.error(e)
             }
@@ -188,5 +302,9 @@ importIntoWebsite(async function () {
         return promise;
     }
 
-    window.handleData(ytInitialData);
+    try {
+        await window.handleData(ytInitialData);
+    } catch (e) {
+        console.error(e)
+    }
 });
