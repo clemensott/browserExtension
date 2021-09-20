@@ -74,6 +74,7 @@ importIntoWebsite(async function () {
 
         const classNames = {
             unkown: 'yt-video-user-state-unkown',
+            missing: 'yt-video-user-state-missing',
             watched: 'yt-video-user-state-watched',
             active: 'yt-video-user-state-active',
             inactive: 'yt-video-user-state-inactive',
@@ -83,9 +84,13 @@ importIntoWebsite(async function () {
         let className = '';
         let innerText = '';
 
-        if (!videoUserState?.sources?.length) {
+        if (!videoUserState) {
             innerText = '\u2370';
             className = classNames.unkown;
+        } else if (!videoUserState?.sources?.length) {
+            element.innerHTML = '<div class="yt-video-user-state-action-button" />';
+
+            className = classNames.missing;
         } else {
             function addButtonToElement({ innerText, title, className, onclick }) {
                 const button = document.createElement('div');

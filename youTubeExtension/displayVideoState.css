@@ -113,6 +113,18 @@ ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
     display: none;
 }
 
+.yt-video-user-state-missing {
+    background: repeating-linear-gradient(-45deg, white 0 10px, black 10px 20px);
+}
+
+.yt-video-user-state-missing > .yt-video-user-state-action-button {
+    height: 25px;
+    margin: 0px!important;
+    border: initial!important;
+    cursor: default!important;
+    background: transparent!important;
+}
+
 .yt-video-user-state-watched {
     background: #009900;
 }
