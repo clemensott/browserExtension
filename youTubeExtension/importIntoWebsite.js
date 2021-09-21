@@ -1,12 +1,10 @@
 (function () {
     function importFunctionIntoWebsiteInternal({ functionString, mainPropertyName, propteryName }) {
-        const result = eval(`(${functionString})()`);
-
-        if (result instanceof Promise) {
-            result.then(assignResult);
-        } else {
-            assignResult(result);
+        async function getResult() {
+            return await eval(`(${functionString})()`);
         }
+
+        getResult().then(assignResult).catch(e => console.error(e));
 
         function assignResult(res) {
             const assign = typeof propteryName === 'string' ? {
