@@ -32,17 +32,19 @@ importIntoWebsite(async function () {
         }];
 
         const listVideos = [
-            ...document.querySelectorAll('#items > ytd-compact-video-renderer'),
-            ...document.querySelectorAll('#items > ytd-grid-video-renderer'),
-            ...document.querySelectorAll('#contents > ytd-rich-item-renderer'),
-            ...document.querySelectorAll('#contents > ytd-video-renderer'),
-            ...document.querySelectorAll('#items > ytd-video-renderer'),
-            ...document.querySelectorAll('#items > ytd-playlist-panel-video-renderer'),
-        ].map(container => ({
-            container,
-            getVideoId: () => getVideoIdFromVideoContainer(container),
-            additionalClassName: 'yt-video-user-state-list-item',
-        }));
+            '#items > ytd-compact-video-renderer',
+            '#items > ytd-grid-video-renderer',
+            '#contents > ytd-rich-item-renderer',
+            '#contents > ytd-video-renderer',
+            '#items > ytd-video-renderer',
+            '#items > ytd-playlist-panel-video-renderer',
+        ]
+            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+            .map(container => ({
+                container,
+                getVideoId: () => getVideoIdFromVideoContainer(container),
+                additionalClassName: 'yt-video-user-state-list-item',
+            }));
 
         return [
             ...watchVideos,
