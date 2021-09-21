@@ -1,5 +1,5 @@
 importIntoWebsite(async function () {
-    const { Mutex, createAPI } = window.subscriptionBox;
+    const { Mutex, createAPI, addToggleDisplayVideoState } = window.subscriptionBox;
     const videoUserStateClassName = 'yt-video-user-state-container';
     const api = await createAPI();
 
@@ -264,19 +264,7 @@ importIntoWebsite(async function () {
         }
     }, 100);
 
-    function addDisableUi() {
-        const dot = document.querySelector('#dot');
-        if (dot) {
-            const disableStyle = `.${videoUserStateClassName} { display:none }`;
-            const disableStyleElement = document.createElement('style');
-            document.body.appendChild(disableStyleElement);
-
-            dot.onclick = () => {
-                disableStyleElement.innerHTML = disableStyleElement.innerHTML ? '' : disableStyle;
-            };
-        }
-    }
-    setTimeout(addDisableUi, 1000);
+    addToggleDisplayVideoState(document.getElementById('voice-search-button'), videoUserStateClassName);
 
     return {
         updateVideosState: function () {

@@ -19,12 +19,15 @@
                 "mutex.js",
                 "api.js",
                 "createAPI.js",
+                "fakeMicButton.js",
+                "addToggleDisplayVideoState.js",
                 "updateSources.js",
                 "displayVideoState.js",
                 "content.js"
             ],
             "css":[
                 "content.css",
+                "fakeMicButton.css",
                 "displayVideoState.css"
             ]
         },
