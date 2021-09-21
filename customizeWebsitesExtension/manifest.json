@@ -48,6 +48,14 @@
         },
         {
             "matches": [
+                "https://www.reddit.com/*"
+            ],
+            "js": [
+                "reddit_content.js"
+            ]
+        },
+        {
+            "matches": [
                 "http://*/*",
                 "https://*/*"
             ],
