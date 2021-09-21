@@ -106,8 +106,7 @@ importIntoWebsite(function () {
 
                 missingChannelIds = channelIds.filter(id => !this.sources.has(id));
                 if (missingChannelIds.length) {
-                    await missingChannelIds.reduce(async (promise, channelId) => {
-                        await promise;
+                    const newSources = await Promise.all(missingChannelIds.map(async channelId => {
                         const response = await this.call({
                             url: '/api/sources/add',
                             body: {
@@ -117,12 +116,12 @@ importIntoWebsite(function () {
                         });
 
                         if (response.ok) {
-                            const source = JSON.parse(await response.text());
-                            if (source?.youTubeId) {
-                                this.sources.set(source.youTubeId, source);
-                            }
+                            return JSON.parse(await response.text());
                         }
-                    }, Promise.resolve());
+                        return null;
+                    }));
+                    
+                    newSources.filter(Boolean).forEach(source => this.sources.set(source.youTubeId, source));
                 }
             } catch (e) {
                 console.error('createChannel error', e);
