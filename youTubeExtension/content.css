@@ -10,22 +10,12 @@ div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
     opacity: 0;
 }
 
-#companion > ytd-action-companion-ad-renderer {
-    display: none!important;
-}
-
-#movie_player > div.ytp-cued-thumbnail-overlay {
-    display: none!important;
-}
-
-#movie_player > div.ytp-chrome-top {
-    display: none!important;
-}
-
-#player-ads {
-    display: none!important;
-}
-
-ytd-promoted-sparkles-web-renderer {
+#companion > ytd-action-companion-ad-renderer,
+#movie_player > div.ytp-cued-thumbnail-overlay,
+#movie_player > div.ytp-chrome-top,
+#player-ads,
+ytd-promoted-sparkles-web-renderer,
+body > ytd-app > ytd-popup-container > tp-yt-paper-dialog.style-scope.ytd-popup-container,
+#masthead-ad {
     display: none!important;
 }
