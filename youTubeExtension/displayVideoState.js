@@ -266,7 +266,13 @@ importIntoWebsite(async function () {
         }
     }, 100);
 
-    addToggleDisplayVideoState(document.getElementById('voice-search-button'), videoUserStateClassName);
+    const setupToggleDisplayVideoStateIntervalId = setInterval(() => {
+        const element = document.getElementById('voice-search-button');
+        if (element) {
+            addToggleDisplayVideoState(element, videoUserStateClassName);
+            clearInterval(setupToggleDisplayVideoStateIntervalId);
+        }
+    }, 100);
 
     return {
         updateVideosState: function () {
