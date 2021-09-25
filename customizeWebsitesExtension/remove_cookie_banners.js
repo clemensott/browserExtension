@@ -61,6 +61,10 @@ const actionConfigs = [
         getRemoveClasses('body', 'cookiebanner-modal-open'),
     ],
     [
+        getHide('#easycmp'),
+        getRemoveClasses('body', 'sws-cmp-visible'),
+    ],
+    [
         getRemove('div[id*=sp_message_container_]'),
         getRemoveClasses('html', 'sp-message-open'),
     ],

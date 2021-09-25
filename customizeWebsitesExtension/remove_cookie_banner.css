@@ -49,3 +49,11 @@ amp-consent#ampforwpConsent {
 cmp-banner {
     display: none!important;
 }
+
+#easycmp {
+    display: none!important;
+}
+
+#cmpbox {
+    display: none!important;
+}
