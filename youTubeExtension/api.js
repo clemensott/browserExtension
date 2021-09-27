@@ -120,7 +120,7 @@ importIntoWebsite(function () {
                         }
                         return null;
                     }));
-                    
+
                     newSources.filter(Boolean).forEach(source => this.sources.set(source.youTubeId, source));
                 }
             } catch (e) {
@@ -164,6 +164,20 @@ importIntoWebsite(function () {
                 }
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        async updateThumbnails(videoIds) {
+            try {
+                return await this.call({
+                    url: '/api/videos/updateThumbnails',
+                    body: {
+                        videoIds,
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+                return null;
             }
         }
 

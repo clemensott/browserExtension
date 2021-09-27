@@ -173,6 +173,7 @@ importIntoWebsite(async function () {
 
         await api.createChannels(Array.from(channels.keys()));
         await api.updateChannels(channels, fetchTime);
+        await api.updateThumbnails(videos.map(v => v.id));
         await api.updateUserStateOfVideos(videos.map(video => video.id), true);
         await triggerUpdateVideosState();
     }
