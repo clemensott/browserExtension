@@ -1,13 +1,17 @@
 importIntoWebsite(function () {
-    const { Mutex, API } = window.subscriptionBox;
-    let api = null;
+    const { Mutex, API, ApiHandler } = window.subscriptionBox;
+    let apiHandler = null;
 
     const createApiMutex = new Mutex(async function () {
-        if (!api) {
-            const tmp = new API(
+        if (!apiHandler) {
+            const api = new API(
                 localStorage.getItem('subscriptionBoxUsername'),
                 localStorage.getItem('subscriptionBoxPassword'),
                 localStorage.getItem('subscriptionBoxBaseUrl'),
+            );
+
+            const tmp = new ApiHandler(
+                api,
                 Number(localStorage.getItem('subscriptionBoxVideoUserStateUpdateInterval')),
             );
 
@@ -18,10 +22,10 @@ importIntoWebsite(function () {
                     'localStorage.setItem("subscriptionBoxBaseUrl", "");');
                 return null;
             }
-            api = tmp;
+            apiHandler = tmp;
         }
 
-        return api;
+        return apiHandler;
     });
 
     return {
