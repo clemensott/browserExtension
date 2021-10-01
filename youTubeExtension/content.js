@@ -1,48 +1,65 @@
 const autoMutedKey = 'yt-extension-auto-muted';
 let autoMuted = !!localStorage.getItem(autoMutedKey);
 let wasAdPlayling = false;
-const cachedElements = {};
+const cachedElements = {
+    videoElement: {
+        selector: '#movie_player > div.html5-video-container > video',
+    },
+    moviePlayerElement: {
+        selector: '#movie_player',
+    },
+    muteButton: {
+        selector: '#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > span > button',
+    },
+    volumeIndicator: {
+        selector: '#movie_player div.ytp-volume-slider-handle',
+    },
+    adContainer: {
+        selector: '#movie_player > div.video-ads.ytp-ad-module',
+    },
+    nextVideoButton: {
+        selector: '#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > a.ytp-next-button.ytp-button',
+    },
+    endVideoButton: {
+        selector: 'a.yt-extension-end-video',
+    },
+    volumeButton: {
+        selector: '#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > span',
+    },
+};
+const endingVideoButtonClassName = 'yt-extension-ending-video';
+const enableEndVideoButton = localStorage.getItem('yt-extension-end-video') == true;
 
-console.log('init youtube helper. autoMuted:', autoMuted);
+console.log('init youtube helper. autoMuted:', autoMuted, enableEndVideoButton);
 
-function getCachedElement(elementKey, path, callback) {
-    let element = cachedElements[elementKey];
-    if (!element || !document.body.contains(element)) {
-        element = document.querySelector(path);
-        if (element) {
-            console.log('search element to cache:', elementKey, !!cachedElements[elementKey]);
-        }
-        cachedElements[elementKey] = element;
+function getCachedElement(cacheContainer, callback) {
+    if (!cacheContainer.element || !document.body.contains(element)) {
+        element = document.querySelector(cacheContainer.selector);
+        cacheContainer.element = element;
         callback && callback(element);
     }
-    return cachedElements[elementKey];
+    return cacheContainer.element;
 }
 
 function getVideoElement() {
-    return getCachedElement(
-        'videoElement',
-        '#movie_player > div.html5-video-container > video',
+    return getCachedElement(cachedElements.videoElement,
         videoPlayer => {
             if (videoPlayer) {
-                videoPlayer.ondurationchange = () => checkIsAdChanged(videoPlayer);
+                videoPlayer.addEventListener('durationchange', () => checkIsAdChanged(videoPlayer));
                 checkIsAdChanged(videoPlayer);
             }
         });
 }
 
-function getMoviePlayerContainerElement() {
-    return getCachedElement('moviePlayerElement', '#movie_player');
-}
-
 function toggleMuteButton() {
-    const muteButton = getCachedElement('muteButton', '#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > span > button');
+    const muteButton = getCachedElement(cachedElements.muteButton);
     if (muteButton) {
         muteButton.click();
     }
 }
 
 function isUiMuted() {
-    const volumeIndicator = getCachedElement('volumeIndicator', '#movie_player div.ytp-volume-slider-handle');
+    const volumeIndicator = getCachedElement(cachedElements.volumeIndicator);
     return volumeIndicator ? volumeIndicator.style.left === '0px' : null;
 }
 
@@ -57,12 +74,8 @@ function setMuteState(mute, videoElement) {
     }
 }
 
-function getAdvertisingContainer() {
-    return getCachedElement('adContainer', '#movie_player > div.video-ads.ytp-ad-module');
-}
-
 function isAdvertisingPlayling() {
-    const moviePlayerElement = getMoviePlayerContainerElement();
+    const moviePlayerElement = getCachedElement(cachedElements.moviePlayerElement);
     return moviePlayerElement && moviePlayerElement.classList.contains('ad-interrupting');
 }
 
@@ -82,11 +95,84 @@ function onIsAdChange(isAdPlayling, videoElement) {
 }
 
 function skipAdvertisement() {
-    const container = getAdvertisingContainer();
+    const container = getCachedElement(cachedElements.adContainer);
     if (container) {
         const skipButton = container.querySelector('button.ytp-ad-skip-button.ytp-button');
         if (skipButton) {
             skipButton.click();
+        }
+    }
+}
+
+function getCurrentVideoId() {
+    return new URLSearchParams(window.location.search).get('v');
+}
+
+function createEndVideoButton() {
+    const button = document.createElement('a');
+    button.classList.add('yt-extension-end-video');
+    button.title = 'Fast forward to end of video';
+    button.innerHTML = `
+        <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%">
+            <path class="ytp-svg-fill" d="M 12,24 20.5,18 12,12 V 24 z M 22,12 v 12 h 2 V 12 h -2 z"></path>
+        </svg>`;
+    return button;
+}
+
+function handleEndVideo({ target }) {
+    const videoElement = getVideoElement();
+    if (videoElement.currentTime >= videoElement.duration) {
+        return;
+    }
+
+    const newPlaybackRate = 8;
+    const oldPlaybackRate = videoElement.playbackRate;
+    const currentVideoId = getCurrentVideoId();
+
+    function removeHandlers() {
+        videoElement.removeEventListener('ended', onEnded);
+        clearInterval(checkVideoChangedIntervalId);
+        target.classList.remove(endingVideoButtonClassName);
+    }
+
+    function checkVideoChanged() {
+        if (currentVideoId !== getCurrentVideoId()) {
+            removeHandlers();
+        }
+    }
+
+    function onEnded() {
+        if (!isAdvertisingPlayling()) {
+            if (videoElement.playbackRate === newPlaybackRate) {
+                videoElement.playbackRate = oldPlaybackRate;
+                videoElement.muted = false;
+            }
+            removeHandlers();
+        }
+    }
+
+    const checkVideoChangedIntervalId = setInterval(checkVideoChanged, 100);
+    videoElement.addEventListener('ended', onEnded);
+
+    videoElement.playbackRate = newPlaybackRate;
+    videoElement.muted = true;
+    videoElement.play();
+    target.classList.add(endingVideoButtonClassName);
+}
+
+function addEndVideoHandling() {
+    const nextButton = getCachedElement(cachedElements.nextVideoButton);
+    if (nextButton) {
+        nextButton.classList.add('yt-extension-next-video');
+    }
+
+    let endButton = getCachedElement(cachedElements.endVideoButton);
+    if (!endButton) {
+        const volumeButton = getCachedElement(cachedElements.volumeButton);
+        if (volumeButton) {
+            endButton = createEndVideoButton();
+            endButton.addEventListener('click', handleEndVideo);
+            volumeButton.parentElement.insertBefore(endButton, volumeButton);
         }
     }
 }
@@ -98,6 +184,10 @@ function loop() {
         if (videoElement.currentTime > 32) {
             skipAdvertisement();
         }
+    }
+
+    if (enableEndVideoButton) {
+        addEndVideoHandling();
     }
 }
 

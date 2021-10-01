@@ -15,7 +15,15 @@ div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
 #movie_player > div.ytp-chrome-top,
 #player-ads,
 ytd-promoted-sparkles-web-renderer,
-body > ytd-app > ytd-popup-container > tp-yt-paper-dialog.style-scope.ytd-popup-container,
-#masthead-ad {
+#masthead-ad,
+a.yt-extension-next-video {
     display: none!important;
+}
+
+a.yt-extension-end-video {
+    cursor: pointer;
+}
+
+a.yt-extension-end-video.yt-extension-ending-video {
+    display: none;
 }
