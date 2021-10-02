@@ -73,6 +73,10 @@ const actionConfigs = [
         clearOverflow('html'),
         clearOverflow('body'),
     ],
+    [
+        getHide('div.popup.popup__cookie'),
+        getRemoveClasses('body', 'hasPopup'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {

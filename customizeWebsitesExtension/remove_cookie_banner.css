@@ -57,3 +57,7 @@ cmp-banner {
 #cmpbox {
     display: none!important;
 }
+
+div.popup.popup__cookie {
+    display: none!important;
+}
