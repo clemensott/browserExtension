@@ -167,15 +167,17 @@ importIntoWebsite(async function () {
     }
 
     async function handleVideosUpdates(videos, fetchTime) {
-        console.log('handleVideosUpdates1:', videos, fetchTime);
-        await triggerUpdateVideosState();
-        const channels = groupBy(videos, video => video.channelId);
+        if (videos && videos.length) {
+            console.log('handleVideosUpdates1:', videos, fetchTime);
+            await triggerUpdateVideosState();
+            const channels = groupBy(videos, video => video.channelId);
 
-        await api.createChannels(Array.from(channels.keys()));
-        await api.updateChannels(channels, fetchTime);
-        await api.updateThumbnails(videos.map(v => v.id));
-        await api.updateUserStateOfVideos(videos.map(video => video.id), true);
-        await triggerUpdateVideosState();
+            await api.createChannels(Array.from(channels.keys()));
+            await api.updateChannels(channels, fetchTime);
+            await api.updateThumbnails(videos.map(v => v.id));
+            await api.updateUserStateOfVideos(videos.map(video => video.id), true);
+            await triggerUpdateVideosState();
+        }
     }
 
     window.handleData = async function (data) {
