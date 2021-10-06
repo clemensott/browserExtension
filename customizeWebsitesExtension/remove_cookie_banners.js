@@ -81,6 +81,10 @@ const actionConfigs = [
         getHide('#tzi-paywahl-bg'),
         getHide('#tzi-paywahl-fg'),
     ],
+    [
+        getHide('#cookieconsent.first'),
+        getHide('#cookie-bg'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
