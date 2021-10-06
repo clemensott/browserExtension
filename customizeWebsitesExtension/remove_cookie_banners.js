@@ -77,6 +77,10 @@ const actionConfigs = [
         getHide('div.popup.popup__cookie'),
         getRemoveClasses('body', 'hasPopup'),
     ],
+    [
+        getHide('#tzi-paywahl-bg'),
+        getHide('#tzi-paywahl-fg'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
