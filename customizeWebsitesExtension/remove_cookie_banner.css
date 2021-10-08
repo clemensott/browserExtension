@@ -61,3 +61,7 @@ cmp-banner {
 div.popup.popup__cookie {
     display: none!important;
 }
+
+#cookie-consent {
+    display: none!important;
+}
