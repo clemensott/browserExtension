@@ -20,7 +20,6 @@ chrome.runtime.onMessage.addListener((msg) => {
                 const frames = document.querySelectorAll('iframe');
                 let element = [...frames].find(f => f.src === lastSrc);
                 const path = [];
-                console.log('element_infos:', element, lastSrc, window.location.href);
 
                 while (element) {
                     path.push(element);
@@ -81,6 +80,7 @@ function sendElementInfos(current, newElements, win) {
         },
         localElements: localElementsMap,
     };
+    console.log('send:',chrome.runtime, chrome)
     chrome.runtime.sendMessage({
         type: lastEvent.type,
         data: lastEvent.data,
