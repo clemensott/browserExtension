@@ -99,7 +99,7 @@ importIntoWebsite(function () {
         }
 
         putVideoSourceState(videoId, sourceIds, isActive, isActiveDeprecated) {
-            return this.toJSON(this.call({
+            return this.expectOk(this.call({
                 url: `/api/videos/sourcesState/${videoId}`,
                 method: 'PUT',
                 body: {
@@ -111,7 +111,7 @@ importIntoWebsite(function () {
         }
 
         deleteVideo(videoId, sourceIds) {
-            return this.toJSON(this.call({
+            return this.expectOk(this.call({
                 url: `/api/videos/${videoId}`,
                 method: 'DELETE',
                 body: {
