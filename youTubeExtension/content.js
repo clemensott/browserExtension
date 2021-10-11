@@ -66,10 +66,8 @@ function isUiMuted() {
 function setMuteState(mute, videoElement) {
     const isMuted = isUiMuted();
     if (typeof isMuted === 'boolean') {
-        if (isMuted && !mute) {
-            videoElement.muted = false;
-        } else if (!isMuted && mute) {
-            videoElement.muted = true;
+        if (isMuted === !!mute) {
+            videoElement.muted = mute;
         }
     }
 }
