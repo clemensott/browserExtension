@@ -1,19 +1,68 @@
+console.log('twitter content script');
+
 function equalsLink(href, path) {
     return href === (window.location.origin + path);
 }
 
-function loop() {
-    document.querySelectorAll('div[role=dialog]').forEach(e => {
-        const hasLoginButton = Array.from(e.querySelectorAll('a')).some(a => equalsLink(a.href, '/login'));
-        const hasSignUpButton = Array.from(e.querySelectorAll('a')).some(a => equalsLink(a.href, '/i/flow/signup'));
+function hasLoginButtons(element) {
+    const links = Array.from(element.querySelectorAll('a'));
+    return links.some(a => equalsLink(a.href, '/login')) &&
+        links.some(a => equalsLink(a.href, '/i/flow/signup'));
+}
 
-        if (hasLoginButton && hasSignUpButton) {
-            console.log('twitter remove login banner')
-            e.remove();
-            document.querySelector('html').style.overflow = 'initial';
+function createCssSelector(element) {
+    const classes = Array.from(element.classList).map(c => `.${c}`).join('');
+    return element.tagName + classes;
+}
+
+function createHideElementStyle(element) {
+    return `
+        ${createCssSelector(element)} {
+            display: none!important;
+        }`;
+}
+
+const dynamicStyles = {
+    loginBanner: {
+        storageKey: 'custom_extension_twitter_login_banner_style_cache',
+        selector: 'div[role=dialog]',
+        isMatchingElement: hasLoginButtons,
+        createStyle: cookieBanner => `
+            ${createHideElementStyle(cookieBanner)}
+    
+            html {
+                overflow: initial!important; 
+            }
+        `,
+        styleElement: null,
+        intervalId: null,
+    },
+    loginFooter: {
+        storageKey: 'custom_extension_twitter_login_footer_style_cache',
+        selector: '#layers > div',
+        isMatchingElement: hasLoginButtons,
+        createStyle: createHideElementStyle,
+        styleElement: null,
+        intervalId: null,
+    },
+};
+
+function updateDynamicStyle(dynamicStyle) {
+    document.querySelectorAll(dynamicStyle.selector).forEach(e => {
+        if (dynamicStyle.isMatchingElement(e)) {
+            const styleHTML = dynamicStyle.createStyle(e);
+            dynamicStyle.styleElement.innerHTML = styleHTML;
+
+            localStorage.setItem(dynamicStyle.storageKey, styleHTML);
+            clearInterval(dynamicStyle.intervalId);
         }
     });
 }
 
-console.log('twitter content script')
-setInterval(loop, 1000);
+Object.values(dynamicStyles).forEach(d => {
+    d.styleElement = document.createElement('style');
+    d.styleElement.innerHTML = localStorage.getItem(d.storageKey) || '';
+    document.body.appendChild(d.styleElement);
+
+    d.intervalId = setInterval(updateDynamicStyle, 500, d);
+});
