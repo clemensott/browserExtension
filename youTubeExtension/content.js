@@ -63,10 +63,10 @@ function isUiMuted() {
     return volumeIndicator ? volumeIndicator.style.left === '0px' : null;
 }
 
-function setMuteState(mute, videoElement) {
+function setMuteState(mute, force, videoElement) {
     const isMuted = isUiMuted();
-    if (typeof isMuted === 'boolean') {
-        if (isMuted === !!mute) {
+    if (force || typeof isMuted === 'boolean') {
+        if (force || isMuted === !!mute) {
             videoElement.muted = mute;
         }
     }
@@ -86,9 +86,9 @@ function onIsAdChange(isAdPlayling, videoElement) {
 
     if (isAdPlayling) {
         videoElement.playbackRate = 8;
-        setMuteState(true, videoElement);
+        setMuteState(true, true, videoElement);
     } else {
-        setMuteState(false, videoElement);
+        setMuteState(false, false, videoElement);
     }
 }
 
