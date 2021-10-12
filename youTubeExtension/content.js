@@ -103,6 +103,12 @@ function skipAdvertisement() {
 }
 
 function getCurrentVideoId() {
+    if (window.location.pathname.startsWith('/shorts/')) {
+        const parts = window.location.pathname.split('/');
+        if (parts.length > 2) {
+            return parts[2];
+        }
+    }
     return new URLSearchParams(window.location.search).get('v');
 }
 
