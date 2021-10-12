@@ -89,7 +89,7 @@ importIntoWebsite(function () {
         }
 
         putVideoUserState(videoId, isWatched) {
-            return this.toJSON(this.call({
+            return this.expectOk(this.call({
                 url: `/api/videos/userState/${videoId}`,
                 method: 'PUT',
                 body: {
