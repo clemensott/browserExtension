@@ -1,14 +1,9 @@
 importIntoWebsite(async function () {
-    const { createAPI, groupBy, tryIgnore } = window.subscriptionBox;
+    const { createAPI, groupBy, tryIgnore, triggerEvent } = window.subscriptionBox;
     const api = await createAPI();
 
     if (!api) {
         return;
-    }
-
-    function triggerUpdateVideosState() {
-        const { updateVideosState } = window.subscriptionBox;
-        return updateVideosState && updateVideosState();
     }
 
     function parseDuration(rawDuration) {
@@ -169,14 +164,14 @@ importIntoWebsite(async function () {
     async function handleVideosUpdates(videos, fetchTime) {
         if (videos && videos.length) {
             console.log('handleVideosUpdates1:', videos, fetchTime);
-            await triggerUpdateVideosState();
+            await triggerEvent('startHandleVideos', videos);
             const channels = groupBy(videos, video => video.channelId);
 
             await api.createChannels(Array.from(channels.keys()));
             await api.updateChannels(channels, fetchTime);
             await api.updateThumbnails(videos.map(v => v.id));
             await api.updateUserStateOfVideos(videos.map(video => video.id), true);
-            await triggerUpdateVideosState();
+            await triggerEvent('endHandleVideos', videos);
         }
     }
 

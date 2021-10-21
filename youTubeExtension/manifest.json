@@ -16,6 +16,7 @@
             "js": [
                 "importIntoWebsite.js",
                 "utils.js",
+                "eventManager.js",
                 "mutex.js",
                 "api.js",
                 "apiHandler.js",

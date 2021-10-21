@@ -1,5 +1,5 @@
 importIntoWebsite(async function () {
-    const { Mutex, createAPI, addToggleDisplayVideoState } = window.subscriptionBox;
+    const { Mutex, createAPI, addToggleDisplayVideoState, addEventHandler } = window.subscriptionBox;
     const videoUserStateClassName = 'yt-video-user-state-container';
     const api = await createAPI();
 
@@ -280,9 +280,10 @@ importIntoWebsite(async function () {
         }
     }, 100);
 
-    return {
-        updateVideosState: function () {
-            return loop.run();
-        }
+    function runLoopNonAsync() {
+        loop.run();
     }
+
+    addEventHandler('startHandleVideos', runLoopNonAsync);
+    addEventHandler('endHandleVideos', runLoopNonAsync);
 });
