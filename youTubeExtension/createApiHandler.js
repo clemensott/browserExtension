@@ -1,5 +1,4 @@
-importIntoWebsite(function () {
-    const { Mutex, API, ApiHandler } = window.subscriptionBox;
+importIntoWebsite(function ({ Mutex, API, ApiHandler }) {
     let apiHandler = null;
 
     const createApiMutex = new Mutex(async function () {

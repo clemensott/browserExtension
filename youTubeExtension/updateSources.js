@@ -1,5 +1,4 @@
-importIntoWebsite(async function () {
-    const { createAPI, groupBy, tryIgnore, triggerEvent } = window.subscriptionBox;
+importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent }) {
     const api = await createAPI();
 
     if (!api) {

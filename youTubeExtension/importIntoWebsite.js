@@ -1,19 +1,20 @@
 (function () {
-    function importFunctionIntoWebsiteInternal({ functionString, mainPropertyName, propteryName }) {
-        async function getResult() {
-            return await eval(`(${functionString})()`);
-        }
+    async function importFunctionIntoWebsiteInternal({ functionString, mainPropertyName, propteryName }) {
+        try {
+            if (!window[mainPropertyName]) {
+                window[mainPropertyName] = {};
+            }
 
-        getResult().then(assignResult).catch(e => console.error(e));
-
-        function assignResult(res) {
+            const res = await eval(`(${functionString})(window[${JSON.stringify(mainPropertyName)}])`);
             const assign = typeof propteryName === 'string' ? {
                 [propteryName]: res,
             } : res;
 
-            if (typeof assign === 'object' && assign !== null) {
+            if (assign && typeof assign === 'object') {
                 window[mainPropertyName] = Object.assign(window[mainPropertyName] || {}, assign);
             }
+        } catch (err) {
+            console.error('import function:', err);
         }
     }
 

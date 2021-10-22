@@ -1,6 +1,4 @@
-importIntoWebsite(function () {
-    const { groupBy } = window.subscriptionBox;
-
+importIntoWebsite(function ({ groupBy }) {
     class ApiHandler {
         constructor(api, videoUserStateUpdateInterval) {
             this.api = api;
@@ -23,7 +21,7 @@ importIntoWebsite(function () {
                     return false
                 }
 
-                return this.api.ping();
+                return await this.api.ping();
             } catch (e) {
                 return false;
             }

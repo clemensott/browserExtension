@@ -1,7 +1,5 @@
-importIntoWebsite(function () {
+importIntoWebsite(function ({ setFakeMicButton }) {
     function addToggleDisplayVideoState(element, className) {
-        const { setFakeMicButton } = window.subscriptionBox;
-
         const disableStyle = `.${className} { display:none }`;
         const disableStyleElement = document.createElement('style');
         document.body.appendChild(disableStyleElement);

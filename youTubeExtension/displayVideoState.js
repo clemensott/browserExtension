@@ -1,5 +1,4 @@
-importIntoWebsite(async function () {
-    const { getVideoIdFromUrl, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler } = window.subscriptionBox;
+importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler }) {
     const videoUserStateClassName = 'yt-video-user-state-container';
     const api = await createAPI();
 

@@ -1,5 +1,4 @@
-importIntoWebsite(function () {
-    const { getVideoIdFromUrl, addEventHandler } = window.subscriptionBox;
+importIntoWebsite(function ( { getVideoIdFromUrl, addEventHandler }) {
     let intervalId = null;
     let handledVideoIds = new Map();
 
