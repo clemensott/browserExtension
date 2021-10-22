@@ -1,5 +1,5 @@
 importIntoWebsite(async function () {
-    const { Mutex, createAPI, addToggleDisplayVideoState, addEventHandler } = window.subscriptionBox;
+    const { getVideoIdFromUrl, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler } = window.subscriptionBox;
     const videoUserStateClassName = 'yt-video-user-state-container';
     const api = await createAPI();
 
@@ -9,17 +9,6 @@ importIntoWebsite(async function () {
 
     function getCurrentVideoUserStateContainer() {
         return document.querySelector('ytd-video-primary-info-renderer #info');
-    }
-
-    function getVideoIdFromUrl(url) {
-        const { pathname, searchParams } = new URL(url);
-        if (pathname.startsWith('/shorts/')) {
-            const parts = pathname.split('/');
-            if (parts.length > 2) {
-                return parts[2];
-            }
-        }
-        return searchParams.get('v');
     }
 
     function getVideoIdFromVideoContainer(container) {

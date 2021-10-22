@@ -25,6 +25,7 @@
                 "addToggleDisplayVideoState.js",
                 "updateSources.js",
                 "displayVideoState.js",
+                "channelVideoHiding.js",
                 "content.js"
             ],
             "css":[
