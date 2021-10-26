@@ -273,5 +273,5 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addTogg
     }
 
     addEventHandler('startHandleVideos', runLoopNonAsync);
-    addEventHandler('endHandleVideos', runLoopNonAsync);
+    addEventHandler('updatedHandleVideos', runLoopNonAsync);
 });
