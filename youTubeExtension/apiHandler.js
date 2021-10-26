@@ -81,6 +81,17 @@ importIntoWebsite(function ({ groupBy }) {
             }
         }
 
+        getStatisticsUpdate(video) {
+            const statistics = {
+                views: video.views,
+                likes: video.likes,
+                dislikes: video.dislikes,
+                comments: video.comments,
+            };
+           
+            return this.getUpdate(statistics, Object.values(statistics).some(value => typeof value === 'number'));
+        }
+
         async updateChannels(channels, fetchTime) {
             try {
                 if (!fetchTime) {
@@ -101,6 +112,7 @@ importIntoWebsite(function ({ groupBy }) {
                             channelId: this.getUpdate(video.channelId),
                             durationTicks: this.getUpdate(video.duration * 1000 * 1000 * 10),
                             state: this.getUpdate(0, true),
+                            statistics: this.getStatisticsUpdate(video),
                             fetchTime,
                         })),
                         fetchTime,

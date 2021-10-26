@@ -20,8 +20,9 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
         return ((parseInt(hours, 10) * 60 + parseInt(minutes, 10)) * 60 + parseInt(seconds));
     }
 
-    function parseViews(rawViews) {
-        return rawViews?.trim().split(' ')[0].replaceAll('.', '').replaceAll(',', '');
+    function parseFormattedInt(raw) {
+        const text = raw?.trim().split(' ')[0].replaceAll('.', '').replaceAll(',', '');
+        return text ? parseInt(text, 10) : undefined;
     }
 
     function getRecommendationVideosData({ compactVideoRenderer: raw }) {
@@ -32,7 +33,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 channelTitle: raw.longBylineText?.runs?.map(r => r?.text)?.find(Boolean),
                 channelId: raw.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId)?.find(Boolean),
                 duration: parseDuration(raw.lengthText?.simpleText),
-                views: parseViews(raw.viewCountText?.simpleText),
+                views: parseFormattedInt(raw.viewCountText?.simpleText),
             };
         } catch {
             return null;
@@ -47,7 +48,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 channelTitle,
                 channelId,
                 duration: parseDuration(raw.thumbnailOverlays?.map(o => o?.thumbnailOverlayTimeStatusRenderer?.text.simpleText).find(Boolean)),
-                views: parseViews(raw.viewCountText?.simpleText),
+                views: parseFormattedInt(raw.viewCountText?.simpleText),
             };
         } catch {
             return null;
@@ -64,13 +65,13 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 title: videoSection?.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelTitle: channelSection?.owner?.videoOwnerRenderer?.title?.runs?.map(r => r?.text).find(Boolean),
                 channelId: channelSection?.owner?.videoOwnerRenderer?.navigationEndpoint?.browseEndpoint?.browseId,
-                views: parseViews(videoSection?.viewCount?.videoViewCountRenderer?.viewCount?.simpleText),
-                likes: videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
-                    map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'LIKE')?.defaultText.simpleText,
-                dislikes: videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
-                    map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'DISLIKE')?.defaultText.simpleText,
-                comments: commentSection?.header?.map(h => h?.commentsHeaderRenderer).find(Boolean)?.countText?.runs?.
-                    map(r => parseInt(r?.text, 10)).find(t => !Number.isNaN(t)),
+                views: parseFormattedInt(videoSection?.viewCount?.videoViewCountRenderer?.viewCount?.simpleText),
+                likes: parseFormattedInt(videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
+                    map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'LIKE')?.defaultText.simpleText),
+                dislikes: parseFormattedInt(videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
+                    map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'DISLIKE')?.defaultText.simpleText),
+                comments: parseFormattedInt(commentSection?.header?.map(h => h?.commentsHeaderRenderer).find(Boolean)?.countText?.runs?.
+                    map(r => parseInt(r?.text, 10)).find(t => !Number.isNaN(t))),
             };
         } catch {
             return null;
@@ -99,7 +100,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 channelTitle: raw.shortBylineText?.runs?.map(r => r?.text).find(Boolean),
                 channelId: raw.shortBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
                 duration: parseDuration(raw.thumbnailOverlays?.map(o => o?.thumbnailOverlayTimeStatusRenderer?.text.simpleText).find(Boolean)),
-                views: parseViews(raw.viewCountText?.simpleText),
+                views: parseFormattedInt(raw.viewCountText?.simpleText),
             };
         } catch {
             return null;
@@ -118,7 +119,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 channelTitle: raw.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelId: raw.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
                 duration: parseDuration(raw?.lengthText?.simpleText),
-                views: parseViews(raw.viewCountText?.simpleText),
+                views: parseFormattedInt(raw.viewCountText?.simpleText),
             };
         } catch {
             return null;
@@ -153,7 +154,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 channelTitle: video?.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
                 channelId: video?.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
                 duration: parseDuration(video?.lengthText?.simpleText),
-                views: parseViews(video.viewCountText?.simpleText),
+                views: parseFormattedInt(video.viewCountText?.simpleText),
             };
         } catch {
             return null;
