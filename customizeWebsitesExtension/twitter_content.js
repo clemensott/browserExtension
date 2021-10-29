@@ -25,7 +25,7 @@ function createHideElementStyle(element) {
 const dynamicStyles = {
     loginBanner: {
         storageKey: 'custom_extension_twitter_login_banner_style_cache',
-        selector: 'div[role=dialog]',
+        selector: '#layers > div:nth-child(2) > div > div > div > div > div > div:nth-child(2)',
         isMatchingElement: hasLoginButtons,
         createStyle: cookieBanner => `
             ${createHideElementStyle(cookieBanner)}
@@ -39,7 +39,7 @@ const dynamicStyles = {
     },
     loginFooter: {
         storageKey: 'custom_extension_twitter_login_footer_style_cache',
-        selector: '#layers > div',
+        selector: '#layers > div:nth-child(1)',
         isMatchingElement: hasLoginButtons,
         createStyle: createHideElementStyle,
         styleElement: null,
