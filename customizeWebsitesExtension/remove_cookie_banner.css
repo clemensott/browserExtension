@@ -65,3 +65,11 @@ div.popup.popup__cookie {
 #cookie-consent {
     display: none!important;
 }
+
+#sp-cc {
+    display: none!important;
+}
+
+#cookie-banner {
+    display: none!important;
+}
