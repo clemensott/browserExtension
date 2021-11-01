@@ -85,6 +85,14 @@ const actionConfigs = [
         getHide('#cookieconsent.first'),
         getHide('#cookie-bg'),
     ],
+    [
+        getHide('#gdpr-cookie-canvas'),
+        getHide('#gdpr-cookie-message'),
+    ],
+    [
+        getHide(() => document.querySelector("#usercentrics-root").shadowRoot.querySelector("#focus-lock-id")),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
@@ -101,11 +109,19 @@ function hide(element) {
 
 setTimeout(clearBannerInterval, 10000);
 
-function getElement(selectors) {
+function getElementFromSelector(selector) {
+    try {
+        return typeof selector === 'function' ? selector() : document.querySelector(selector);
+    } catch {
+        return null;
+    }
+}
+
+function getElementFromSelectors(selectors) {
     if (!Array.isArray(selectors)) {
         selectors = [selectors];
     }
-    return selectors.reduce((element, selector) => element || document.querySelector(selector), null);
+    return selectors.reduce((element, selector) => element || getElementFromSelector(selector), null);
 }
 
 async function handleElement({ element, config }) {
@@ -126,7 +142,7 @@ async function handleElement({ element, config }) {
 function checkSimpleContainers(actions) {
     for (let i = 0; i < actions.length; i++) {
         const elements = actions[i].map(config => ({
-            element: getElement(config.selector),
+            element: getElementFromSelectors(config.selector),
             config,
         }));
         if (elements.every(element => element.element)) {
