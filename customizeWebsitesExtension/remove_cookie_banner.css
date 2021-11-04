@@ -73,3 +73,7 @@ div.popup.popup__cookie {
 #cookie-banner {
     display: none!important;
 }
+
+#klaro > div > div {
+    display: none!important;
+}
