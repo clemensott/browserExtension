@@ -30,7 +30,7 @@ function clearOverflow(selector) {
         selector,
         delay: 500,
         style: {
-            overflow: 'initial'
+            overflow: 'initial',
         },
     };
 }
@@ -92,6 +92,10 @@ const actionConfigs = [
     [
         getHide(() => document.querySelector("#usercentrics-root").shadowRoot.querySelector("#focus-lock-id")),
         clearOverflow('body'),
+    ],
+    [
+        getHide('#page-1788782821 > div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.cc-individual-cookie-settings.ui-draggable'),
+        getHide('#page-1788782821 > div.ui-widget-overlay.ui-front.cc-individual-cookie-settings-overlay'),
     ],
 ];
 
