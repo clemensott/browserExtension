@@ -1,79 +1,25 @@
-#gdpr-consent-tool-wrapper {
-    display: none;
-}
-
-.cmp_app.cmp_overwriteLevel1#consentDialog {
-    display: none;
-}
-
-#chrome > div.cc_banner-wrapper > div.cc_banner.cc_container.cc_container--open {
-    display: none;
-}
-
-#qc-cmp2-container.qc-cmp2-container {
-    display: none;
-}
-
-.snigel-cmp-framework#snigel-cmp-framework {
-    display: none;
-}
-
-#onetrust-consent-sdk {
-    display: none;
-}
-
-#didomi-notice {
-    display: none!important;
-}
-
-div.cookie-alert.t-dark {
-    display: none!important;
-}
-
-div#BorlabsCookieBoxWrap {
-    display: none!important;
-}
-
-div#BorlabsCookieBox {
-    display: none!important;
-}
-
-div#cookiebanner {
-    display: none!important;
-}
-
-amp-consent#ampforwpConsent {
-    display: none!important;
-}
-
-cmp-banner {
-    display: none!important;
-}
-
-#easycmp {
-    display: none!important;
-}
-
-#cmpbox {
-    display: none!important;
-}
-
-div.popup.popup__cookie {
-    display: none!important;
-}
-
-#cookie-consent {
-    display: none!important;
-}
-
-#sp-cc {
-    display: none!important;
-}
-
-#cookie-banner {
-    display: none!important;
-}
-
-#klaro > div > div {
+#gdpr-consent-tool-wrapper,
+.cmp_app.cmp_overwriteLevel1#consentDialog,
+#chrome > div.cc_banner-wrapper > div.cc_banner.cc_container.cc_container--open,
+#qc-cmp2-container.qc-cmp2-container,
+.snigel-cmp-framework#snigel-cmp-framework,
+#onetrust-consent-sdk,
+#didomi-notice,
+div.cookie-alert.t-dark,
+div#BorlabsCookieBoxWrap,
+div#BorlabsCookieBox,
+div#cookiebanner,
+amp-consent#ampforwpConsent,
+cmp-banner,
+#easycmp,
+#cmpbox,
+div.popup.popup__cookie,
+#cookie-consent,
+#sp-cc,
+#cookie-banner,
+#klaro > div > div,
+#SgCookieOptin,
+div.contao-cookiebar.cookiebar_default.cc-top.cc-blocked.cc-active,
+#cc-banner-wrap {
     display: none!important;
 }

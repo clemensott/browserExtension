@@ -97,6 +97,10 @@ const actionConfigs = [
         getHide('#page-1788782821 > div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.cc-individual-cookie-settings.ui-draggable'),
         getHide('#page-1788782821 > div.ui-widget-overlay.ui-front.cc-individual-cookie-settings-overlay'),
     ],
+    [
+        getRemove('#cmp-style-reset'),
+        clearOverflow('.cmp-prevent-scroll'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
