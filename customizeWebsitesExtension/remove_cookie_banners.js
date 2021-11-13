@@ -44,6 +44,7 @@ const actionConfigs = [
     [
         getHide('#CybotCookiebotDialog[name=CybotCookiebotDialog]'),
         getRemove('#CybotCookiebotDialogBodyUnderlay'),
+        clearOverflow('body'),
     ],
     [
         getHide('body > .tp-modal'),

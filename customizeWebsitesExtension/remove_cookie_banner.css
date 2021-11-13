@@ -20,6 +20,7 @@ div.popup.popup__cookie,
 #klaro > div > div,
 #SgCookieOptin,
 div.contao-cookiebar.cookiebar_default.cc-top.cc-blocked.cc-active,
+div.cc_overlay_lock,
 #cc-banner-wrap {
     display: none!important;
 }
