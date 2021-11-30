@@ -187,7 +187,7 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addTogg
                 className = classNames.inactiveDepricated;
             } else if (isSingleInactive && videoUserState.sources.length === 1) {
                 buttonOptions.setWatched();
-                buttonOptions.setDisableDeprecated(inactiveDeprecatedSources.map(s => s.sourceId));
+                buttonOptions.setActive(inactiveSources.map(s => s.sourceId));
 
                 className = classNames.inactive;
             } else if (videoUserState.sources.length === 1) {
