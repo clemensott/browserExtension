@@ -230,9 +230,9 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             tryIgnore(() => data?.onResponseReceivedActions?.
                 map(a => a?.appendContinuationItemsAction?.continuationItems).filter(Boolean).flat());
         if (subBoxSections) {
-            const subBoxVideos = subBoxSections
-                .map(s => s?.itemSectionRenderer?.contents.map(c => c?.shelfRenderer.content.gridRenderer.items).filter(Boolean).flat())
-                .filter(Boolean).flat();
+            const subBoxVideos = tryIgnore(() => subBoxSections.map(
+                s => s?.itemSectionRenderer?.contents.map(c => c?.shelfRenderer?.content?.gridRenderer?.items).filter(Boolean).flat()
+            ).filter(Boolean).flat());
             const videos = subBoxVideos.map(getSubBoxVideoData).filter(Boolean);
             console.log('handle sub box videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
