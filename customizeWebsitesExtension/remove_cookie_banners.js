@@ -102,6 +102,11 @@ const actionConfigs = [
         getRemove('#cmp-style-reset'),
         clearOverflow('.cmp-prevent-scroll'),
     ],
+    [
+        getHide('#cmpbox2'),
+        getHide('#cmpbox'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
