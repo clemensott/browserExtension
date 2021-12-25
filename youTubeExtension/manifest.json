@@ -26,6 +26,7 @@
                 "updateSources.js",
                 "displayVideoState.js",
                 "channelVideoHiding.js",
+                "isUpdatingSources.js",
                 "content.js"
             ],
             "css":[

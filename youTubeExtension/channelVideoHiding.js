@@ -1,4 +1,4 @@
-importIntoWebsite(function ( { getVideoIdFromUrl, addEventHandler }) {
+importIntoWebsite(function ({ getVideoIdFromUrl, addEventHandler }) {
     let intervalId = null;
     let handledVideoIds = new Map();
 

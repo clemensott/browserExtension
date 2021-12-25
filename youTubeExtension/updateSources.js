@@ -164,15 +164,26 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
     async function handleVideosUpdates(videos, fetchTime) {
         if (videos && videos.length) {
             console.log('handleVideosUpdates1:', videos, fetchTime);
-            await triggerEvent('startHandleVideos', videos);
-            const channels = groupBy(videos, video => video.channelId);
 
-            await api.createChannels(Array.from(channels.keys()));
-            await api.updateChannels(channels, fetchTime);
-            await api.updateUserStateOfVideos(videos.map(video => video.id), true);
-            await triggerEvent('updatedHandleVideos', videos);
-            await api.updateThumbnails(videos.map(v => v.id));
-            await triggerEvent('endHandleVideos', videos);
+            let triggerUpdatedHandleVideos = false;
+            try {
+                await triggerEvent('startHandleVideos', videos);
+                triggerUpdatedHandleVideos = true;
+
+                const channels = groupBy(videos, video => video.channelId);
+                await api.createChannels(Array.from(channels.keys()));
+                await api.updateChannels(channels, fetchTime);
+                await api.updateUserStateOfVideos(videos.map(video => video.id), true);
+                await triggerEvent('updatedHandleVideos', videos);
+                triggerUpdatedHandleVideos = false;
+
+                await api.updateThumbnails(videos.map(v => v.id));
+            } finally {
+                if (triggerUpdatedHandleVideos) {
+                    await triggerEvent('updatedHandleVideos', videos);
+                }
+                await triggerEvent('endHandleVideos', videos);
+            }
         }
     }
 
@@ -189,19 +200,19 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             await handleVideosUpdates(videos, fetchTime);
         }
 
-        const watchPlaylistVideos = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.playlist?.playlist?.contents);
-        if (watchPlaylistVideos) {
-            const videos = watchPlaylistVideos.map(getWatchPlaylistVideoData).filter(Boolean);
-            console.log('handle watch playlist videos:', videos.length);
-            await handleVideosUpdates(videos, fetchTime);
-        }
-
         const recommendationVideos =
             tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
             tryIgnore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems);
         if (recommendationVideos) {
             const videos = recommendationVideos.map(getRecommendationVideosData).filter(Boolean);
             console.log('handle recommendation videos:', videos.length);
+            await handleVideosUpdates(videos, fetchTime);
+        }
+
+        const watchPlaylistVideos = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.playlist?.playlist?.contents);
+        if (watchPlaylistVideos) {
+            const videos = watchPlaylistVideos.map(getWatchPlaylistVideoData).filter(Boolean);
+            console.log('handle watch playlist videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
         }
 
