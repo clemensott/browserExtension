@@ -14,25 +14,10 @@
                 "https://www.youtube.com/*"
             ],
             "js": [
-                "importIntoWebsite.js",
-                "utils.js",
-                "eventManager.js",
-                "mutex.js",
-                "api.js",
-                "apiHandler.js",
-                "createApiHandler.js",
-                "fakeMicButton.js",
-                "addToggleDisplayVideoState.js",
-                "updateSources.js",
-                "displayVideoState.js",
-                "channelVideoHiding.js",
-                "isUpdatingSources.js",
-                "content.js"
+                "dist/content.bundle.js"
             ],
             "css":[
-                "content.css",
-                "fakeMicButton.css",
-                "displayVideoState.css"
+                "dist/content.bundle.css"
             ]
         },
         {
@@ -40,8 +25,11 @@
                 "https://www.youtube.com/feed/subscriptions"
             ],
             "js": [
-                "reloadSubscriptionSite.js"
+                "src/reloadSubscriptionSite.js"
             ]
         }
+    ],
+    "web_accessible_resources": [
+        "dist/*.js"
     ]
 }

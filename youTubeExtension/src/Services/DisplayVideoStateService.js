@@ -1,57 +1,87 @@
-importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler }) {
-    const videoUserStateClassName = 'yt-video-user-state-container';
-    const api = await createAPI();
+import getVideoIdFromUrl from '../utils/getVideoIdFromUrl';
+import setIntervalUntil from '../utils/setIntervalUntil';
+import AtOnceService from './AtOnceService';
+import addToggleDisplayVideoState from '../components/addToggleDisplayVideoState';
+import './DisplayVideoStateService.css';
 
-    if (!api) {
-        return;
+const videoUserStateClassName = 'yt-video-user-state-container';
+
+function getCurrentVideoUserStateContainer() {
+    return document.querySelector('ytd-video-primary-info-renderer #info');
+}
+
+function getVideoIdFromVideoContainer(container) {
+    const a = container.querySelector('a#thumbnail');
+    return a && getVideoIdFromUrl(a.href);
+}
+
+function getVideoContainers() {
+    const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
+
+    const watchVideos = [{
+        container: currentVideoUserStateContainer,
+        getVideoId: () => getVideoIdFromUrl(window.location.href),
+        additionalClassName: 'yt-video-user-state-watch',
+        insertReferenceNodeSelector: '#flex',
+    }];
+
+    const listVideos = [
+        '#items > ytd-compact-video-renderer',
+        '#items > ytd-grid-video-renderer',
+        '#contents > ytd-rich-item-renderer',
+        '#contents > ytd-video-renderer',
+        '#items > ytd-video-renderer',
+        '#items > ytd-playlist-panel-video-renderer',
+    ]
+        .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+        .map(container => ({
+            container,
+            getVideoId: () => getVideoIdFromVideoContainer(container),
+            additionalClassName: 'yt-video-user-state-list-item',
+        }));
+
+    return [
+        ...watchVideos,
+        ...listVideos,
+    ];
+}
+
+export default class DisplayVideoStateService {
+    constructor(api) {
+        this.api = api;
+        this.videoContainers = null;
+        this.loop = new AtOnceService(async (fast = false, forceUserStateUpdate = false) => {
+            try {
+                if (!fast || !this.videoContainers) {
+                    this.videoContainers = getVideoContainers();
+                }
+                this.videoContainers.forEach(container => container.videoId = container.getVideoId());
+                this.updateUI();
+
+                const videoIds = this.videoContainers.map(c => c.videoId).filter(Boolean);
+                const updatedVideoIds = await this.api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
+                this.updateUI(updatedVideoIds);
+            } catch (e) {
+                console.error('loop error', e)
+            }
+        });
+        this.runLoopNonAsync = this.runLoopNonAsync.bind(this);
     }
 
-    function getCurrentVideoUserStateContainer() {
-        return document.querySelector('ytd-video-primary-info-renderer #info');
+    updateUI(videoIdsToUpdate) {
+        this.videoContainers.forEach(container => {
+            if (container.videoId && (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(container.videoId))) {
+                this.updateVideoUserStateUI(container);
+            }
+        });
     }
 
-    function getVideoIdFromVideoContainer(container) {
-        const a = container.querySelector('a#thumbnail');
-        return a && getVideoIdFromUrl(a.href);
-    }
-
-    function getVideoContainers() {
-        const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
-
-        const watchVideos = [{
-            container: currentVideoUserStateContainer,
-            getVideoId: () => getVideoIdFromUrl(window.location.href),
-            additionalClassName: 'yt-video-user-state-watch',
-            insertReferenceNodeSelector: '#flex',
-        }];
-
-        const listVideos = [
-            '#items > ytd-compact-video-renderer',
-            '#items > ytd-grid-video-renderer',
-            '#contents > ytd-rich-item-renderer',
-            '#contents > ytd-video-renderer',
-            '#items > ytd-video-renderer',
-            '#items > ytd-playlist-panel-video-renderer',
-        ]
-            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
-            .map(container => ({
-                container,
-                getVideoId: () => getVideoIdFromVideoContainer(container),
-                additionalClassName: 'yt-video-user-state-list-item',
-            }));
-
-        return [
-            ...watchVideos,
-            ...listVideos,
-        ];
-    }
-
-    function updateVideoUserStateUI({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
+    updateVideoUserStateUI({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
         if (!container || !document.contains(container)) {
             return;
         }
 
-        const videoUserState = api.videoUserStates[videoId];
+        const videoUserState = this.api.videoUserStates[videoId];
         let element = container.querySelector(`.${videoUserStateClassName}`);
         if (!element) {
             element = document.createElement('span');
@@ -102,7 +132,7 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
                 return async () => {
                     try {
                         await func();
-                        await api.updateUserStateOfVideos([videoId], true);
+                        await this.api.updateUserStateOfVideos([videoId], true);
                         await loop.run();
                     } catch (e) {
                         console.error('delete video error', e);
@@ -116,8 +146,8 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
                     title: 'Set watched and inactive!',
                     onclick: wrapFunction(() => {
                         return Promise.all([
-                            api.updateUserVideo(videoId, true),
-                            api.deactivateVideo(videoId, sourceIds),
+                            this.api.updateUserVideo(videoId, true),
+                            this.api.deactivateVideo(videoId, sourceIds),
                         ]);
                     }),
                 }),
@@ -125,21 +155,21 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
                     innerText: '\u2713',
                     title: 'Set watched!',
                     onclick: wrapFunction(() => {
-                        return api.updateUserVideo(videoId, true);
+                        return this.api.updateUserVideo(videoId, true);
                     }),
                 }),
                 setNotWatched: () => addButtonToElement({
                     innerText: '\u274C',
                     title: 'Set not watched!',
                     onclick: wrapFunction(() => {
-                        return api.updateUserVideo(videoId, false);
+                        return this.api.updateUserVideo(videoId, false);
                     }),
                 }),
                 setActive: sourceIds => addButtonToElement({
                     innerText: '\u2716',
                     title: 'Set active!',
                     onclick: wrapFunction(() => {
-                        return api.updateVideoSourcesState({
+                        return this.api.updateVideoSourcesState({
                             videoId,
                             sourceIds,
                             isActive: true,
@@ -150,14 +180,14 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
                     innerText: '\u2713',
                     title: 'Set inactive!',
                     onclick: wrapFunction(() => {
-                        return api.deactivateVideo(videoId, sourceIds);
+                        return this.api.deactivateVideo(videoId, sourceIds);
                     }),
                 }),
                 setDisableDeprecated: sourceIds => addButtonToElement({
                     innerText: '\u2716',
                     title: 'Remove deprecated inactive!',
                     onclick: wrapFunction(() => {
-                        return api.updateVideoSourcesState({
+                        return this.api.updateVideoSourcesState({
                             videoId,
                             sourceIds,
                             isActiveDeprecated: false,
@@ -221,60 +251,37 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
         element.classList.add(className);
     }
 
-    let videoContainers = null;
-    const loop = new Mutex(async function (fast = false, forceUserStateUpdate = false) {
-        try {
-            if (!fast || !videoContainers) {
-                videoContainers = getVideoContainers();
-            }
-            videoContainers.forEach(container => container.videoId = container.getVideoId());
-            updateUI();
-
-            const videoIds = videoContainers.map(c => c.videoId).filter(Boolean);
-            const updatedVideoIds = await api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
-            updateUI(updatedVideoIds);
-
-            function updateUI(videoIdsToUpdate) {
-                videoContainers.forEach(container => {
-                    if (container.videoId && (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(container.videoId))) {
-                        updateVideoUserStateUI(container);
-                    }
-                });
-            }
-        } catch (e) {
-            console.error('loop error', e)
-        }
-    });
-
-    setInterval(() => loop.run({ optional: true, params: [false] }), 200);
-    setInterval(() => loop.run({ optional: true }), 5000);
-
-    window.onfocus = async () => {
-        await loop.run({ params: [false, true] });
-    };
-
-    setIntervalUntil(() => {
-        if (!getVideoContainers().length) return true;
-
-        loop.run();
-        return false;
-    }, 100);
-
-    setIntervalUntil(() => {
-        const element = document.getElementById('voice-search-button');
-        if (!element) return true;
-
-        addToggleDisplayVideoState(element, videoUserStateClassName);
-        return false;
-    }, 100);
-
-    function runLoopNonAsync() {
-        loop.run();
+    runLoopNonAsync() {
+        this.loop.run();
     }
 
-    document.addEventListener('updateSources.startHandleVideos', runLoopNonAsync);
-    document.addEventListener('updateSources.endHandleVideos', async ({ detail: videos }) => {
-        await api.updateUserStateOfVideos(videos.map(video => video.id), true);
-        runLoopNonAsync();
-    });
-});
+    start() {
+        setInterval(() => this.loop.run({ optional: true, params: [false] }), 200);
+        setInterval(() => this.loop.run({ optional: true }), 5000);
+
+        window.onfocus = async () => {
+            await this.loop.run({ params: [false, true] });
+        };
+
+        setIntervalUntil(() => {
+            if (!getVideoContainers().length) return true;
+
+            this.loop.run();
+            return false;
+        }, 100);
+
+        setIntervalUntil(() => {
+            const element = document.getElementById('voice-search-button');
+            if (!element) return true;
+
+            addToggleDisplayVideoState(element, videoUserStateClassName);
+            return false;
+        }, 100);
+
+        document.addEventListener('updateSources.startHandleVideos', this.runLoopNonAsync);
+        document.addEventListener('updateSources.endHandleVideos', async ({ detail: videos }) => {
+            await this.api.updateUserStateOfVideos(videos.map(video => video.id), true);
+            this.runLoopNonAsync();
+        });
+    }
+}

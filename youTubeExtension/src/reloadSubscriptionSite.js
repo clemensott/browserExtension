@@ -41,7 +41,8 @@
     }
 
     function updateTimeoutUI() {
-        infoText.innerText = !!timeout ? ` in ${((timeout.until - Date.now()) / 1000).toFixed(0)}s` : '';
+        const remainingSeconds = Math.max((timeout.until - Date.now()) / 1000, 0);
+        infoText.innerText = !!timeout ? ` in ${remainingSeconds.toFixed(0)}s` : '';
     }
 
     function reloadPage() {

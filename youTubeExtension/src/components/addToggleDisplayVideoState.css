@@ -1,3 +1,7 @@
 .yt-fake-mic-button-container > ytd-button-renderer {
     pointer-events: none;
 }
+
+#lightbox {
+    display: none;
+}
