@@ -1,4 +1,4 @@
-importIntoWebsite(async function ({ addEventHandler, setIntervalUntil }) {
+importIntoWebsite(async function ({ setIntervalUntil }) {
     const dataVideoIds = new Map();
     const thumbnailVideoIds = new Map();
 
@@ -43,22 +43,22 @@ importIntoWebsite(async function ({ addEventHandler, setIntervalUntil }) {
         thumbnailUpdateCountIndicator.innerText = thumbnailVideoIds.size ? `Updating ${thumbnailVideoIds.size}x thumbnail` : '';
     }
 
-    addEventHandler('updateSources.startHandleVideos', videos => {
+    document.addEventListener('updateSources.startHandleVideos', ({ detail: videos }) => {
         addVideosIds(videos.map(video => video.id), dataVideoIds);
         updateDataUpdateCountIndicator();
     });
 
-    addEventHandler('updateSources.endHandleVideos', videos => {
+    document.addEventListener('updateSources.endHandleVideos', ({ detail: videos }) => {
         removeVideosIds(videos.map(video => video.id), dataVideoIds);
         setTimeout(updateDataUpdateCountIndicator, 50);
     });
 
-    addEventHandler('updateSources.startUpdateThumbnails', videoIds => {
+    document.addEventListener('updateSources.startUpdateThumbnails', ({ detail: videoIds }) => {
         addVideosIds(videoIds, thumbnailVideoIds);
         updateThumbnailDataUpdateCountIndicator();
     });
 
-    addEventHandler('updateSources.endUpdateThumbnails', videoIds => {
+    document.addEventListener('updateSources.endUpdateThumbnails', ({ detail: videoIds }) => {
         removeVideosIds(videoIds, thumbnailVideoIds);
         setTimeout(updateThumbnailDataUpdateCountIndicator, 50);
     });

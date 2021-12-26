@@ -272,8 +272,8 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, 
         loop.run();
     }
 
-    addEventHandler('updateSources.startHandleVideos', runLoopNonAsync);
-    addEventHandler('updateSources.endHandleVideos', async videos => {
+    document.addEventListener('updateSources.startHandleVideos', runLoopNonAsync);
+    document.addEventListener('updateSources.endHandleVideos', async ({ detail: videos }) => {
         await api.updateUserStateOfVideos(videos.map(video => video.id), true);
         runLoopNonAsync();
     });
