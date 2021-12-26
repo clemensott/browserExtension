@@ -163,34 +163,38 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
 
     async function handleVideosUpdates(videos, fetchTime) {
         if (videos && videos.length) {
-            console.log('handleVideosUpdates1:', videos, fetchTime);
+            console.log('handleVideosUpdates1:', videos.length, fetchTime);
 
-            let triggerUpdatedHandleVideos = false;
             try {
-                await triggerEvent('startHandleVideos', videos);
-                triggerUpdatedHandleVideos = true;
+                await triggerEvent('updateSources.startHandleVideos', videos);
 
                 const channels = groupBy(videos, video => video.channelId);
                 await api.createChannels(Array.from(channels.keys()));
                 await api.updateChannels(channels, fetchTime);
-                await api.updateUserStateOfVideos(videos.map(video => video.id), true);
-                await triggerEvent('updatedHandleVideos', videos);
-                triggerUpdatedHandleVideos = false;
-
-                await api.updateThumbnails(videos.map(v => v.id));
             } finally {
-                if (triggerUpdatedHandleVideos) {
-                    await triggerEvent('updatedHandleVideos', videos);
-                }
-                await triggerEvent('endHandleVideos', videos);
+                await triggerEvent('updateSources.endHandleVideos', videos);
             }
+        }
+    }
+
+    async function handleThumbnailsUpdate(videoIds) {
+        if (videoIds && videoIds.length) {
+            await triggerEvent('updateSources.startUpdateThumbnails', videoIds);
+            await api.updateThumbnails(videoIds);
+            await triggerEvent('updateSources.endUpdateThumbnails', videoIds);
         }
     }
 
     window.handleData = async function (data) {
         console.log('handleData');
         const fetchTime = new Date().toISOString();
+        const thumbnailUpdatePromises = [];
+
         window.lastHandleData = data;
+
+        function updateThumbnails(videos){
+            thumbnailUpdatePromises.push(handleThumbnailsUpdate(videos.map(v => v.id)));
+        }
 
         const watchVideo = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);
         const watchVideoId = tryIgnore(() => data?.currentVideoEndpoint?.watchEndpoint?.videoId);
@@ -198,6 +202,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = [getWatchVideoData(watchVideo, watchVideoId)].filter(Boolean);
             console.log('handle watch video:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const recommendationVideos =
@@ -207,6 +212,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = recommendationVideos.map(getRecommendationVideosData).filter(Boolean);
             console.log('handle recommendation videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const watchPlaylistVideos = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.playlist?.playlist?.contents);
@@ -214,6 +220,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = watchPlaylistVideos.map(getWatchPlaylistVideoData).filter(Boolean);
             console.log('handle watch playlist videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const channelVideos =
@@ -232,6 +239,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = channelVideos.map(v => getChannelVideosData(v, channelTitle, channelId)).filter(Boolean);
             console.log('handle channel videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const subBoxSections =
@@ -247,6 +255,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = subBoxVideos.map(getSubBoxVideoData).filter(Boolean);
             console.log('handle sub box videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const searchPrimaryVideos =
@@ -259,6 +268,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
                 .map(getSearchPrimaryVideoData).filter(Boolean);
             console.log('handle primary search videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const searchSecondaryVideos = tryIgnore(() => data?.contents?.twoColumnSearchResultsRenderer?.
@@ -270,6 +280,7 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = searchSecondaryVideos.map(getSearchSecondaryVideoData).filter(Boolean);
             console.log('handle secondary search videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
 
         const homeVideos =
@@ -281,7 +292,10 @@ importIntoWebsite(async function ({ createAPI, groupBy, tryIgnore, triggerEvent 
             const videos = homeVideos.map(getHomeExtendedVideo).flat().map(getHomeVideoData).filter(Boolean);
             console.log('handle home videos:', videos.length);
             await handleVideosUpdates(videos, fetchTime);
+            updateThumbnails(videos);
         }
+
+        await Promise.all(thumbnailUpdatePromises);
     }
 
     async function handleFetchPromise(promise) {

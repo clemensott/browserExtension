@@ -272,6 +272,9 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addTogg
         loop.run();
     }
 
-    addEventHandler('startHandleVideos', runLoopNonAsync);
-    addEventHandler('updatedHandleVideos', runLoopNonAsync);
+    addEventHandler('updateSources.startHandleVideos', runLoopNonAsync);
+    addEventHandler('updateSources.endHandleVideos', async videos => {
+        await api.updateUserStateOfVideos(videos.map(video => video.id), true);
+        runLoopNonAsync();
+    });
 });

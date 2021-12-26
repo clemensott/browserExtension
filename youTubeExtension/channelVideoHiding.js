@@ -2,12 +2,12 @@ importIntoWebsite(function ({ getVideoIdFromUrl, addEventHandler }) {
     let intervalId = null;
     let handledVideoIds = new Map();
 
-    addEventHandler('startHandleVideos', videos => {
+    addEventHandler('updateSources.startHandleVideos', videos => {
         videos.forEach(video => handledVideoIds.set(video.id, false));
     });
 
-    addEventHandler('endHandleVideos', videos => {
-        videos.forEach(video => handledVideoIds.set(video.id, true));
+    addEventHandler('updateSources.endUpdateThumbnails', videoIds => {
+        videoIds.forEach(videoId => handledVideoIds.set(videoId, true));
     });
 
     function getVideoIdFromVideoContainer(container) {

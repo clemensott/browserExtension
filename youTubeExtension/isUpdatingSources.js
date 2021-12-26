@@ -43,24 +43,23 @@ importIntoWebsite(async function ({ addEventHandler, setIntervalUntil }) {
         thumbnailUpdateCountIndicator.innerText = thumbnailVideoIds.size ? `Updating ${thumbnailVideoIds.size}x thumbnail` : '';
     }
 
-    addEventHandler('startHandleVideos', videos => {
+    addEventHandler('updateSources.startHandleVideos', videos => {
         addVideosIds(videos.map(video => video.id), dataVideoIds);
         updateDataUpdateCountIndicator();
     });
 
-    addEventHandler('updatedHandleVideos', videos => {
-        const videoIds = videos.map(video => video.id);
-        removeVideosIds(videoIds, dataVideoIds);
-        setTimeout(updateDataUpdateCountIndicator, 50);        
+    addEventHandler('updateSources.endHandleVideos', videos => {
+        removeVideosIds(videos.map(video => video.id), dataVideoIds);
+        setTimeout(updateDataUpdateCountIndicator, 50);
+    });
 
+    addEventHandler('updateSources.startUpdateThumbnails', videoIds => {
         addVideosIds(videoIds, thumbnailVideoIds);
         updateThumbnailDataUpdateCountIndicator();
     });
 
-    addEventHandler('endHandleVideos', videos => {
-        removeVideosIds(videos.map(video => video.id), thumbnailVideoIds);
+    addEventHandler('updateSources.endUpdateThumbnails', videoIds => {
+        removeVideosIds(videoIds, thumbnailVideoIds);
         setTimeout(updateThumbnailDataUpdateCountIndicator, 50);
     });
-
-    updateIndicator();
 });
