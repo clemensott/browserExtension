@@ -1,4 +1,4 @@
-importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler }) {
+importIntoWebsite(async function ({ getVideoIdFromUrl, setIntervalUntil, Mutex, createAPI, addToggleDisplayVideoState, addEventHandler }) {
     const videoUserStateClassName = 'yt-video-user-state-container';
     const api = await createAPI();
 
@@ -253,19 +253,19 @@ importIntoWebsite(async function ({ getVideoIdFromUrl, Mutex, createAPI, addTogg
         await loop.run({ params: [false, true] });
     };
 
-    const initIntervalId = setInterval(() => {
-        if (getVideoContainers().length) {
-            loop.run();
-            clearInterval(initIntervalId);
-        }
+    setIntervalUntil(() => {
+        if (!getVideoContainers().length) return true;
+
+        loop.run();
+        return false;
     }, 100);
 
-    const setupToggleDisplayVideoStateIntervalId = setInterval(() => {
+    setIntervalUntil(() => {
         const element = document.getElementById('voice-search-button');
-        if (element) {
-            addToggleDisplayVideoState(element, videoUserStateClassName);
-            clearInterval(setupToggleDisplayVideoStateIntervalId);
-        }
+        if (!element) return true;
+
+        addToggleDisplayVideoState(element, videoUserStateClassName);
+        return false;
     }, 100);
 
     function runLoopNonAsync() {
