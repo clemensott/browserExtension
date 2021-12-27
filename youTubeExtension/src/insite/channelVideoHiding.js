@@ -3,14 +3,6 @@ import getVideoIdFromUrl from '../utils/getVideoIdFromUrl';
 let intervalId = null;
 let handledVideoIds = new Map();
 
-document.addEventListener('updateSources.startHandleVideos', ({ detail: videos }) => {
-    videos.forEach(video => handledVideoIds.set(video.id, false));
-});
-
-document.addEventListener('updateSources.endUpdateThumbnails', ({ detail: videoIds }) => {
-    videoIds.forEach(videoId => handledVideoIds.set(videoId, true));
-});
-
 function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
     return a && getVideoIdFromUrl(a.href);
@@ -25,9 +17,17 @@ function getVideoContainers() {
 }
 
 function hideKnownVideos() {
-    getVideoContainers().forEach(e => {
-        e.style.display = isVideoUnkown(e) || !handledVideoIds.get(getVideoIdFromVideoContainer(e)) ? null : 'none';
-    });
+    const containers = Array.from(getVideoContainers());
+    const allHidden = containers.reduce((allHiddenUntilNow, e) => {
+        const show = isVideoUnkown(e) || !handledVideoIds.get(getVideoIdFromVideoContainer(e));
+        e.style.display = show ? null : 'none';
+        return allHiddenUntilNow && !show;
+    }, true);
+
+    if (allHidden) {
+        console.log('hide count:', containers.length);
+        window.scrollTo(0, Math.random() * 400);
+    }
 }
 
 function unhideKnownVideos() {
@@ -37,6 +37,18 @@ function unhideKnownVideos() {
     handledVideoIds = new Map();
 }
 
+document.addEventListener('updateSources.startHandleVideos', ({ detail: videos }) => {
+    videos.forEach(video => handledVideoIds.set(video.id, false));
+});
+
+document.addEventListener('updateSources.endUpdateThumbnails', ({ detail: videoIds }) => {
+    videoIds.forEach(videoId => handledVideoIds.set(videoId, true));
+
+    if (intervalId) {
+        hideKnownVideos();
+    }
+});
+
 function startHiding(hideCurrent = true) {
     stopHiding();
     if (hideCurrent) {
@@ -44,7 +56,8 @@ function startHiding(hideCurrent = true) {
             handledVideoIds.set(getVideoIdFromVideoContainer(e), true);
         });
     }
-    intervalId = setInterval(hideKnownVideos, 1000);
+    intervalId = setInterval(hideKnownVideos, 10000);
+    hideKnownVideos();
 }
 
 function stopHiding(unhideElements) {
