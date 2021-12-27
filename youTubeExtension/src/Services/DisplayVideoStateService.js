@@ -133,7 +133,7 @@ export default class DisplayVideoStateService {
                     try {
                         await func();
                         await this.api.updateUserStateOfVideos([videoId], true);
-                        await loop.run();
+                        await this.loop.run();
                     } catch (e) {
                         console.error('delete video error', e);
                     }
