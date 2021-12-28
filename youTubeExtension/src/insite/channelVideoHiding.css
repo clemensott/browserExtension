@@ -1,0 +1,7 @@
+#items.yt-channel-video-hiding-all > ytd-grid-video-renderer {
+    display: none!important;
+}
+
+#items.yt-channel-video-hiding-not-all > ytd-grid-video-renderer:not(:nth-last-child(-n+100)) {
+    display: none!important;
+}

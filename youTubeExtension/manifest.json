@@ -17,7 +17,8 @@
                 "dist/content.bundle.js"
             ],
             "css":[
-                "dist/content.bundle.css"
+                "dist/content.bundle.css",
+                "dist/insite.bundle.css"
             ]
         },
         {

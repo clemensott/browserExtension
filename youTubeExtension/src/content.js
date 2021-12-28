@@ -13,6 +13,7 @@ import DisplayVideoStateService from './Services/DisplayVideoStateService';
     const apiHandler = await createApiHandler();
 
     if (apiHandler) {
+        console.log('API baseURL:', apiHandler.api.baseUrl);
         try {
             const updateSourcesService = new UpdateSourcesService(apiHandler);
             updateSourcesService.start();
