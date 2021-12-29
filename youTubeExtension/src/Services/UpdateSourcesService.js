@@ -185,7 +185,8 @@ export default class UpdateSourcesService {
     async handleThumbnailsUpdate(videoIds) {
         if (videoIds && videoIds.length) {
             triggerEvent('updateSources.startUpdateThumbnails', videoIds);
-            await this.api.updateThumbnails(videoIds);
+            const distinctVideoIds = Array.from(new Set(videoIds));
+            await this.api.updateThumbnails(distinctVideoIds);
             triggerEvent('updateSources.endUpdateThumbnails', videoIds);
         }
     }
