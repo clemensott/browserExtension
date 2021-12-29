@@ -27,3 +27,8 @@ jobs:
         cd youTubeExtension
         npm install
         npx webpack
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-files
+        path: "./dist"
