@@ -41,8 +41,12 @@
     }
 
     function updateTimeoutUI() {
-        const remainingSeconds = Math.max((timeout.until - Date.now()) / 1000, 0);
-        infoText.innerText = !!timeout ? ` in ${remainingSeconds.toFixed(0)}s` : '';
+        if (timeout) {
+            const remainingSeconds = Math.max((timeout.until - Date.now()) / 1000, 0);
+            infoText.innerText = ` in ${remainingSeconds.toFixed(0)}s`;
+        } else {
+            infoText.innerText = '';
+        }
     }
 
     function reloadPage() {
