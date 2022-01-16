@@ -1,72 +1,43 @@
+import React from 'react';
 import DomEventService from './DomEventService';
 import ChannelVideoHidingService from './ChannelVideoHidingService';
+import ReactRenderer from '../utils/ReactRenderer';
+import ChannelVideoHiding from '../components/ChannelVideoHiding';
 import './ChannelHelperService.css';
 
-function getChannelVideoHidingControlHtml(checked) {
-    return `
-        <span class="yt-channel-helper-service-hide-videos-contianer">
-            <input id="channel_video_hiding" type="checkbox" ${checked ? 'checked' : ''}>
-            <label for="channel_video_hiding">Video hiding</label>
-        </span>
-    `;
-}
 
 export default class ChannelHelperService {
     constructor() {
         this.channelVideoHidingService = ChannelVideoHidingService.getInstance();
-        this.channelVideoHidingService.addRunningChangeEventListener(this.onChannelHidingRunningChange.bind(this));
 
         this.domService = DomEventService.getInstance();
         this.domService.channel.addEventListener(this.onChannelChange.bind(this));
 
-        this.onChannelVideoHidingCheckboxChange = this.onChannelVideoHidingCheckboxChange.bind(this);
+        this.channelHidingRederer = new ReactRenderer({
+            className: 'yt-channel-helper-service-own-container',
+            beforeSelector: '#buttons',
+        });
     }
 
     start() {
         this.domService.start();
     }
 
-    onChannelHidingRunningChange({ detail: { isRunning } }) {
-        if (this.channelOwnContainer) {
-            const input = this.channelOwnContainer.querySelector('#channel_video_hiding');
-            if (input) {
-                input.checked = isRunning;
-            }
-        }
-    }
-
-    onChannelChange({ detail: { currentElements: container, lastElements } }) {
-        if (this.channelOwnContainer) {
-            const input = this.channelOwnContainer.querySelector('#channel_video_hiding');
-            if (input) {
-                input.removeEventListener('change', this.onChannelVideoHidingCheckboxChange);
-            }
-            this.channelOwnContainer.remove();
-            this.channelOwnContainer = null;
-        }
-        if (container) {
+    onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {
+        if (lastContainer) {
             const innerHeaderContainer = container.querySelector('#inner-header-container');
-            const buttonsElement = innerHeaderContainer.querySelector('#buttons');
-
-            this.channelOwnContainer = document.createElement('div');
-            this.channelOwnContainer.classList.add('yt-channel-helper-service-own-container');
-            this.channelOwnContainer.innerHTML = getChannelVideoHidingControlHtml(this.channelVideoHidingService.isHiding());
-
-            const input = this.channelOwnContainer.querySelector('#channel_video_hiding');
-            if (input) {
-                input.addEventListener('change', this.onChannelVideoHidingCheckboxChange);
-            }
-
-            innerHeaderContainer.insertBefore(this.channelOwnContainer, buttonsElement);
-            innerHeaderContainer.classList.add('yt-channel-helper-service-inner-header-container');
+            innerHeaderContainer.classList.remove('yt-channel-helper-service-inner-header-container');
         }
-    }
+        if (newContainer) {
+            const innerHeaderContainer = newContainer.querySelector('#inner-header-container');
 
-    onChannelVideoHidingCheckboxChange({ target }) {
-        if (target.checked) {
-            this.channelVideoHidingService.start();
+            this.channelHidingRederer.render(
+                <ChannelVideoHiding service={this.channelVideoHidingService} />,
+                innerHeaderContainer,
+            );
+            innerHeaderContainer.classList.add('yt-channel-helper-service-inner-header-container');
         } else {
-            this.channelVideoHidingService.stop();
+            this.channelHidingRederer.unmount();
         }
     }
 }

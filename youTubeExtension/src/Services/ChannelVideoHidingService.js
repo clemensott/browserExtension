@@ -1,7 +1,7 @@
 import KeysTracker from '../utils/KeysTracker';
 import NavigationEventService from './NavigationEventService';
 import triggerEvent from "../utils/triggerEvent";
-import './ChannelHelperService.css';
+import './ChannelVideoHidingService.css';
 
 
 const constants = {
