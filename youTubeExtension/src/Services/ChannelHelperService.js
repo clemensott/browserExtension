@@ -13,7 +13,7 @@ export default class ChannelHelperService {
         this.domService = DomEventService.getInstance();
         this.domService.channel.addEventListener(this.onChannelChange.bind(this));
 
-        this.channelHidingRederer = new ReactRenderer({
+        this.channelHidingRenderer = new ReactRenderer({
             className: 'yt-channel-helper-service-own-container',
             beforeSelector: '#buttons',
         });
@@ -31,13 +31,13 @@ export default class ChannelHelperService {
         if (newContainer) {
             const innerHeaderContainer = newContainer.querySelector('#inner-header-container');
 
-            this.channelHidingRederer.render(
+            this.channelHidingRenderer.render(
                 <ChannelVideoHiding service={this.channelVideoHidingService} />,
                 innerHeaderContainer,
             );
             innerHeaderContainer.classList.add('yt-channel-helper-service-inner-header-container');
         } else {
-            this.channelHidingRederer.unmount();
+            this.channelHidingRenderer.unmount();
         }
     }
 }

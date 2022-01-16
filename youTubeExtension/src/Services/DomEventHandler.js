@@ -9,10 +9,11 @@ function defautlChangeDetector(current, last) {
 }
 
 export default class DomEventHandler {
-    constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout }) {
+    constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout, notFoundTimeout }) {
         this.eventName = eventName;
         this.elementsExists = elementsExists || defaultElementsExists;
         this.elementsGetter = elementsGetter;
+        this.notFoundTimeout = notFoundTimeout;
         this.timeout = timeout;
         this.changeDetector = changeDetector || defautlChangeDetector;
         this.intervalId = null;
@@ -23,7 +24,8 @@ export default class DomEventHandler {
 
     start() {
         if (!this.intervalId) {
-            this.intervalId = setInterval(this.onTick, this.timeout);
+            const timeout = this.notFoundTimeout && !this.lastElements ? this.notFoundTimeout : this.timeout;
+            this.intervalId = setInterval(this.onTick, timeout);
         }
     }
 
@@ -45,7 +47,12 @@ export default class DomEventHandler {
             });
         }
 
+        const changeTimout = this.notFoundTimeout && (this.lastElements ^ currentElements);
         this.lastElements = currentElements;
+        if (changeTimout) {
+            this.stop();
+            this.start();
+        }
     }
 
     addEventListener(callback) {

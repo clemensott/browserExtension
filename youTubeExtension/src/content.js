@@ -18,6 +18,8 @@ import DisplayVideoStateService from './Services/DisplayVideoStateService';
     if (apiHandler) {
         console.log('API baseURL:', apiHandler.api.baseUrl);
         try {
+            const isUpdatingSourcesService = new IsUpdatingSourcesService();
+            isUpdatingSourcesService.start();
             const updateSourcesService = new UpdateSourcesService(apiHandler);
             updateSourcesService.start();
             initDataService.addOnDataListener(({ detail }) => {
@@ -25,8 +27,6 @@ import DisplayVideoStateService from './Services/DisplayVideoStateService';
                     updateSourcesService.handleData(detail.data);
                 }
             });
-            const isUpdatingSourcesService = new IsUpdatingSourcesService();
-            isUpdatingSourcesService.start();
         } catch (err) {
             console.error('init update source service:', err);
         }
