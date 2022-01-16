@@ -6,19 +6,32 @@ import InitDataService from './Services/InitDataService';
 import UpdateSourcesService from './Services/UpdateSourcesService';
 import IsUpdatingSourcesService from './Services/IsUpdatingSourcesService';
 import DisplayVideoStateService from './Services/DisplayVideoStateService';
+import ChannelVideoHidingService from './Services/ChannelVideoHidingService';
+import DomEventService from './Services/DomEventService';
+import NavigationEventService from "./Services/NavigationEventService";
 
 (async function () {
     startPlayerService();
 
-    new ChannelHelperService().start();
+    const navigationService = new NavigationEventService();
+    const domService = new DomEventService({ navigationService });
+    const channelVideoHidingService = new ChannelVideoHidingService();
+    const channelHelperService = new ChannelHelperService({
+        channelVideoHidingService,
+        domService,
+    });
+    const isUpdatingSourcesService = new IsUpdatingSourcesService({ domService });
 
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler();
 
     if (apiHandler) {
+        navigationService.start();
+        domService.start();
+        channelHelperService.start();
+
         console.log('API baseURL:', apiHandler.api.baseUrl);
         try {
-            const isUpdatingSourcesService = new IsUpdatingSourcesService();
             isUpdatingSourcesService.start();
             const updateSourcesService = new UpdateSourcesService(apiHandler);
             updateSourcesService.start();
@@ -37,7 +50,7 @@ import DisplayVideoStateService from './Services/DisplayVideoStateService';
         } catch (err) {
             console.error('init display video state service:', err);
         }
-    }
 
-    importBundle();
+        importBundle();
+    }
 })();

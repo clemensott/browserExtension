@@ -1,12 +1,11 @@
 import React from 'react';
 import IsUpdatingIndicator from '../components/IsUpdatingIndicator';
 import ReactRenderer from '../utils/ReactRenderer';
-import DomEventService from './DomEventService';
 
 
 export default class IsUpdatingSourcesService {
-    constructor() {
-        this.domService = DomEventService.getInstance();
+    constructor({ domService }) {
+        this.domService = domService;
         this.renderer = new ReactRenderer({
             id: 'is_updating_sources_indicator_container',
             beforeSelector: '#end',

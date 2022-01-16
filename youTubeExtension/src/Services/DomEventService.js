@@ -1,15 +1,13 @@
 import { navigationChange } from '../constants';
 import DomEventHandler from './DomEventHandler';
-import NavigationEventService from './NavigationEventService';
-
-let instance = null;
 
 export default class DomEventService {
-    constructor() {
+    constructor({ navigationService }) {
         this.channel = new DomEventHandler({
             eventName: 'DomEventService.channel',
             elementsGetter: this.getChannelHeader,
-            timeout: 500,
+            timeout: 1000,
+            notFoundTimeout: 100,
         });
         this.masterHeadContainer = new DomEventHandler({
             eventName: 'DomEventService.masterHeadContainer',
@@ -18,15 +16,8 @@ export default class DomEventService {
             notFoundTimeout: 100,
         });
 
-        this.navigationService = NavigationEventService.getInstance();
+        this.navigationService = navigationService;
         this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange.bind(this));
-    }
-
-    static getInstance() {
-        if (!instance) {
-            instance = new DomEventService();
-        }
-        return instance;
     }
 
     getChannelHeader() {
@@ -38,7 +29,6 @@ export default class DomEventService {
     }
 
     start() {
-        this.navigationService.start();
         this.masterHeadContainer.start();
     }
 

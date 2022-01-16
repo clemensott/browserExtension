@@ -25,8 +25,6 @@ function createArgs(state, last) {
     return args;
 }
 
-let instance = null;
-
 export default class NavigationEventService {
     constructor() {
         this.intervalId = null;
@@ -38,13 +36,6 @@ export default class NavigationEventService {
         };
 
         this.onTick = this.onTick.bind(this);
-    }
-
-    static getInstance() {
-        if (!instance) {
-            instance = new NavigationEventService();
-        }
-        return instance;
     }
 
     static isVideoWatchSite() {

@@ -1,16 +1,14 @@
 import React from 'react';
-import DomEventService from './DomEventService';
-import ChannelVideoHidingService from './ChannelVideoHidingService';
 import ReactRenderer from '../utils/ReactRenderer';
 import ChannelVideoHiding from '../components/ChannelVideoHiding';
 import './ChannelHelperService.css';
 
 
 export default class ChannelHelperService {
-    constructor() {
-        this.channelVideoHidingService = ChannelVideoHidingService.getInstance();
+    constructor({ channelVideoHidingService, domService }) {
+        this.channelVideoHidingService = channelVideoHidingService;
 
-        this.domService = DomEventService.getInstance();
+        this.domService = domService;
         this.domService.channel.addEventListener(this.onChannelChange.bind(this));
 
         this.channelHidingRenderer = new ReactRenderer({
@@ -20,7 +18,6 @@ export default class ChannelHelperService {
     }
 
     start() {
-        this.domService.start();
     }
 
     onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {

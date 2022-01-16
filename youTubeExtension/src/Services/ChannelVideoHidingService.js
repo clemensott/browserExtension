@@ -12,8 +12,6 @@ const constants = {
     RUNNING_CHANGE_EVENTNAME: 'ChannelVideoHidingService.runningChange',
 };
 
-let instance = null;
-
 function getContainer() {
     return document.querySelector('#items.style-scope.ytd-grid-renderer');
 }
@@ -45,13 +43,6 @@ export default class ChannelVideoHidingService {
                 this.checkHideCount();
             }
         });
-    }
-
-    static getInstance() {
-        if (!instance) {
-            instance = new ChannelVideoHidingService();
-        }
-        return instance;
     }
 
     checkHideCount(log = false) {
