@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './IsUpdatingIndicator.css';
 
 
 function addVideosIds(videoIds, map) {
@@ -58,9 +59,9 @@ export default function IsUpdatingIndicator() {
     }, []);
 
     return (
-        <>
+        <div className='yt-is-updating-indication-container'>
             <div>{dataVideoCount ? `Updating ${dataVideoCount}x data` : ''}</div>
             <div>{thumbnailVideoCount ? `Updating ${thumbnailVideoCount}x thumbnail` : ''}</div>
-        </>
+        </div>
     );
 }

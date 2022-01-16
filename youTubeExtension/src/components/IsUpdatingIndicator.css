@@ -1,0 +1,9 @@
+.yt-is-updating-indication-container {
+    width: 0;
+}
+
+.yt-is-updating-indication-container > div {
+    width: 1000px;
+    text-align: center;
+    transform: translate(-50%, 0);
+}

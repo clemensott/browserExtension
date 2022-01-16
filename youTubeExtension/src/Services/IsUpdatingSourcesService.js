@@ -6,7 +6,11 @@ import ReactRenderer from '../utils/ReactRenderer';
 export default class IsUpdatingSourcesService {
     constructor({ domService }) {
         this.domService = domService;
-        this.renderer = new ReactRenderer({
+        this.beforeSearchRenderer = new ReactRenderer({
+            id: 'is_updating_sources_before_search',
+            beforeSelector: '#center',
+        });
+        this.indicatorRenderer = new ReactRenderer({
             id: 'is_updating_sources_indicator_container',
             beforeSelector: '#end',
         });
@@ -16,9 +20,10 @@ export default class IsUpdatingSourcesService {
 
     onHeaderContainer({ detail: { currentElements: container } }) {
         if (container) {
-            this.renderer.render(<IsUpdatingIndicator />, container);
+            this.beforeSearchRenderer.render(<div />, container);
+            this.indicatorRenderer.render(<IsUpdatingIndicator />, container);
         } else {
-            this.renderer.unmount();
+            this.indicatorRenderer.unmount();
         }
     }
 
