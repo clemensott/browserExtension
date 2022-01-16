@@ -14,11 +14,10 @@
                 "https://www.youtube.com/*"
             ],
             "js": [
-                "dist/content.bundle.js"
+                "content.bundle.js"
             ],
             "css":[
-                "dist/content.bundle.css",
-                "dist/insite.bundle.css"
+                "content.bundle.css"
             ]
         },
         {
@@ -26,11 +25,11 @@
                 "https://www.youtube.com/feed/subscriptions"
             ],
             "js": [
-                "src/reloadSubscriptionSite.js"
+                "reloadSubscriptionSite.bundle.js"
             ]
         }
     ],
     "web_accessible_resources": [
-        "dist/*.js"
+        "./*.js"
     ]
 }

@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     content: './src/content.js',
     insite: './src/insite/index.js',
+    reloadSubscriptionSite: './src/reloadSubscriptionSite.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

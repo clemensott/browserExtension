@@ -4,7 +4,8 @@
   "description": "A lot of usefull stuff for youtube",
   "main": "content.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "package:windows":"xcopy static dist /y & webpack"
   },
   "author": "Clemens Ott",
   "license": "ISC",
