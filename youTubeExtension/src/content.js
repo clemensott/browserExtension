@@ -1,5 +1,6 @@
 import importBundle from "./insite/importBundle";
 import startPlayerService from './player';
+import ChannelHelperService from './Services/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
 import UpdateSourcesService from './Services/UpdateSourcesService';
@@ -8,6 +9,8 @@ import DisplayVideoStateService from './Services/DisplayVideoStateService';
 
 (async function () {
     startPlayerService();
+
+    new ChannelHelperService().start();
 
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler();

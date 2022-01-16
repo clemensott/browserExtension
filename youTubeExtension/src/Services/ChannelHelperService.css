@@ -1,0 +1,14 @@
+#inner-header-container.yt-channel-helper-service-inner-header-container > #meta.ytd-c4-tabbed-header-renderer {
+    flex: initial!important;
+}
+
+div.yt-channel-helper-service-own-container {
+    flex: 1;
+}
+
+.yt-channel-helper-service-hide-videos-contianer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px;
+}

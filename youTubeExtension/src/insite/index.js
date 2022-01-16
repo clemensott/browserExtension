@@ -1,6 +1,5 @@
 import InitDataService from '../Services/InitDataService';
 import fetchIntersectorService from '../Services/FetchIntersectorService';
-import channelVideoHiding from './channelVideoHiding';
 import createApiHandler from '../utils/createApiHandler';
 
 (function () {
@@ -11,7 +10,6 @@ import createApiHandler from '../utils/createApiHandler';
     fetchIntersectorService.enable();
 
     Object.assign(window, {
-        channelVideoHiding,
         createApiHandler,
     });
 })();
