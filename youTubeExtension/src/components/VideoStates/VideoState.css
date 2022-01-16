@@ -1,6 +1,7 @@
-.yt-video-user-state-container {
+.yt-video-user-state-container > div {
     font-size: 13px;
     display: flex;
+    height: 100%;
 }
 
 ytd-grid-video-renderer > .yt-video-user-state-container {
@@ -13,6 +14,7 @@ ytd-grid-video-renderer > .yt-video-user-state-container {
 
 ytd-grid-video-renderer:hover > .yt-video-user-state-container {
     top: 93px;
+    height: initial;
 }
 
 ytd-compact-video-renderer > .yt-video-user-state-container {
@@ -25,6 +27,7 @@ ytd-compact-video-renderer > .yt-video-user-state-container {
 
 ytd-compact-video-renderer:hover > .yt-video-user-state-container {
     top: calc(100% - 25px);
+    height: initial;
 }
 
 ytd-rich-item-renderer > .yt-video-user-state-container {
@@ -38,6 +41,7 @@ ytd-rich-item-renderer > .yt-video-user-state-container {
 
 ytd-rich-item-renderer:hover > .yt-video-user-state-container {
     margin-top: calc(56.25% - 25px);
+    height: initial;
 }
 
 ytd-video-renderer > .yt-video-user-state-container {
@@ -51,6 +55,7 @@ ytd-video-renderer > .yt-video-user-state-container {
 
 ytd-video-renderer:hover > .yt-video-user-state-container {
     top: calc(100% - 25px);
+    height: initial;
 }
 
 ytd-playlist-panel-video-renderer {
@@ -69,7 +74,7 @@ ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
     top: 35px;
 }
 
-*:hover > .yt-video-user-state-list-item {
+*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item {
     height: initial;
     padding-top: initial;
 }
@@ -87,7 +92,7 @@ ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
     display: none;
 }
 
-*:hover > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
+*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
     display: initial;
 }
 
@@ -109,8 +114,7 @@ ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
 }
 
 .yt-video-user-state-unkown {
-    background: white;
-    display: none;
+    background: transparent;
 }
 
 .yt-video-user-state-missing {
