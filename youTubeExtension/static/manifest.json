@@ -30,6 +30,6 @@
         }
     ],
     "web_accessible_resources": [
-        "./*.js"
+        "insite.bundle.js"
     ]
 }
