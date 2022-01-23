@@ -107,6 +107,10 @@ const actionConfigs = [
         getHide('#cmpbox'),
         clearOverflow('body'),
     ],
+    [
+        getHide('#didomi-host'),
+        getRemoveClasses('body', 'didomi-popup-open'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
