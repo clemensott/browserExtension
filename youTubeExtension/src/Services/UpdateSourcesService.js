@@ -196,7 +196,11 @@ export default class UpdateSourcesService {
         const thumbnailUpdatePromises = [];
 
         const updateThumbnails = videos => {
-            thumbnailUpdatePromises.push(this.handleThumbnailsUpdate(videos.map(v => v.id)));
+            const visibleVideos = videos.filter(v => {
+                const source = this.api.getSource(v.channelId);
+                return source && source.isActive && source.visibleVideos.includes(v.id);
+            });
+            thumbnailUpdatePromises.push(this.handleThumbnailsUpdate(visibleVideos.map(v => v.id)));
         }
 
         const watchVideo = tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.results?.results?.contents);

@@ -127,6 +127,10 @@ export default class ApiHandler {
         }
     }
 
+    getSource(youtubeId){
+        return this.sources.get(youtubeId);
+    }
+
     async updateThumbnails(videoIds) {
         try {
             return await this.api.videoUpdateThumbnails(videoIds);

@@ -32,8 +32,24 @@ export default class ChannelVideoHidingService {
 
         document.addEventListener('updateSources.startHandleVideos', ({ detail: videos }) => {
             this.updatingVideoIds.add(videos.map(v => v.id));
+            
+            if (this.intervalId) {
+                this.checkHideCount();
+            }
+        });
+
+        document.addEventListener('updateSources.endHandleVideos', ({ detail: videos }) => {
+            this.updatingVideoIds.remove(videos.map(v => v.id));
 
             setTimeout(() => this.intervalId && this.checkHideCount(), 100);
+        });
+
+        document.addEventListener('updateSources.startUpdateThumbnails', ({ detail: videoIds }) => {
+            this.updatingVideoIds.add(videoIds);
+
+            if (this.intervalId) {
+                this.checkHideCount();
+            }
         });
 
         document.addEventListener('updateSources.endUpdateThumbnails', ({ detail: videoIds }) => {
