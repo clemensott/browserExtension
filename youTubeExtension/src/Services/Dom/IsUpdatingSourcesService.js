@@ -1,11 +1,13 @@
 import React from 'react';
-import IsUpdatingIndicator from '../components/IsUpdatingIndicator';
-import ReactRenderer from '../utils/ReactRenderer';
+import IsUpdatingIndicator from '../../components/IsUpdatingIndicator';
+import ReactRenderer from '../../utils/ReactRenderer';
 
 
 export default class IsUpdatingSourcesService {
-    constructor({ domService }) {
+    constructor({ domService, trackerService }) {
         this.domService = domService;
+        this.trackerService = trackerService;
+
         this.beforeSearchRenderer = new ReactRenderer({
             id: 'is_updating_sources_before_search',
             beforeSelector: '#center',
@@ -21,7 +23,7 @@ export default class IsUpdatingSourcesService {
     onHeaderContainer({ detail: { currentElements: container } }) {
         if (container) {
             this.beforeSearchRenderer.render(<div />, container);
-            this.indicatorRenderer.render(<IsUpdatingIndicator />, container);
+            this.indicatorRenderer.render(<IsUpdatingIndicator trackerService={this.trackerService} />, container);
         } else {
             this.indicatorRenderer.unmount();
         }

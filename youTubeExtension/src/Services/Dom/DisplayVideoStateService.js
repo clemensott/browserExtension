@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import getVideoIdFromUrl from '../utils/getVideoIdFromUrl';
-import setIntervalUntil from '../utils/setIntervalUntil';
-import AtOnceService from './AtOnceService';
-import addToggleDisplayVideoState from '../components/addToggleDisplayVideoState';
-import VideoState from '../components/VideoStates/VideoState';
+import getVideoIdFromUrl from '../../utils/getVideoIdFromUrl';
+import setIntervalUntil from '../../utils/setIntervalUntil';
+import AtOnceService from '../AtOnceService';
+import addToggleDisplayVideoState from '../../components/addToggleDisplayVideoState';
+import VideoState from '../../components/VideoStates/VideoState';
 
 const videoUserStateClassName = 'yt-video-user-state-container';
 

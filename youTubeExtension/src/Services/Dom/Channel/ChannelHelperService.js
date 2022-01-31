@@ -1,6 +1,8 @@
 import React from 'react';
-import ReactRenderer from '../utils/ReactRenderer';
-import ChannelVideoHiding from '../components/ChannelVideoHiding';
+import ReactDOM from 'react-dom';
+import ReactRenderer from '../../../utils/ReactRenderer';
+import ChannelVideoHiding from '../../../components/ChannelVideoHiding';
+import VideosTabCount from '../../../components/VideosTabCount';
 import './ChannelHelperService.css';
 
 
@@ -9,7 +11,6 @@ export default class ChannelHelperService {
         this.channelVideoHidingService = channelVideoHidingService;
 
         this.domService = domService;
-        this.domService.channel.addEventListener(this.onChannelChange.bind(this));
 
         this.channelHidingRenderer = new ReactRenderer({
             className: 'yt-channel-helper-service-own-container',
@@ -17,7 +18,9 @@ export default class ChannelHelperService {
         });
     }
 
-    start() {
+    init() {
+        this.domService.channel.addEventListener(this.onChannelChange.bind(this));
+        this.domService.channelVideosCount.addEventListener(this.onChannelVideosChange.bind(this));
     }
 
     onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {
@@ -35,6 +38,16 @@ export default class ChannelHelperService {
             innerHeaderContainer.classList.add('yt-channel-helper-service-inner-header-container');
         } else {
             this.channelHidingRenderer.unmount();
+        }
+    }
+
+    onChannelVideosChange({ detail: { currentElements: newObj, lastElements: lastObj } }) {
+        if (lastObj && (!newObj || newObj.videosTab !== lastObj.videosTab)) {
+            ReactDOM.render(<VideosTabCount />, lastObj.videosTab);
+        }
+
+        if (newObj && newObj.videosTab) {
+            ReactDOM.render(<VideosTabCount {...newObj} />, newObj.videosTab);
         }
     }
 }

@@ -1,4 +1,4 @@
-import triggerEvent from "../utils/triggerEvent";
+import triggerEvent from '../../utils/triggerEvent';
 
 function defaultElementsExists(last) {
     return last instanceof Node && document.contains(last);
@@ -9,13 +9,14 @@ function defautlChangeDetector(current, last) {
 }
 
 export default class DomEventHandler {
-    constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout, notFoundTimeout }) {
+    constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout, notFoundTimeout, triggerEventOnRunChange }) {
         this.eventName = eventName;
         this.elementsExists = elementsExists || defaultElementsExists;
         this.elementsGetter = elementsGetter;
         this.notFoundTimeout = notFoundTimeout;
         this.timeout = timeout;
         this.changeDetector = changeDetector || defautlChangeDetector;
+        this.triggerEventOnRunChange = triggerEventOnRunChange || false;
         this.intervalId = null;
         this.lastElements = null;
 
@@ -26,6 +27,14 @@ export default class DomEventHandler {
         if (!this.intervalId) {
             const timeout = this.notFoundTimeout && !this.lastElements ? this.notFoundTimeout : this.timeout;
             this.intervalId = setInterval(this.onTick, timeout);
+
+            if (this.triggerEventOnRunChange) {
+                triggerEvent(this.eventName, {
+                    lastElements: null,
+                    currentElements: this.lastElements,
+                });
+                this.onTick();
+            }
         }
     }
 
@@ -33,26 +42,33 @@ export default class DomEventHandler {
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
+
+            if (this.triggerEventOnRunChange) {
+                triggerEvent(this.eventName, {
+                    lastElements: this.lastElements,
+                    currentElements: null,
+                });
+            }
         }
     }
 
     onTick() {
         const currentElements = this.elementsExists(this.lastElements) ?
-            this.lastElements : this.elementsGetter();
+            this.lastElements : this.elementsGetter(this.lastElements);
         if (this.changeDetector(currentElements, this.lastElements)) {
-            console.log('dom change:', this.elementsExists(this.lastElements), currentElements, this.lastElements);
             triggerEvent(this.eventName, {
                 lastElements: this.lastElements,
                 currentElements,
             });
         }
 
-        const changeTimout = this.notFoundTimeout && (this.lastElements ^ currentElements);
-        this.lastElements = currentElements;
-        if (changeTimout) {
-            this.stop();
-            this.start();
+        if (this.intervalId && this.notFoundTimeout && (!!this.lastElements ^ !!currentElements)) {
+            const timeout = currentElements ? this.timeout : this.notFoundTimeout;
+            clearInterval(this.intervalId);
+            this.intervalId = setInterval(this.onTick, timeout);
         }
+
+        this.lastElements = currentElements;
     }
 
     addEventListener(callback) {

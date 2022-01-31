@@ -1,34 +1,41 @@
-import importBundle from "./insite/importBundle";
+import importBundle from './insite/importBundle';
 import startPlayerService from './player';
-import ChannelHelperService from './Services/ChannelHelperService';
+import ChannelHelperService from './Services/Dom/Channel/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
 import UpdateSourcesService from './Services/UpdateSourcesService';
-import IsUpdatingSourcesService from './Services/IsUpdatingSourcesService';
-import DisplayVideoStateService from './Services/DisplayVideoStateService';
-import ChannelVideoHidingService from './Services/ChannelVideoHidingService';
-import DomEventService from './Services/DomEventService';
-import NavigationEventService from "./Services/NavigationEventService";
+import IsUpdatingSourcesService from './Services/Dom/IsUpdatingSourcesService';
+import DisplayVideoStateService from './Services/Dom/DisplayVideoStateService';
+import ChannelVideoHidingService from './Services/Dom/Channel/ChannelVideoHidingService';
+import DomEventService from './Services/Dom/DomEventService';
+import NavigationEventService from './Services/NavigationEventService';
+import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService';
 
 (async function () {
     startPlayerService();
 
+    const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
-    const domService = new DomEventService({ navigationService });
-    const channelVideoHidingService = new ChannelVideoHidingService();
+    const domService = new DomEventService({ navigationService, updateSourcesTrackerService });
+    const channelVideoHidingService = new ChannelVideoHidingService({ domService, updateSourcesTrackerService });
     const channelHelperService = new ChannelHelperService({
         channelVideoHidingService,
         domService,
     });
-    const isUpdatingSourcesService = new IsUpdatingSourcesService({ domService });
+    const isUpdatingSourcesService = new IsUpdatingSourcesService({
+        domService,
+        trackerService: updateSourcesTrackerService,
+    });
 
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler();
 
     if (apiHandler) {
-        navigationService.start();
+        channelHelperService.init();
+        channelVideoHidingService.init();
         domService.start();
-        channelHelperService.start();
+        navigationService.start();
+        updateSourcesTrackerService.init();
 
         console.log('API baseURL:', apiHandler.api.baseUrl);
         try {
