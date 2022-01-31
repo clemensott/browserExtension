@@ -1,4 +1,4 @@
-import ElementCacheService from "../Services/ElementCacheService";
+import ElementCacheService from '../Services/Dom/ElementCacheService';
 
 export const elementCacheIds = {
     AUTO_MUTED_KEY: 'yt-extension-auto-muted',

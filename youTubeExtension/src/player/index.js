@@ -1,6 +1,6 @@
-import { elementCacheIds, elementCache } from "./PlayerElementCache";
-import getCurrentVideoId from "../utils/getCurrentVideoId";
-import setIntervalUntil from "../utils/setIntervalUntil";
+import { elementCacheIds, elementCache } from './PlayerElementCache';
+import getCurrentVideoId from '../utils/getCurrentVideoId';
+import setIntervalUntil from '../utils/setIntervalUntil';
 import './index.css';
 
 const constants = {
