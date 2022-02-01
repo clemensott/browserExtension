@@ -1,5 +1,6 @@
 import React from 'react';
 import VideoStateButton from './VideoStateButton';
+import VideoStateDropdown from './VideoStateDropdown';
 import './VideoState.css';
 
 
@@ -51,7 +52,7 @@ function SetDisableDeprecatedButton({ wrapFunction }) {
 }
 
 
-export default function VideoState({ videoId, videoUserState, additionalClassName, api, onVideoUpdate }) {
+export default function VideoState({ videoId, videoUserState, additionalClassName, api, onVideoUpdate, onDropdownOpenChange }) {
     if (!videoUserState) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-unkown`} />
@@ -86,12 +87,21 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     const inactiveDeprecatedSourceIds = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated).map(s => s.sourceId);
     const isSingleDeprecatedInactive = inactiveDeprecatedSourceIds.length === 1;
 
+    const dropdown = (
+        <VideoStateDropdown
+            videoId={videoId}
+            apiUrl={api.api.baseUrl}
+            onDropdownOpenChange={onDropdownOpenChange}
+        />
+    );
+
     if (videoUserState.isWatched) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-watched`}>
                 <SetNoWatchedButton wrapFunction={createWrapFunction()} />
                 {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
                 {isSingleInactive && <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />}
+                {dropdown}
             </div>
         );
     }
@@ -100,6 +110,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
             <div className={`${additionalClassName} yt-video-user-state-inactive-depricated`}>
                 <SetWatchedButton wrapFunction={createWrapFunction()} />
                 <SetDisableDeprecatedButton wrapFunction={createWrapFunction(inactiveDeprecatedSourceIds)} />
+                {dropdown}
             </div>
         );
     }
@@ -108,6 +119,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
             <div className={`${additionalClassName} yt-video-user-state-inactive`}>
                 <SetWatchedButton wrapFunction={createWrapFunction()} />
                 <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />
+                {dropdown}
             </div>
         );
     }
@@ -117,6 +129,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
                 <SetWatchedAndInactiveButton wrapFunction={createWrapFunction(videoUserState.sources.map(s => s.sourceId))} />
                 {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
                 {isSingleInactive && <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />}
+                {dropdown}
             </div>
         );
     }
@@ -129,6 +142,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
                     text={`${inactiveSourceIds.length} / ${videoUserState.sources.length}`}
                     className="yt-video-user-state-action-button-count"
                 />
+                {dropdown}
             </div>
         );
     }
@@ -140,6 +154,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
                 text={`${inactiveSourceIds.length} / ${videoUserState.sources.length}`}
                 className="yt-video-user-state-action-button-count"
             />
+            {dropdown}
         </div>
     );
 }

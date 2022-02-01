@@ -1,0 +1,22 @@
+.video-state-dropdown-container {
+    position: relative;
+    z-index: 10;
+}
+
+.video-state-dropdown-action-button {
+    flex-grow: 0;
+}
+
+.video-state-dropdown-action-button::after {
+    content: '…';
+}
+
+.video-state-dropdown-menu-container {
+    position: absolute;
+    top: 25px;
+    right: 0;
+    background-color: #fAfAfA;
+    padding: 10px 15px;
+    border: gray solid 1px;
+    box-shadow: 2px 2px 4px 1px rgb(0 0 0 / 55%);
+}

@@ -12,7 +12,8 @@ ytd-grid-video-renderer > .yt-video-user-state-container {
     height: 4px;
 }
 
-ytd-grid-video-renderer:hover > .yt-video-user-state-container {
+ytd-grid-video-renderer:hover > .yt-video-user-state-container,
+ytd-grid-video-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     top: 93px;
     height: initial;
 }
@@ -25,7 +26,8 @@ ytd-compact-video-renderer > .yt-video-user-state-container {
     height: 4px;
 }
 
-ytd-compact-video-renderer:hover > .yt-video-user-state-container {
+ytd-compact-video-renderer:hover > .yt-video-user-state-container,
+ytd-compact-video-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     top: calc(100% - 25px);
     height: initial;
 }
@@ -39,7 +41,8 @@ ytd-rich-item-renderer > .yt-video-user-state-container {
     margin-top: calc(56.25% - 4px);
 }
 
-ytd-rich-item-renderer:hover > .yt-video-user-state-container {
+ytd-rich-item-renderer:hover > .yt-video-user-state-container,
+ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     margin-top: calc(56.25% - 25px);
     height: initial;
 }
@@ -53,7 +56,8 @@ ytd-video-renderer > .yt-video-user-state-container {
     height: 4px;
 }
 
-ytd-video-renderer:hover > .yt-video-user-state-container {
+ytd-video-renderer:hover > .yt-video-user-state-container,
+ytd-video-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     top: calc(100% - 25px);
     height: initial;
 }
@@ -70,36 +74,41 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container {
     height: 4px;
 }
 
-ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container {
+ytd-playlist-panel-video-renderer:hover > .yt-video-user-state-container,
+ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     top: 35px;
 }
 
-*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item {
+*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item,
+.yt-video-user-state-container.yt-video-user-state-container-not-collapse > .yt-video-user-state-list-item {
     height: initial;
     padding-top: initial;
 }
 
 .yt-video-user-state-action-button {
-    flex-grow: 1;
     text-align: center;
     margin: 2px;
     color: white;
     border: 2px solid #BBBBBB;
     cursor: pointer;
+    height: 17px;
+    padding: 0 10px;
+}
+
+.yt-video-user-state-action-button:not(.video-state-dropdown-action-button) {
+    flex-grow: 1;
 }
 
 .yt-video-user-state-list-item > .yt-video-user-state-action-button {
     display: none;
 }
 
-*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
+*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item > .yt-video-user-state-action-button,
+.yt-video-user-state-container.yt-video-user-state-container-not-collapse > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
     display: initial;
 }
 
 .yt-video-user-state-action-button:hover {
-    flex-grow: 1;
-    text-align: center;
-    margin: 2px;
     color: black;
     background: white;
 }

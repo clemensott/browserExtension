@@ -7,6 +7,7 @@ import addToggleDisplayVideoState from '../../components/addToggleDisplayVideoSt
 import VideoState from '../../components/VideoStates/VideoState';
 
 const videoUserStateClassName = 'yt-video-user-state-container';
+const videoUserStateNotCollapse = 'yt-video-user-state-container-not-collapse';
 
 function getCurrentVideoUserStateContainer() {
     return document.querySelector('ytd-video-primary-info-renderer #info');
@@ -105,7 +106,15 @@ export default class DisplayVideoStateService {
                 videoUserState={videoUserState}
                 additionalClassName={additionalClassName}
                 api={this.api}
-                onVideoUpdate={() => this.loop.run()} />,
+                onVideoUpdate={() => this.loop.run()}
+                onDropdownOpenChange={open => {
+                    if (open) {
+                        element.classList.add(videoUserStateNotCollapse);
+                    } else {
+                        element.classList.remove(videoUserStateNotCollapse);
+                    }
+                }}
+            />,
             element,
         );
     }
