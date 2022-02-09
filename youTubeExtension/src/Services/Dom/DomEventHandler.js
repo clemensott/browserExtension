@@ -29,7 +29,7 @@ export default class DomEventHandler {
             this.intervalId = setInterval(this.onTick, timeout);
 
             if (this.triggerEventOnRunChange) {
-                triggerEvent(this.eventName, {
+                this.triggerEvent({
                     lastElements: null,
                     currentElements: this.lastElements,
                 });
@@ -44,7 +44,7 @@ export default class DomEventHandler {
             this.intervalId = null;
 
             if (this.triggerEventOnRunChange) {
-                triggerEvent(this.eventName, {
+                this.triggerEvent({
                     lastElements: this.lastElements,
                     currentElements: null,
                 });
@@ -56,7 +56,7 @@ export default class DomEventHandler {
         const currentElements = this.elementsExists(this.lastElements) ?
             this.lastElements : this.elementsGetter(this.lastElements);
         if (this.changeDetector(currentElements, this.lastElements)) {
-            triggerEvent(this.eventName, {
+            this.triggerEvent({
                 lastElements: this.lastElements,
                 currentElements,
             });
@@ -69,6 +69,15 @@ export default class DomEventHandler {
         }
 
         this.lastElements = currentElements;
+    }
+
+    triggerEvent(args) {
+        this.onChange(args);
+        triggerEvent(this.eventName, args);
+    }
+
+    onChange(args) {
+
     }
 
     addEventListener(callback) {

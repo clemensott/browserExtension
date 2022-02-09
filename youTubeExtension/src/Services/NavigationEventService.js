@@ -19,8 +19,8 @@ function mergeStates(currentState, lastState) {
 
 function createArgs(state, last) {
     const args = {};
-    Object.entries(last).forEach(([key, lastValue]) => {
-        args[key] = mergeStates(state[key], lastValue);
+    Object.entries(state).forEach(([key, value]) => {
+        args[key] = mergeStates(value, last && last[key]);
     });
     return args;
 }
@@ -29,11 +29,7 @@ export default class NavigationEventService {
     constructor() {
         this.intervalId = null;
         this.lastUrl = null;
-        this.lastState = {
-            isVideoWatchSite: false,
-            isChannelSite: false,
-            isChannelVideosSite: false,
-        };
+        this.lastState = null;
 
         this.onTick = this.onTick.bind(this);
     }
@@ -68,6 +64,10 @@ export default class NavigationEventService {
         }
     }
 
+    static isSubscriptionBoxSite() {
+        return window.location.pathname === '/feed/subscriptions';
+    }
+
     start() {
         this.stop();
         this.intervalId = setInterval(this.onTick, 20);
@@ -91,6 +91,7 @@ export default class NavigationEventService {
             isVideoWatchSite: NavigationEventService.isVideoWatchSite(),
             isChannelSite: NavigationEventService.isChannelSite(),
             isChannelVideosSite: NavigationEventService.isChannelVideosSite(),
+            isSubscriptionBoxSite: NavigationEventService.isSubscriptionBoxSite(),
         };
         triggerEvent(constants.URL_CHANGE_EVENTNAME, createArgs(state, this.lastState));
 

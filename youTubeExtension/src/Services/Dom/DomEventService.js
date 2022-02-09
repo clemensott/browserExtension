@@ -2,6 +2,7 @@ import { navigationChange } from '../../constants';
 import ChannelDomEventHandler from './Channel/ChannelDomEventHandler';
 import ChannelVideosDomEventHandler from './Channel/ChannelVideosDomEventHandler';
 import DomEventHandler from './DomEventHandler';
+import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
 
 export default class DomEventService {
     constructor({ navigationService, updateSourcesTrackerService }) {
@@ -15,6 +16,7 @@ export default class DomEventService {
             timeout: 10000,
             notFoundTimeout: 100,
         });
+        this.reloadSubscriptionBoxDomEventHandler = new ReloadSubscriptionBoxDomEventHandler();
 
         this.navigationService = navigationService;
         this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange.bind(this));
@@ -37,10 +39,15 @@ export default class DomEventService {
         }
 
         if (detail.isChannelVideosSite === navigationChange.ENTERED) {
-            console.log('start channelVideosCount')
             this.channelVideosCount.start();
         } else if (detail.isChannelVideosSite === navigationChange.LEFT) {
             this.channelVideosCount.stop();
+        }
+
+        if (detail.isSubscriptionBoxSite === navigationChange.ENTERED) {
+            this.reloadSubscriptionBoxDomEventHandler.start();
+        } else if (detail.isSubscriptionBoxSite === navigationChange.LEFT) {
+            this.reloadSubscriptionBoxDomEventHandler.stop();
         }
     }
 }
