@@ -6,7 +6,6 @@ module.exports = {
   entry: {
     content: './src/content.js',
     insite: './src/insite/index.js',
-    reloadSubscriptionSite: './src/reloadSubscriptionSite.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -24,6 +23,13 @@ module.exports = {
       test: /\.css$/,
       use: [MiniCssExtractPlugin.loader, 'css-loader',],
     }],
+  },
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+    port: 8012,
+    webSocketServer: false,
   },
   plugins: [
     new MiniCssExtractPlugin({
