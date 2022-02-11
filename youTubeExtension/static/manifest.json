@@ -19,14 +19,6 @@
             "css":[
                 "content.bundle.css"
             ]
-        },
-        {
-            "matches": [
-                "https://www.youtube.com/feed/subscriptions"
-            ],
-            "js": [
-                "reloadSubscriptionSite.bundle.js"
-            ]
         }
     ],
     "web_accessible_resources": [
