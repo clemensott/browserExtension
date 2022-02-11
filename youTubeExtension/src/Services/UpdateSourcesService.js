@@ -3,6 +3,10 @@ import tryIgnore from '../utils/tryIgnore';
 import triggerEvent from '../utils/triggerEvent';
 import fetchIntersectorService from './FetchIntersectorService';
 
+function fullFlat(array) {
+    return array.map(a => Array.isArray(a) ? fullFlat(a) : a).flat();
+}
+
 function parseDuration(rawDuration) {
     if (!rawDuration) {
         return null;
@@ -212,9 +216,12 @@ export default class UpdateSourcesService {
             updateThumbnails(videos);
         }
 
-        const recommendationVideos =
-            tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results) ||
-            tryIgnore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems);
+        const recommendationVideos = fullFlat([
+            tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results?.map(r => r?.itemSectionRenderer?.contents)),
+            tryIgnore(() => data?.contents?.twoColumnWatchNextResults?.secondaryResults?.secondaryResults?.results),
+            tryIgnore(() => data?.onResponseReceivedEndpoints[0]?.appendContinuationItemsAction?.continuationItems),
+            tryIgnore(() => data?.onResponseReceivedEndpoints[0]?.reloadContinuationItemsCommand?.continuationItems),
+        ]).filter(Boolean);
         if (recommendationVideos) {
             const videos = recommendationVideos.map(getRecommendationVideosData).filter(Boolean);
             console.log('handle recommendation videos:', videos.length);

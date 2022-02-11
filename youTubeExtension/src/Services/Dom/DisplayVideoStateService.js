@@ -30,6 +30,7 @@ function getVideoContainers() {
 
     const listVideos = [
         '#items > ytd-compact-video-renderer',
+        '#contents > ytd-compact-video-renderer',
         '#items > ytd-grid-video-renderer',
         '#contents > ytd-rich-item-renderer',
         '#contents > ytd-video-renderer',
