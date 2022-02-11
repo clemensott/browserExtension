@@ -10,8 +10,10 @@ import ChannelVideoHidingService from './Services/Dom/Channel/ChannelVideoHiding
 import DomEventService from './Services/Dom/DomEventService';
 import NavigationEventService from './Services/NavigationEventService';
 import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService';
+import checkExclusivity from './utils/checkExclusivity';
 
-(async function () {
+
+async function main() {
     startPlayerService();
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
@@ -60,4 +62,8 @@ import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService'
 
         importBundle();
     }
-})();
+}
+
+if (checkExclusivity()) {
+    main();
+}
