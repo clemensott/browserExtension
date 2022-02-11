@@ -30,16 +30,32 @@ async function injectStyles(url) {
     }
 }
 
+async function loadScripts() {
+    try {
+        await js.map(getUrlFromPath).reduce(async (promise, path) => {
+            await promise;
+            return runScript(path);
+        }, Promise.resolve());
+    } catch (err) {
+        console.debug(err);
+    }
+}
+
+async function loadSyles() {
+    try {
+        await css.map(getUrlFromPath).reduce(async (promise, path) => {
+            await promise;
+            return injectStyles(path);
+        }, Promise.resolve());
+    } catch (err) {
+        console.debug(err);
+    }
+}
+
 if (js) {
-    js.map(getUrlFromPath).reduce(async (promise, path) => {
-        await promise;
-        return runScript(path);
-    }, Promise.resolve());
+    loadScripts();
 }
 
 if (css) {
-    css.map(getUrlFromPath).reduce(async (promise, path) => {
-        await promise;
-        return injectStyles(path);
-    }, Promise.resolve());
+    loadSyles();
 }
