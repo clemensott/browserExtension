@@ -4,8 +4,9 @@ export default class ApiHandler {
     constructor(api, videoUserStateUpdateInterval) {
         this.api = api;
         this.videoUserStateUpdateInterval = videoUserStateUpdateInterval || 60;
+        this.channels = new Map();
         this.sources = new Map();
-        this.videoUserStates = {};
+        this.videoUserStates = new Map();
     }
 
     getUpdate(value, overrideHasUpdate) {
@@ -28,8 +29,16 @@ export default class ApiHandler {
         }
     }
 
+    getVideoUserState(videoId) {
+        return this.videoUserStates.get(videoId);
+    }
+
+    setVideoUserState(videoUserState) {
+        return this.videoUserStates.set(videoUserState.videoId, videoUserState);
+    }
+
     isVideoToUpdateUserState(videoId) {
-        const userState = this.videoUserStates[videoId];
+        const userState = this.getVideoUserState(videoId);
         return !userState?.timestamp || (Date.now() - userState.timestamp > this.videoUserStateUpdateInterval * 1000);
     }
 
@@ -48,31 +57,31 @@ export default class ApiHandler {
         } catch { }
 
         videoIds.forEach(videoId => {
-            this.videoUserStates[videoId] = {
-                ...this.videoUserStates[videoId],
+            this.setVideoUserState({
+                ...this.getVideoUserState(videoId),
                 ...response.get(videoId),
                 videoId,
                 timestamp: Date.now(),
-            };
+            });
         });
         return videoIds;
     }
 
     async createChannels(channelIds) {
         try {
-            let missingChannelIds = channelIds.filter(id => !this.sources.has(id));
+            let missingChannelIds = channelIds.filter(id => !this.channels.has(id));
             if (!missingChannelIds.length) {
                 return;
             }
 
             const fetchedChannels = await this.api.sourceFromYoutubeIds(missingChannelIds);
-            fetchedChannels.forEach(channel => this.sources.set(channel.youTubeId, channel));
+            fetchedChannels.forEach(channel => this.setSource(channel));
 
-            missingChannelIds = channelIds.filter(id => !this.sources.has(id));
+            missingChannelIds = channelIds.filter(id => !this.channels.has(id));
             await Promise.all(missingChannelIds.map(async channelId => {
                 try {
                     const source = await this.api.sourceAdd(channelId, false);
-                    this.sources.set(source.youTubeId, source)
+                    this.setSource(source);
                 } catch (e) {
                     console.log('create source error:', e)
                 }
@@ -99,7 +108,7 @@ export default class ApiHandler {
                 fetchTime = new Date().toISOString();
             }
             const sources = Array.from(channels.keys()).map(channelId => {
-                const sourceId = this.sources.get(channelId)?.id;
+                const sourceId = this.channels.get(channelId)?.id;
                 const videos = Array.from(groupBy(channels.get(channelId), v => v.id).values()).map(g => g[0]).filter(Boolean);
                 const channelTitle = videos.map(v => v.channelTitle).find(Boolean);
                 return sourceId && {
@@ -127,8 +136,31 @@ export default class ApiHandler {
         }
     }
 
-    getSource(youtubeId){
-        return this.sources.get(youtubeId);
+    async loadSources(sourceIds) {
+        try {
+            const missingSourceIds = sourceIds.filter(id => !this.sources.has(id));
+            if (missingSourceIds.length) {
+                const fetchedSources = await this.api.sourceList(missingSourceIds);
+                fetchedSources.forEach(source => this.setSource(source));
+            }
+        } catch (e) {
+            console.error('loadSources error', e);
+        }
+    }
+
+    setSource(source) {
+        this.sources.set(source.id, source);
+        if (source.youTubeId) {
+            this.channels.set(source.youTubeId, source);
+        }
+    }
+
+    getSourceFromId(sourceId) {
+        return this.sources.get(sourceId);
+    }
+
+    getSourceFromYouTubeId(youtubeId) {
+        return this.channels.get(youtubeId);
     }
 
     async updateThumbnails(videoIds) {

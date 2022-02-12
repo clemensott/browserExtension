@@ -49,6 +49,15 @@ export default class API {
         }));
     }
 
+    sourceList(sourceIds) {
+        return this.toJSON(this.call({
+            url: '/api/sources/list',
+            body: {
+                sourceIds,
+            },
+        }));
+    }
+
     sourceFromYoutubeIds(youTubeIds) {
         return this.toJSON(this.call({
             url: '/api/sources/fromYoutubeIds',

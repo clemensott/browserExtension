@@ -64,12 +64,27 @@ export default class DisplayVideoStateService {
 
                 const videoIds = this.videoContainers.map(c => c.videoId).filter(Boolean);
                 const updatedVideoIds = await this.api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
+                if (updatedVideoIds) {
+                    await this.loadSourcesOfVideos(updatedVideoIds);
+                }
                 this.updateUI(updatedVideoIds);
             } catch (e) {
                 console.error('loop error', e)
             }
         });
         this.runLoopNonAsync = this.runLoopNonAsync.bind(this);
+    }
+
+    loadSourcesOfVideos(videoIds) {
+        const sourceIds = (videoIds || [])
+            .map(videoId => this.api.getVideoUserState(videoId))
+            .filter(Boolean)
+            .map(state => state.sources)
+            .filter(Boolean)
+            .flat()
+            .map(s => s.sourceId);
+
+        return this.api.loadSources(sourceIds);
     }
 
     updateUI(videoIdsToUpdate) {
@@ -85,7 +100,7 @@ export default class DisplayVideoStateService {
             return;
         }
 
-        const videoUserState = this.api.videoUserStates[videoId];
+        const videoUserState = this.api.getVideoUserState(videoId);
         let element = container.querySelector(`.${videoUserStateClassName}`);
         if (!element) {
             element = document.createElement('span');
@@ -101,10 +116,18 @@ export default class DisplayVideoStateService {
         element.dataset.id = videoId;
         element.dataset.timestamp = timestamp;
 
+        const videoUserStateWithSourcesData = videoUserState ? {
+            ...videoUserState,
+            sources: videoUserState.sources && videoUserState.sources.map(source => ({
+                ...source,
+                data: this.api.getSourceFromId(source.sourceId),
+            })),
+        } : null;
+
         ReactDOM.render(
             <VideoState
                 videoId={videoId}
-                videoUserState={videoUserState}
+                videoUserState={videoUserStateWithSourcesData}
                 additionalClassName={additionalClassName}
                 api={this.api}
                 onVideoUpdate={() => this.loop.run()}

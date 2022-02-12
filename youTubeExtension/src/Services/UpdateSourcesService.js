@@ -201,7 +201,7 @@ export default class UpdateSourcesService {
 
         const updateThumbnails = videos => {
             const visibleVideos = videos.filter(v => {
-                const source = this.api.getSource(v.channelId);
+                const source = this.api.getSourceFromYouTubeId(v.channelId);
                 return source && source.isActive && source.visibleVideos.includes(v.id);
             });
             thumbnailUpdatePromises.push(this.handleThumbnailsUpdate(visibleVideos.map(v => v.id)));

@@ -16,14 +16,19 @@
     top: 25px;
     right: 0;
     background-color: #fAfAfA;
-    padding: 5px 15px;
+    padding: 5px 10px;
     border: gray solid 1px;
     box-shadow: 2px 2px 4px 1px rgb(0 0 0 / 55%);
 }
 
 .video-state-dropdown-menu-item {
-    margin: 5px 0;
+    margin: 5px 5px;
     white-space: nowrap;
     font-size: 15px;
     cursor: pointer;
+    color: black;
+}
+
+.video-state-dropdown-menu-item:hover {
+    color: #4f4f4f;
 }
