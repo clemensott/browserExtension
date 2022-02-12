@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import VideoStateButton from './VideoStateButton';
+import VideoStateDropdownVideoActionButtons from './VideoStateDropdownVideoActionButtons';
 import './VideoStateDropdown.css';
 
 
-export default function VideoStateDropdown({ videoId, apiUrl, onDropdownOpenChange }) {
+export default function VideoStateDropdown({ videoId, apiUrl, actionButtons, onDropdownOpenChange }) {
     const [showMenu, setShowMenu] = useState(false);
     const dropdown = useRef(null);
     const closeMenu = useRef(e => {
@@ -38,10 +39,13 @@ export default function VideoStateDropdown({ videoId, apiUrl, onDropdownOpenChan
                 showMenu ? (
                     <div className="video-state-dropdown-container">
                         <div ref={dropdown} className="video-state-dropdown-menu-container">
-                            <a className="video-state-dropdown-menu-thumbnail"
-                                href={`${apiUrl}/pages/thumbnail?videoId=${encodeURIComponent(videoId)}`}>
-                                Thumbnail
-                            </a>
+                            <div className="video-state-dropdown-menu-item">
+                                <a className="video-state-dropdown-menu-thumbnail"
+                                    href={`${apiUrl}/pages/thumbnail?videoId=${encodeURIComponent(videoId)}`}>
+                                    Thumbnail
+                                </a>
+                            </div>
+                            <VideoStateDropdownVideoActionButtons buttons={actionButtons} />
                         </div>
                     </div>
                 ) : null

@@ -4,52 +4,67 @@ import VideoStateDropdown from './VideoStateDropdown';
 import './VideoState.css';
 
 
-function SetWatchedAndInactiveButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x2705;" title="Set watched and inactive!" onClick={wrapFunction(({ api, videoId, sourceIds }) => {
-        return Promise.all([
-            api.updateUserVideo(videoId, true),
-            api.deactivateVideo(videoId, sourceIds),
-        ]);
-    })} />;
-}
-
-function SetWatchedButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x2705;" title="Set watched and inactive!" onClick={wrapFunction(({ api, videoId }) => {
-        return api.updateUserVideo(videoId, true);
-    })} />;
-}
-
-function SetNoWatchedButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x274C;" title="Set not watched!" onClick={wrapFunction(({ api, videoId }) => {
-        return api.updateUserVideo(videoId, false);
-    })} />;
-}
-
-function SetActiveButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x2716;" title="Set active!" onClick={wrapFunction(({ api, videoId, sourceIds }) => {
-        return api.updateVideoSourcesState({
-            videoId,
-            sourceIds,
-            isActive: true,
-        });
-    })} />;
-}
-
-function SetInactiveButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x2713;" title="Set inactive!" onClick={wrapFunction(({ api, videoId, sourceIds }) => {
-        return api.deactivateVideo(videoId, sourceIds);
-    })} />;
-}
-
-function SetDisableDeprecatedButton({ wrapFunction }) {
-    return <VideoStateButton text="&#x2716;" title="Remove deprecated inactive!" onClick={wrapFunction(({ api, videoId, sourceIds }) => {
-        return api.updateVideoSourcesState({
-            videoId,
-            sourceIds,
-            isActiveDeprecated: false,
-        });
-    })} />;
-}
+const actionButtonConfig = {
+    setWatchedAndInactive: {
+        icon: '\u2705',
+        text: 'Watched',
+        title: 'Set watched and inactive!',
+        run: ({ api, videoId, sourceIds }) => {
+            return Promise.all([
+                api.updateUserVideo(videoId, true),
+                api.deactivateVideo(videoId, sourceIds),
+            ]);
+        },
+    },
+    setWatched: {
+        icon: '\u2705',
+        text: 'Watched',
+        title: 'Set watched!',
+        run: ({ api, videoId }) => {
+            return api.updateUserVideo(videoId, true);
+        },
+    },
+    setNotWatched: {
+        icon: '\u274C',
+        text: 'Not watched',
+        title: 'Set not watched!',
+        run: ({ api, videoId }) => {
+            return api.updateUserVideo(videoId, false);
+        },
+    },
+    setActive: {
+        icon: '\u2716',
+        text: 'Activate',
+        title: 'Set active!',
+        run: ({ api, videoId, sourceIds }) => {
+            return api.updateVideoSourcesState({
+                videoId,
+                sourceIds,
+                isActive: true,
+            });
+        },
+    },
+    setInactive: {
+        icon: '\u2713',
+        text: 'Deactivate',
+        title: 'Set inactive!',
+        run: ({ api, videoId, sourceIds }) => {
+            return api.deactivateVideo(videoId, sourceIds);
+        },
+    },
+    setDisableDeprecated: {
+        icon: '\u2716',
+        text: 'Remove deprecated',
+        title: 'Remove deprecated inactive!',
+        run: ({ api, videoId, sourceIds }) => {
+            return api.updateVideoSourcesState({
+                videoId,
+                sourceIds,
+                isActiveDeprecated: false,
+            });
+        },
+    },
+};
 
 
 export default function VideoState({ videoId, videoUserState, additionalClassName, api, onVideoUpdate, onDropdownOpenChange }) {
@@ -66,18 +81,30 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
         );
     }
 
-    const createWrapFunction = (sourceIds) => {
-        return func => {
-            return async () => {
-                try {
-                    await func({ api, videoId, sourceIds });
-                    await api.updateUserStateOfVideos([videoId], true);
-                    onVideoUpdate && await onVideoUpdate();
-                } catch (e) {
-                    console.error('delete video error', e);
-                }
-            };
+    const createWrapFunction = (func, sourceIds) => {
+        return async () => {
+            try {
+                await func({ api, videoId, sourceIds });
+                await api.updateUserStateOfVideos([videoId], true);
+                onVideoUpdate && await onVideoUpdate();
+            } catch (e) {
+                console.error('delete video error', e);
+            }
         };
+    }
+
+    function createActionButton(config, sourceId) {
+        if (sourceId && !Array.isArray(sourceId)) {
+            sourceId = [sourceId];
+        }
+        return {
+            ...config,
+            onClick: createWrapFunction(config.run, sourceId),
+        };
+    }
+
+    function createActionButtons(config, sourceIds = [undefined]) {
+        return sourceIds.map(sourceId => createActionButton(config, sourceId));
     }
 
     const activeSourceIds = videoUserState.sources.filter(vus => vus.isActive).map(s => s.sourceId);
@@ -87,74 +114,70 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     const inactiveDeprecatedSourceIds = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated).map(s => s.sourceId);
     const isSingleDeprecatedInactive = inactiveDeprecatedSourceIds.length === 1;
 
-    const dropdown = (
-        <VideoStateDropdown
-            videoId={videoId}
-            apiUrl={api.api.baseUrl}
-            onDropdownOpenChange={onDropdownOpenChange}
-        />
-    );
+    const Dropdown = ({ actionButtons }) => {
+        return (
+            <VideoStateDropdown
+                videoId={videoId}
+                apiUrl={api.api.baseUrl}
+                onDropdownOpenChange={onDropdownOpenChange}
+                actionButtons={actionButtons}
+            />
+        )
+    };
 
     if (videoUserState.isWatched) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-watched`}>
-                <SetNoWatchedButton wrapFunction={createWrapFunction()} />
-                {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
-                {isSingleInactive && <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />}
-                {dropdown}
+                <VideoStateButton {...createActionButton(actionButtonConfig.setNotWatched)} />
+                <Dropdown
+                    actionButtons={[
+                        ...createActionButtons(actionButtonConfig.setInactive, activeSourceIds),
+                        ...createActionButtons(actionButtonConfig.setActive, inactiveSourceIds),
+                    ]}
+                />
             </div>
         );
     }
     if (isSingleDeprecatedInactive && videoUserState.sources.length === 1) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-inactive-depricated`}>
-                <SetWatchedButton wrapFunction={createWrapFunction()} />
-                <SetDisableDeprecatedButton wrapFunction={createWrapFunction(inactiveDeprecatedSourceIds)} />
-                {dropdown}
+                <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
+                <Dropdown actionButtons={
+                    createActionButtons(actionButtonConfig.setDisableDeprecated, isSingleDeprecatedInactive)
+                } />
             </div>
         );
     }
     if (isSingleInactive && videoUserState.sources.length === 1) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-inactive`}>
-                <SetWatchedButton wrapFunction={createWrapFunction()} />
-                <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />
-                {dropdown}
+                <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
+                <Dropdown actionButtons={
+                    createActionButtons(actionButtonConfig.setActive, inactiveSourceIds)
+                } />
             </div>
         );
     }
-    if (videoUserState.sources.length === 1) {
+    if (isSingleActive && videoUserState.sources.length === 1) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-active`}>
-                <SetWatchedAndInactiveButton wrapFunction={createWrapFunction(videoUserState.sources.map(s => s.sourceId))} />
-                {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
-                {isSingleInactive && <SetActiveButton wrapFunction={createWrapFunction(inactiveSourceIds)} />}
-                {dropdown}
+                <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, activeSourceIds)} />
+                <Dropdown actionButtons={
+                    createActionButtons(actionButtonConfig.setInactive, activeSourceIds)
+                } />
             </div>
         );
     }
-    if (isSingleActive) {
-        return (
-            <div className={`${additionalClassName} yt-video-user-state-active`}>
-                <SetWatchedAndInactiveButton wrapFunction={createWrapFunction(videoUserState.sources.map(s => s.sourceId))} />
-                {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
-                <VideoStateButton
-                    text={`${inactiveSourceIds.length} / ${videoUserState.sources.length}`}
-                    className="yt-video-user-state-action-button-count"
-                />
-                {dropdown}
-            </div>
-        );
-    }
+    const allSourceIds = videoUserState.sources.map(s => s.sourceId);
     return (
         <div className={`${additionalClassName} yt-video-user-state-active`}>
-            <SetWatchedButton wrapFunction={createWrapFunction(videoUserState.sources.map(s => s.sourceId))} />
-            {isSingleActive && <SetInactiveButton wrapFunction={createWrapFunction(activeSourceIds)} />}
-            <VideoStateButton
-                text={`${inactiveSourceIds.length} / ${videoUserState.sources.length}`}
-                className="yt-video-user-state-action-button-count"
+            <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, allSourceIds)} />
+            <Dropdown
+                actionButtons={[
+                    ...createActionButtons(actionButtonConfig.setInactive, activeSourceIds),
+                    ...createActionButtons(actionButtonConfig.setActive, inactiveSourceIds),
+                ]}
             />
-            {dropdown}
         </div>
     );
 }

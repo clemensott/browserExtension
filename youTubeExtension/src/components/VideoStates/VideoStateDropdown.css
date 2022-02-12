@@ -1,6 +1,6 @@
 .video-state-dropdown-container {
     position: relative;
-    z-index: 10;
+    z-index: 1000;
 }
 
 .video-state-dropdown-action-button {
@@ -16,7 +16,14 @@
     top: 25px;
     right: 0;
     background-color: #fAfAfA;
-    padding: 10px 15px;
+    padding: 5px 15px;
     border: gray solid 1px;
     box-shadow: 2px 2px 4px 1px rgb(0 0 0 / 55%);
+}
+
+.video-state-dropdown-menu-item {
+    margin: 5px 0;
+    white-space: nowrap;
+    font-size: 15px;
+    cursor: pointer;
 }
