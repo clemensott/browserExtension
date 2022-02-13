@@ -84,7 +84,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     const createWrapFunction = (func, sources) => {
         return async () => {
             try {
-                const sourceIds = sources.map(s => s.sourceId);
+                const sourceIds = sources && sources.map(s => s.sourceId);
                 await func({ api, videoId, sourceIds });
                 await api.updateUserStateOfVideos([videoId], true);
                 onVideoUpdate && await onVideoUpdate();
@@ -106,24 +106,42 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     }
 
     function createActionButtons(config, sources = [undefined]) {
-        return sources.map(source => createActionButton(config, source));
+        try {
+            return sources.map(source => createActionButton(config, source));
+        } catch (err) {
+            console.error('createActionButtons:', config, sources, err);
+        }
     }
 
-    const activeSources = videoUserState.sources.filter(vus => vus.isActive);
-    const isSingleActive = activeSources.length === 1;
-    const inactiveSources = videoUserState.sources.filter(vus => !vus.isActive);
-    const isSingleInactive = inactiveSources.length === 1;
-    const inactiveDeprecatedSources = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated);
-    const isSingleDeprecatedInactive = inactiveDeprecatedSources.length === 1;
+    const activeForSources = videoUserState.sources.filter(vus => vus.isActive);
+    const isSingleActive = activeForSources.length === 1;
+    const inactiveForSources = videoUserState.sources.filter(vus => !vus.isActive);
+    const isSingleInactive = inactiveForSources.length === 1;
+    const inactiveDeprecatedForSources = videoUserState.sources.filter(vus => !vus.isActive && vus.isActiveDeprecated);
+    const isSingleDeprecatedInactive = inactiveDeprecatedForSources.length === 1;
 
-    const Dropdown = ({ actionButtons }) => {
+    const AdditionalActionButtons = ({ actionButtons }) => {
+        let firstActionButton = null;
+        const activeSources = actionButtons.filter(a => a.sources && a.sources.length && a.sources.every(s => s.data && s.data.isActive));
+        if (activeSources.length === 1) {
+            firstActionButton = activeSources[0];
+            const index = actionButtons.indexOf(firstActionButton);
+            actionButtons.splice(index, 1);
+        }
         return (
-            <VideoStateDropdown
-                videoId={videoId}
-                apiUrl={api.api.baseUrl}
-                onDropdownOpenChange={onDropdownOpenChange}
-                actionButtons={actionButtons}
-            />
+            <>
+                {
+                    firstActionButton ? (
+                        <VideoStateButton {...firstActionButton} />
+                    ) : null
+                }
+                <VideoStateDropdown
+                    videoId={videoId}
+                    apiUrl={api.api.baseUrl}
+                    onDropdownOpenChange={onDropdownOpenChange}
+                    actionButtons={actionButtons}
+                />
+            </>
         )
     };
 
@@ -131,10 +149,10 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
         return (
             <div className={`${additionalClassName} yt-video-user-state-watched`}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setNotWatched)} />
-                <Dropdown
+                <AdditionalActionButtons
                     actionButtons={[
-                        ...createActionButtons(actionButtonConfig.setInactive, activeSources),
-                        ...createActionButtons(actionButtonConfig.setActive, inactiveSources),
+                        ...createActionButtons(actionButtonConfig.setInactive, activeForSources),
+                        ...createActionButtons(actionButtonConfig.setActive, inactiveForSources),
                     ]}
                 />
             </div>
@@ -144,8 +162,8 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
         return (
             <div className={`${additionalClassName} yt-video-user-state-inactive-depricated`}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
-                <Dropdown actionButtons={
-                    createActionButtons(actionButtonConfig.setDisableDeprecated, isSingleDeprecatedInactive)
+                <AdditionalActionButtons actionButtons={
+                    createActionButtons(actionButtonConfig.setDisableDeprecated, inactiveDeprecatedForSources)
                 } />
             </div>
         );
@@ -154,8 +172,8 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
         return (
             <div className={`${additionalClassName} yt-video-user-state-inactive`}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
-                <Dropdown actionButtons={
-                    createActionButtons(actionButtonConfig.setActive, inactiveSources)
+                <AdditionalActionButtons actionButtons={
+                    createActionButtons(actionButtonConfig.setActive, inactiveForSources)
                 } />
             </div>
         );
@@ -163,9 +181,9 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     if (isSingleActive && videoUserState.sources.length === 1) {
         return (
             <div className={`${additionalClassName} yt-video-user-state-active`}>
-                <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, activeSources)} />
-                <Dropdown actionButtons={
-                    createActionButtons(actionButtonConfig.setInactive, activeSources)
+                <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, activeForSources)} />
+                <AdditionalActionButtons actionButtons={
+                    createActionButtons(actionButtonConfig.setInactive, activeForSources)
                 } />
             </div>
         );
@@ -173,10 +191,10 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     return (
         <div className={`${additionalClassName} yt-video-user-state-active`}>
             <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, videoUserState.sources)} />
-            <Dropdown
+            <AdditionalActionButtons
                 actionButtons={[
-                    ...createActionButtons(actionButtonConfig.setInactive, activeSources),
-                    ...createActionButtons(actionButtonConfig.setActive, inactiveSources),
+                    ...createActionButtons(actionButtonConfig.setInactive, activeForSources),
+                    ...createActionButtons(actionButtonConfig.setActive, inactiveForSources),
                 ]}
             />
         </div>

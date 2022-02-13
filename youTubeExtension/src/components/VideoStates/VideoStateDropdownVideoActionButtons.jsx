@@ -4,7 +4,7 @@ import VideoStateDropdownVideoActionButton from './VideoStateDropdownVideoAction
 
 
 export default function VideoStateDropdownVideoActionButtons({ buttons }) {
-    return Array.isArray(buttons) ? (
+    return Array.isArray(buttons) && buttons.length ? (
         <>
             <VideoStateDropwdownSeparator />
             {
