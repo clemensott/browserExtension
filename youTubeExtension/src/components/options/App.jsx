@@ -17,7 +17,6 @@ async function pingApi(baseUrl) {
 }
 
 export default function App() {
-    const [loaded, setLoaded] = useState(false);
     const [apiBaseUrl, setApiBaseUrl] = useState();
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState();
@@ -26,23 +25,19 @@ export default function App() {
     const enableSubscriptionboxReload = useRef();
     const subscriptionboxReloadSeconds = useRef();
 
-    useEffect(() => {
-        (async () => {
-            await options.load();
-            setLoaded(true);
-        })();
-    }, [options]);
-
     const checkBaseUrlValid = async url => {
         setApiBaseUrlValid(await pingApi(url));
     }
 
     useEffect(() => {
-        setApiBaseUrl(options.apiBaseUrl);
-        setApiUsername(options.apiUsername);
-        setApiPassword(options.apiPassword);
-        checkBaseUrlValid(options.apiBaseUrl);
-    }, [loaded]);
+        (async () => {
+            await options.load();
+            setApiBaseUrl(options.apiBaseUrl);
+            setApiUsername(options.apiUsername);
+            setApiPassword(options.apiPassword);
+            checkBaseUrlValid(options.apiBaseUrl);
+        })();
+    }, [options]);
 
     useEffect(() => {
         checkBaseUrlValid(apiBaseUrl);
