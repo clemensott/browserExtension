@@ -36,7 +36,7 @@ jobs:
         with:
           upload_url: ${{ steps.create-youtube-extension-auto-release.outputs.upload_url }}
           asset_path: ./youtube-extension.zip
-          asset_path: youtube-extension-v2-auto-${{ github.run_number }}.zip
+          asset_name: youtube-extension-v2-auto-${{ github.run_number }}.zip
           asset_content_type: application/zip
 
   build-youtube-extension:
