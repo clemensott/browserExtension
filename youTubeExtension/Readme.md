@@ -1,3 +1,12 @@
+# YouTube Extension
+
+
+## Build
+
+1. run `npm install`
+2. run `npm run package:windows` or `npm run package:linux` depending on your os
+
+
 ## Ideas
 
 - eventify Code
