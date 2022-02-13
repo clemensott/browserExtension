@@ -129,7 +129,7 @@ function handleEndVideo({ target }) {
 }
 
 function addEndVideoHandling() {
-    const nextButton =  elementCache.getElement(elementCacheIds.NEXT_VIDEO_BUTTON);
+    const nextButton = elementCache.getElement(elementCacheIds.NEXT_VIDEO_BUTTON);
     if (nextButton) {
         nextButton.classList.add('yt-extension-next-video');
     }
@@ -160,8 +160,8 @@ function loop() {
 }
 
 
-export default function start() {
-    enableEndVideoButton = localStorage.getItem(constants.ENABLE_END_VIDEO_BUTTON_STORAGE_KEY) == true;
+export default function start(options) {
+    enableEndVideoButton = options.isEndVideoButtonEnabled;
 
     console.log('start player ad handler. enableEndVideoButton:', enableEndVideoButton);
 

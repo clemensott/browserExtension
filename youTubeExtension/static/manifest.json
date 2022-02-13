@@ -17,10 +17,13 @@
             "js": [
                 "content.bundle.js"
             ],
-            "css":[
+            "css": [
                 "content.bundle.css"
             ]
         }
+    ],
+    "permissions": [
+        "storage"
     ],
     "web_accessible_resources": [
         "insite.bundle.js"

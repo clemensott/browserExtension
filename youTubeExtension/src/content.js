@@ -11,10 +11,15 @@ import DomEventService from './Services/Dom/DomEventService';
 import NavigationEventService from './Services/NavigationEventService';
 import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService';
 import checkExclusivity from './utils/checkExclusivity';
+import StorageService from './Services/StorageService';
+import OptionsService from './Services/OptionsService';
 
 
 async function main() {
-    startPlayerService();
+    const optionsService = new OptionsService(new StorageService());
+    await optionsService.load();
+
+    startPlayerService(optionsService);
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
@@ -30,7 +35,7 @@ async function main() {
     });
 
     const initDataService = new InitDataService();
-    const apiHandler = await createApiHandler();
+    const apiHandler = await createApiHandler(optionsService);
 
     if (apiHandler) {
         channelHelperService.init();

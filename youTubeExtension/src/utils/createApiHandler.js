@@ -1,16 +1,16 @@
 import API from '../Services/API';
 import ApiHandler from '../Services/ApiHandler';
 
-export default async function createApiHandler() {
+export default async function createApiHandler(options) {
     const api = new API(
-        localStorage.getItem('subscriptionBoxUsername'),
-        localStorage.getItem('subscriptionBoxPassword'),
-        localStorage.getItem('subscriptionBoxBaseUrl'),
+        options.apiUsername,
+        options.apiPassword,
+        options.apiBaseUrl,
     );
 
     const apiHandler = new ApiHandler(
         api,
-        Number(localStorage.getItem('subscriptionBoxVideoUserStateUpdateInterval')),
+        Number(options.videoUserStateUpdateInterval),
     );
 
     if (await apiHandler.init()) {

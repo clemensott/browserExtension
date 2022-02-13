@@ -5,7 +5,7 @@ import DomEventHandler from './DomEventHandler';
 
 
 export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandler {
-    constructor() {
+    constructor(options) {
         super({
             eventName: 'SubscriptionBoxDomEventHandler.change',
             elementsGetter: ReloadSubscriptionBoxDomEventHandler.getContainer,
@@ -14,6 +14,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
             triggerEventOnRunChange: true,
         });
 
+        this.options = options;
         this.reloadIndicatorRenderer = new ReactRenderer({
             id: 'reload_subscription_box_container',
             beforeSelector: '#spacer',
@@ -25,15 +26,15 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
     }
 
     getReloadingSeconds() {
-        return Number(localStorage.getItem('subscriptionBoxReloadSeconds')) || 300;
+        return this.options.subscriptionBoxReloadSeconds;
     }
 
     getReloadingEnabled() {
-        return localStorage.getItem('subscriptionBoxReloadEnabled') == true;
+        return this.options.isSubscriptionBoxReloadEnabled;
     }
 
     onChangeReloadEnabled(enabled) {
-        localStorage.setItem('subscriptionBoxReloadEnabled', enabled ? 1 : 0);
+        this.options.isSubscriptionBoxReloadEnabled = !!enabled;
     }
 
     onChange({ currentElements: container }) {
@@ -42,7 +43,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
                 <ReloadCheckbox
                     runDownSeconds={this.getReloadingSeconds()}
                     defaultChecked={this.getReloadingEnabled()}
-                    onChange={this.onChangeReloadEnabled}
+                    onChange={this.onChangeReloadEnabled.bind(this)}
                 />, container);
         } else {
             this.reloadIndicatorRenderer.unmount();
