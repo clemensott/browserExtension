@@ -1,16 +1,28 @@
 import React, { useRef, useEffect, useState } from 'react';
 import StorageService from '../../Services/StorageService';
 import OptionsService from '../../Services/OptionsService';
+import API from '../../Services/API';
 import './App.css';
 
 const options = new OptionsService(new StorageService());
 
+async function pingApi(baseUrl) {
+    try {
+        const url = new URL(baseUrl);
+        const api = new API(null, null, baseUrl);
+        return !!url && await api.ping()
+    } catch {
+        return false;
+    }
+}
+
 export default function App() {
     const [loaded, setLoaded] = useState(false);
+    const [apiBaseUrl, setApiBaseUrl] = useState();
+    const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
+    const [apiUsername, setApiUsername] = useState();
+    const [apiPassword, setApiPassword] = useState();
     const enableEndVideoButton = useRef();
-    const apiBaseUrl = useRef();
-    const apiUsername = useRef();
-    const apiPassword = useRef();
     const enableSubscriptionboxReload = useRef();
     const subscriptionboxReloadSeconds = useRef();
 
@@ -21,12 +33,27 @@ export default function App() {
         })();
     }, [options]);
 
+    const checkBaseUrlValid = async url => {
+        setApiBaseUrlValid(await pingApi(url));
+    }
+
+    useEffect(() => {
+        setApiBaseUrl(options.apiBaseUrl);
+        setApiUsername(options.apiUsername);
+        setApiPassword(options.apiPassword);
+        checkBaseUrlValid(options.apiBaseUrl);
+    }, [loaded]);
+
+    useEffect(() => {
+        checkBaseUrlValid(apiBaseUrl);
+    }, [apiBaseUrl, apiUsername, apiPassword]);
+
     const saveOptions = () => {
         options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
 
-        options.apiBaseUrl = apiBaseUrl.current.value;
-        options.apiUsername = apiUsername.current.value;
-        options.apiPassword = apiPassword.current.value;
+        options.apiBaseUrl = apiBaseUrl;
+        options.apiUsername = apiUsername;
+        options.apiPassword = apiPassword;
 
         options.isSubscriptionBoxReloadEnabled = !!enableSubscriptionboxReload.current.checked;
         options.subscriptionBoxReloadSeconds = parseInt(subscriptionboxReloadSeconds.current.value, 10);
@@ -34,7 +61,9 @@ export default function App() {
 
     return (
         <div className="container">
-            <h1>YouTube Extension Options</h1>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <h1>YouTube Extension Options</h1>
+            </div>
 
             <div className="form-section">
                 <h2>Video Player</h2>
@@ -61,33 +90,33 @@ export default function App() {
                 <div className="form-group">
                     <label htmlFor="api-base-url">Base URL</label>
                     <input
-                        ref={apiBaseUrl}
                         id="api-base-url"
                         type="text"
-                        className="form-control"
-                        defaultValue={options.apiBaseUrl}
+                        className={`form-control ${apiBaseUrlValid ? '' : 'form-error'}`}
+                        defaultValue={apiBaseUrl}
+                        onChange={async e => setApiBaseUrl(e.target.value)}
                     />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="api-username">Username</label>
                     <input
-                        ref={apiUsername}
                         id="api-username"
                         type="text"
-                        className="form-control"
-                        defaultValue={options.apiUsername}
+                        className={`form-control ${!apiBaseUrlValid || apiUsername ? '' : 'form-error'}`}
+                        defaultValue={apiUsername}
+                        onChange={async e => setApiUsername(e.target.value)}
                     />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="api-password">Password</label>
                     <input
-                        ref={apiPassword}
                         id="api-username"
                         type="text"
-                        className="form-control"
-                        defaultValue={options.apiPassword}
+                        className={`form-control ${!apiBaseUrlValid || apiPassword ? '' : 'form-error'}`}
+                        defaultValue={apiPassword}
+                        onChange={async e => setApiPassword(e.target.value)}
                     />
                 </div>
             </div>
@@ -121,8 +150,14 @@ export default function App() {
 
 
             <div>
-                <button className="btn" onClick={saveOptions}>Save</button>
+                <button
+                    className="btn"
+                    onClick={saveOptions}
+                    disabled={apiBaseUrl ? !(apiBaseUrlValid && apiUsername && apiPassword) : false}
+                >
+                    Save
+                </button>
             </div>
-        </div>
+        </div >
     );
 }

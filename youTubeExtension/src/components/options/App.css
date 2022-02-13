@@ -55,6 +55,10 @@ body {
     box-sizing: border-box;
 }
 
+.form-error {
+    border-color: #ff0040;
+}
+
 .btn {
     display: inline-block;
     font-weight: 400;
@@ -75,6 +79,13 @@ body {
     color: #fff;
     background-color: #ff0040;
     border-color: #ff0040;
+}
+
+.btn:disabled {
+    color: #fff;
+    background-color: gray;
+    border-color: gray;
+    cursor: initial;
 }
 
 .info-text {
