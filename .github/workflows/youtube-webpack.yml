@@ -29,6 +29,7 @@ jobs:
         with:
           tag_name: v2.auto.${{ github.run_number }}
           release_name: YouTube Extension automatic Release v2.auto.${{ github.run_number }}
+          prerelease: true
       - name: Upload youtube extensions assets to release
         uses: actions/upload-release-asset@v1
         env:
