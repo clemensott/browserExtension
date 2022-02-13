@@ -1,22 +1,22 @@
-#movie_player.ad-interrupting > div.html5-video-container > video {
+body:not(.disable-video-player-manipulation) #movie_player.ad-interrupting > div.html5-video-container > video {
     opacity: 0;
 }
 
-div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
+body:not(.disable-video-player-manipulation) div.ytp-ad-image-overlay, div.ytp-ad-text-overlay {
     display: none;
 }
 
-#movie_player > div.video-ads.ytp-ad-module {
+body:not(.disable-video-player-manipulation) #movie_player > div.video-ads.ytp-ad-module {
     opacity: 0;
 }
 
-#companion > ytd-action-companion-ad-renderer,
-#movie_player > div.ytp-cued-thumbnail-overlay,
-#movie_player > div.ytp-chrome-top,
-#player-ads,
-ytd-promoted-sparkles-web-renderer,
-#masthead-ad,
-a.yt-extension-next-video {
+body:not(.disable-video-player-manipulation) #companion > ytd-action-companion-ad-renderer,
+body:not(.disable-video-player-manipulation) #movie_player > div.ytp-cued-thumbnail-overlay,
+body:not(.disable-video-player-manipulation) #movie_player > div.ytp-chrome-top,
+body:not(.disable-video-player-manipulation) #player-ads,
+body:not(.disable-video-player-manipulation) ytd-promoted-sparkles-web-renderer,
+body:not(.disable-video-player-manipulation) #masthead-ad,
+body:not(.disable-video-player-manipulation) a.yt-extension-next-video {
     display: none!important;
 }
 

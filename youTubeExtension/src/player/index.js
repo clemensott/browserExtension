@@ -160,11 +160,15 @@ function loop() {
 }
 
 
-export default function start(options) {
-    enableEndVideoButton = options.isEndVideoButtonEnabled;
+export default function setup(options) {
+    if (options.isVideoPlayerManipulationEnabled) {
+        enableEndVideoButton = options.isEndVideoButtonEnabled;
 
-    console.log('start player ad handler. enableEndVideoButton:', enableEndVideoButton);
+        console.log('start player ad handler. enableEndVideoButton:', enableEndVideoButton);
 
-    setInterval(loop, 1000);
-    setIntervalUntil(() => !getVideoElement(), 20);
+        setInterval(loop, 1000);
+        setIntervalUntil(() => !getVideoElement(), 20);
+    } else {
+        document.body.classList.add('disable-video-player-manipulation');
+    }
 }

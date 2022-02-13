@@ -1,4 +1,8 @@
 const optionKeys = {
+    IS_VIDEO_PLAYER_MANIPULATION_ENABLED: {
+        key: 'IS_VIDEO_PLAYER_MANIPULATION_ENABLED',
+        defaultValue: true,
+    },
     IS_END_VIDEO_BUTTON_ENABLED: {
         key: 'IS_END_VIDEO_BUTTON_ENABLED',
         defaultValue: false,
@@ -53,6 +57,14 @@ export default class OptionsService {
     set(key, value) {
         this.options.set(key, value);
         this.storage.set({ [key]: value });
+    }
+
+    get isVideoPlayerManipulationEnabled() {
+        return this.get(optionKeys.IS_VIDEO_PLAYER_MANIPULATION_ENABLED.key);
+    }
+
+    set isVideoPlayerManipulationEnabled(value) {
+        return this.set(optionKeys.IS_VIDEO_PLAYER_MANIPULATION_ENABLED.key, value);
     }
 
     get isEndVideoButtonEnabled() {

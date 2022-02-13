@@ -17,6 +17,7 @@ async function pingApi(baseUrl) {
 }
 
 export default function App() {
+    const [enableVideoPlayerManipulation, setEnableVideoPlayerManipulation] = useState(true);
     const [apiBaseUrl, setApiBaseUrl] = useState();
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState();
@@ -32,6 +33,7 @@ export default function App() {
     useEffect(() => {
         (async () => {
             await options.load();
+            setEnableVideoPlayerManipulation(!!options.isVideoPlayerManipulationEnabled);
             setApiBaseUrl(options.apiBaseUrl);
             setApiUsername(options.apiUsername);
             setApiPassword(options.apiPassword);
@@ -44,6 +46,7 @@ export default function App() {
     }, [apiBaseUrl, apiUsername, apiPassword]);
 
     const saveOptions = () => {
+        options.isVideoPlayerManipulationEnabled = !!enableVideoPlayerManipulation;
         options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
 
         options.apiBaseUrl = apiBaseUrl;
@@ -63,12 +66,27 @@ export default function App() {
             <div className="form-section">
                 <h2>Video Player</h2>
 
+                <div className="info-text">
+                    Fast forwards, mutes and turn ads black.
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="enable-player-manipulation-video-button"
+                        type="checkbox"
+                        checked={enableVideoPlayerManipulation}
+                        onChange={e => setEnableVideoPlayerManipulation(e.target.checked)}
+                    />
+                    <label htmlFor="enable-player-manipulation-video-button">Enable video player manipulation</label>
+                </div>
+
                 <div className="form-group">
                     <input
                         ref={enableEndVideoButton}
                         id="enable-end-video-button"
                         type="checkbox"
                         defaultChecked={options.isEndVideoButtonEnabled}
+                        disabled={!enableVideoPlayerManipulation}
                     />
                     <label htmlFor="enable-end-video-button">Enable end video button</label>
                 </div>

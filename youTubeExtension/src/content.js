@@ -1,5 +1,5 @@
 import importBundle from './insite/importBundle';
-import startPlayerService from './player';
+import setupPlayerService from './player';
 import ChannelHelperService from './Services/Dom/Channel/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
@@ -19,7 +19,7 @@ async function main() {
     const optionsService = new OptionsService(new StorageService());
     await optionsService.load();
 
-    startPlayerService(optionsService);
+    setupPlayerService(optionsService);
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
