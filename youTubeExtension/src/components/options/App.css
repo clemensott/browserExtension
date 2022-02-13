@@ -1,0 +1,16 @@
+
+/* Default CSS from chrome extension */
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 75%;
+    display: block;
+    margin: 8px;
+}
+
+
+.container {
+    background-color: lightyellow;
+    max-width: 1024px;
+    margin: auto;
+    padding: 40px;
+}

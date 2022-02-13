@@ -5,7 +5,7 @@
   "main": "content.js",
   "scripts": {
     "build": "webpack",
-    "dev:windows": "xcopy static devDist /y /i & node ./convertManifest.js devDist & webpack serve --mode development",
+    "dev:windows": "xcopy static devDist /y /i & node ./convertManifest.js & webpack serve --mode development",
     "dev:linux": "cp -R static/. dist/ & node ./convertManifest.js devDist & webpack serve --mode development",
     "package:windows": "xcopy static dist /y /i & webpack",
     "package:linux": "cp -R static/. dist/ & webpack"

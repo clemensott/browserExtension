@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     content: './src/content.js',
     insite: './src/insite/index.js',
+    options: './src/options.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -27,6 +28,9 @@ module.exports = {
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*',
+    },
+    static: {
+      directory: path.join(__dirname, 'devDist'),
     },
     port: 8012,
     webSocketServer: false,
