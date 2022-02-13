@@ -1,7 +1,7 @@
 import triggerEvent from '../utils/triggerEvent';
 
 const constants = {
-    STORAGE_KEY: '',
+    STORAGE_KEY: 'youtube-extension-fake-storage',
     EVENTNAME: 'yotube-extension-storage-service-set',
 };
 
@@ -32,7 +32,6 @@ export default class StorageService {
     }
 
     get(keys) {
-        console.log('storage get:', !!(chrome && chrome.storage && chrome.storage.sync), keys);
         if (chrome && chrome.storage && chrome.storage.sync) {
             return new Promise(resolve => {
                 chrome.storage.sync.get(keys, resolve);
