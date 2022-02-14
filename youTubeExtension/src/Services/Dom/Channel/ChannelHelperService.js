@@ -42,7 +42,7 @@ export default class ChannelHelperService {
     }
 
     onChannelVideosChange({ detail: { currentElements: newObj, lastElements: lastObj } }) {
-        if (lastObj && (!newObj || newObj.videosTab !== lastObj.videosTab)) {
+        if (lastObj && lastObj.videosTab instanceof Node && (!newObj || newObj.videosTab !== lastObj.videosTab)) {
             ReactDOM.render(<VideosTabCount />, lastObj.videosTab);
         }
 
