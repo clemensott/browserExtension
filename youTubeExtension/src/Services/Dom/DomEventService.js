@@ -5,7 +5,7 @@ import DomEventHandler from './DomEventHandler';
 import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
 
 export default class DomEventService {
-    constructor({ navigationService, updateSourcesTrackerService }) {
+    constructor({ optionsService, navigationService, updateSourcesTrackerService }) {
         this.channel = new ChannelDomEventHandler();
         this.channelVideosCount = new ChannelVideosDomEventHandler({
             updateTrackerService: updateSourcesTrackerService,
@@ -16,7 +16,7 @@ export default class DomEventService {
             timeout: 10000,
             notFoundTimeout: 100,
         });
-        this.reloadSubscriptionBoxDomEventHandler = new ReloadSubscriptionBoxDomEventHandler();
+        this.reloadSubscriptionBoxDomEventHandler = new ReloadSubscriptionBoxDomEventHandler(optionsService);
 
         this.navigationService = navigationService;
         this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange.bind(this));

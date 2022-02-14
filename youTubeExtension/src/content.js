@@ -23,7 +23,7 @@ async function main() {
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
-    const domService = new DomEventService({ navigationService, updateSourcesTrackerService });
+    const domService = new DomEventService({ optionsService, navigationService, updateSourcesTrackerService });
     const channelVideoHidingService = new ChannelVideoHidingService({ domService, updateSourcesTrackerService });
     const channelHelperService = new ChannelHelperService({
         channelVideoHidingService,
