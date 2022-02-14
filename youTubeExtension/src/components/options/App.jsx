@@ -158,7 +158,7 @@ export default function App() {
                     <label htmlFor="api-password">Password</label>
                     <input
                         id="api-username"
-                        type="text"
+                        type="password"
                         className={`form-control ${!apiBaseUrlValid || apiPassword ? '' : 'form-error'}`}
                         defaultValue={apiPassword}
                         onChange={async e => setApiPassword(e.target.value)}
