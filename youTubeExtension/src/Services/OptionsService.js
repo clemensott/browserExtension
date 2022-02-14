@@ -7,6 +7,10 @@ const optionKeys = {
         key: 'IS_END_VIDEO_BUTTON_ENABLED',
         defaultValue: false,
     },
+    IS_DOM_MANIPULATION_ENABLED: {
+        key: 'IS_DOM_MANIPULATION_ENABLED',
+        defaultValue: false,
+    },
     SUBSCRIPTION_BOX_RELOAD_SECONDS: {
         key: 'SUBSCRIPTION_BOX_RELOAD_SECONDS',
         defaultValue: 300,
@@ -73,6 +77,14 @@ export default class OptionsService {
 
     set isEndVideoButtonEnabled(value) {
         return this.set(optionKeys.IS_END_VIDEO_BUTTON_ENABLED.key, value);
+    }
+
+    get isDomManipulationEnabled() {
+        return this.get(optionKeys.IS_DOM_MANIPULATION_ENABLED.key);
+    }
+
+    set isDomManipulationEnabled(value) {
+        return this.set(optionKeys.IS_DOM_MANIPULATION_ENABLED.key, value);
     }
 
     get subscriptionBoxReloadSeconds() {

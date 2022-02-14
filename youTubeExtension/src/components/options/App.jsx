@@ -17,13 +17,13 @@ async function pingApi(baseUrl) {
 }
 
 export default function App() {
+    const [enableDomManipulation, setEnableDomManipulation] = useState(false);
     const [enableVideoPlayerManipulation, setEnableVideoPlayerManipulation] = useState(true);
     const [apiBaseUrl, setApiBaseUrl] = useState();
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState();
     const [apiPassword, setApiPassword] = useState();
     const enableEndVideoButton = useRef();
-    const enableSubscriptionboxReload = useRef();
     const subscriptionboxReloadSeconds = useRef();
 
     const checkBaseUrlValid = async url => {
@@ -46,15 +46,15 @@ export default function App() {
     }, [apiBaseUrl, apiUsername, apiPassword]);
 
     const saveOptions = () => {
+        options.isDomManipulationEnabled = !!enableDomManipulation;
+        options.subscriptionBoxReloadSeconds = parseInt(subscriptionboxReloadSeconds.current.value, 10);
+
         options.isVideoPlayerManipulationEnabled = !!enableVideoPlayerManipulation;
         options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
 
         options.apiBaseUrl = apiBaseUrl;
         options.apiUsername = apiUsername;
         options.apiPassword = apiPassword;
-
-        options.isSubscriptionBoxReloadEnabled = !!enableSubscriptionboxReload.current.checked;
-        options.subscriptionBoxReloadSeconds = parseInt(subscriptionboxReloadSeconds.current.value, 10);
     };
 
     return (
@@ -64,7 +64,39 @@ export default function App() {
             </div>
 
             <div className="form-section">
-                <h2>Video Player</h2>
+                <h2>User Interface Manipulation</h2>
+
+                <div className="info-text">
+                    Adds various additional elements to user interface.
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="enable-dom-manipulation"
+                        type="checkbox"
+                        checked={enableDomManipulation}
+                        onChange={e => setEnableDomManipulation(e.target.checked)}
+                    />
+                    <label htmlFor="enable-dom-manipulation">Enable various user interface manipulations</label>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="subscriptionbox-reload-time">Subscription box reload countdown in seconds</label>
+                    <input
+                        ref={subscriptionboxReloadSeconds}
+                        id="subscriptionbox-reload-time"
+                        type="number"
+                        min="1"
+                        step="1"
+                        className="form-control"
+                        defaultValue={options.subscriptionBoxReloadSeconds}
+                        disabled={!enableDomManipulation}
+                    />
+                </div>
+            </div>
+
+            <div className="form-section">
+                <h2>Video Player Manipulation</h2>
 
                 <div className="info-text">
                     Fast forwards, mutes and turn ads black.
@@ -130,33 +162,6 @@ export default function App() {
                         className={`form-control ${!apiBaseUrlValid || apiPassword ? '' : 'form-error'}`}
                         defaultValue={apiPassword}
                         onChange={async e => setApiPassword(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            <div className="form-section">
-                <h2>Subscription Box</h2>
-
-                <div className="form-group">
-                    <input
-                        ref={enableSubscriptionboxReload}
-                        id="enable-subscriptionbox-reload"
-                        type="checkbox"
-                        defaultChecked={options.isSubscriptionBoxReloadEnabled}
-                    />
-                    <label htmlFor="enable-subscriptionbox-reload">Enable reload site</label>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="subscriptionbox-reload-time">Reload countdown in seconds</label>
-                    <input
-                        ref={subscriptionboxReloadSeconds}
-                        id="subscriptionbox-reload-time"
-                        type="number"
-                        min="1"
-                        step="1"
-                        className="form-control"
-                        defaultValue={options.subscriptionBoxReloadSeconds}
                     />
                 </div>
             </div>

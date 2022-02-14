@@ -37,13 +37,15 @@ async function main() {
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler(optionsService);
 
-    if (apiHandler) {
+    if (optionsService.isDomManipulationEnabled) {
         channelHelperService.init();
         channelVideoHidingService.init();
         domService.start();
         navigationService.start();
         updateSourcesTrackerService.init();
+    }
 
+    if (apiHandler) {
         console.log('API baseURL:', apiHandler.api.baseUrl);
         try {
             isUpdatingSourcesService.start();
