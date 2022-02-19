@@ -33,10 +33,13 @@ export default function App() {
     useEffect(() => {
         (async () => {
             await options.load();
+            
+            setEnableDomManipulation(!!options.isDomManipulationEnabled);
             setEnableVideoPlayerManipulation(!!options.isVideoPlayerManipulationEnabled);
             setApiBaseUrl(options.apiBaseUrl);
             setApiUsername(options.apiUsername);
             setApiPassword(options.apiPassword);
+            
             checkBaseUrlValid(options.apiBaseUrl);
         })();
     }, [options]);
