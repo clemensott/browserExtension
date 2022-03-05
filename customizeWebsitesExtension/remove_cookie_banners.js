@@ -21,6 +21,13 @@ function getRemoveClasses(selector, ...removeClasses) {
     };
 }
 
+function getAddClasses(selector, ...removeClasses) {
+    return {
+        selector,
+        removeClasses,
+    };
+}
+
 function getSimpleHide(selector) {
     return [getHide(selector)];
 }
@@ -111,6 +118,15 @@ const actionConfigs = [
         getHide('#didomi-host'),
         getRemoveClasses('body', 'didomi-popup-open'),
     ],
+    [
+        getHide('div.overlay_el5_B'),
+        getAddClasses('html', 'allow-scroll'),
+    ],
+    [
+        getHide('div.i-amphtml-consent-ui-mask'),
+        getHide('amp-consent#inews-consent'),
+        getRemoveClasses('html', 'i-amphtml-scroll-disabled'),
+    ]
 ];
 
 const bannerIntervalId = setInterval(() => {
@@ -151,6 +167,9 @@ async function handleElement({ element, config }) {
     }
     if (config.removeClasses) {
         config.removeClasses.forEach(className => element.classList.remove(className));
+    }
+    if (config.addClasses) {
+        config.removeClasses.forEach(className => element.classList.add(className));
     }
     if (config.remove) {
         element.remove();
