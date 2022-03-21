@@ -5,12 +5,23 @@ import setIntervalUntil from '../../utils/setIntervalUntil';
 import AtOnceService from '../AtOnceService';
 import addToggleDisplayVideoState from '../../components/addToggleDisplayVideoState';
 import VideoState from '../../components/VideoStates/VideoState';
+import './DisplayVideoStateService.css';
 
 const videoUserStateClassName = 'yt-video-user-state-container';
 const videoUserStateNotCollapse = 'yt-video-user-state-container-not-collapse';
 
-function getCurrentVideoUserStateContainer() {
-    return document.querySelector('ytd-video-primary-info-renderer #info');
+function getVideoIdOfShortVideoContainer(container) {
+    let parent = container;
+    while (parent && parent.tagName !== 'YTD-REEL-VIDEO-RENDERER') {
+        parent = parent.parentElement;
+    }
+    const videoContainer = parent && parent.querySelector('div[id^="player-container"');
+    const match = videoContainer &&
+        videoContainer.style['background-image'] &&
+        videoContainer.style['background-image'].match(/\/vi\/([a-zA-Z0-9-_]*)\//);
+    return match && match[1] || (
+        videoContainer.id === 'player-container-0' ? getVideoIdFromUrl(window.location.href) : null
+    );
 }
 
 function getVideoIdFromVideoContainer(container) {
@@ -19,14 +30,22 @@ function getVideoIdFromVideoContainer(container) {
 }
 
 function getVideoContainers() {
-    const currentVideoUserStateContainer = getCurrentVideoUserStateContainer();
-
     const watchVideos = [{
-        container: currentVideoUserStateContainer,
+        container: document.querySelector('ytd-video-primary-info-renderer #info'),
         getVideoId: () => getVideoIdFromUrl(window.location.href),
         additionalClassName: 'yt-video-user-state-watch',
         insertReferenceNodeSelector: '#flex',
     }];
+
+    const shortVideos = [
+        'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
+    ]
+        .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+        .map(container => ({
+            container,
+            getVideoId: () => getVideoIdOfShortVideoContainer(container),
+            additionalClassName: 'yt-video-user-state-watch',
+        }));
 
     const listVideos = [
         '#items > ytd-compact-video-renderer',
@@ -46,6 +65,7 @@ function getVideoContainers() {
 
     return [
         ...watchVideos,
+        ...shortVideos,
         ...listVideos,
     ];
 }
@@ -148,6 +168,7 @@ export default class DisplayVideoStateService {
     }
 
     start() {
+        document.body.classList.add('yt-extension-display-video-states');
         setInterval(() => this.loop.run({ optional: true, params: [false] }), 200);
         setInterval(() => this.loop.run({ optional: true }), 5000);
 
