@@ -21,6 +21,7 @@ div.popup.popup__cookie,
 div.contao-cookiebar.cookiebar_default.cc-top.cc-blocked.cc-active,
 div.cc_overlay_lock,
 #cookieman-modal,
-#cc-banner-wrap {
+#cc-banner-wrap,
+*[is_cookie_banner_hide] {
     display: none!important;
 }

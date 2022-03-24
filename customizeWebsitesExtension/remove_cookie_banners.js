@@ -1,8 +1,10 @@
+const debugKey = 'debug';
+
 function getHide(...selector) {
     return {
         selector,
-        style: {
-            display: 'none',
+        attributes: {
+            is_cookie_banner_hide: 1,
         },
     };
 }
@@ -126,7 +128,11 @@ const actionConfigs = [
         getHide('div.i-amphtml-consent-ui-mask'),
         getHide('amp-consent#inews-consent'),
         getRemoveClasses('html', 'i-amphtml-scroll-disabled'),
-    ]
+    ],
+    [
+        getHide('#usercentrics-root'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
@@ -171,6 +177,9 @@ async function handleElement({ element, config }) {
     if (config.addClasses) {
         config.removeClasses.forEach(className => element.classList.add(className));
     }
+    if (config.attributes) {
+        Object.entries(config.attributes).forEach(([key, value]) => element.setAttribute(key, value));
+    }
     if (config.remove) {
         element.remove();
     }
@@ -178,10 +187,15 @@ async function handleElement({ element, config }) {
 
 function checkSimpleContainers(actions) {
     for (let i = 0; i < actions.length; i++) {
-        const elements = actions[i].map(config => ({
+        const debug = actions[i].includes(debugKey);
+        const list = debug ? actions[i].filter(item => typeof item === 'object') : actions[i];
+        const elements = list.map(config => ({
             element: getElementFromSelectors(config.selector),
             config,
         }));
+        if (debug) {
+            console.log('elements:', elements);
+        }
         if (elements.every(element => element.element)) {
             elements.forEach(handleElement);
             setTimeout(() => clearBannerInterval(), 1000);
