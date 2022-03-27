@@ -37,9 +37,8 @@ function getSimpleHide(selector) {
 function clearOverflow(selector) {
     return {
         selector,
-        delay: 500,
-        style: {
-            overflow: 'initial',
+        attributes: {
+            is_cookie_banner_initial_overflow: '',
         },
     };
 }

@@ -22,6 +22,11 @@ div.contao-cookiebar.cookiebar_default.cc-top.cc-blocked.cc-active,
 div.cc_overlay_lock,
 #cookieman-modal,
 #cc-banner-wrap,
+div.amgdprcookie-bar-template,
 *[is_cookie_banner_hide] {
     display: none!important;
+}
+
+*[is_cookie_banner_initial_overflow] {
+    overflow: initial!important;
 }
