@@ -1,24 +1,25 @@
 import triggerEvent from '../../utils/triggerEvent';
 
-function defaultElementsExists(last) {
-    return last instanceof Node && document.contains(last);
-}
-
-function defautlChangeDetector(current, last) {
-    return current !== last;
-}
 
 export default class DomEventHandler {
     constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout, notFoundTimeout, triggerEventOnRunChange }) {
         this.eventName = eventName;
-        this.elementsExists = elementsExists || defaultElementsExists;
-        this.elementsGetter = elementsGetter;
         this.notFoundTimeout = notFoundTimeout;
         this.timeout = timeout;
-        this.changeDetector = changeDetector || defautlChangeDetector;
         this.triggerEventOnRunChange = triggerEventOnRunChange || false;
         this.intervalId = null;
         this.lastElements = null;
+
+        if (elementsExists) {
+            this.elementsExists = elementsExists;
+        }
+        if (elementsGetter) {
+            this.getElements = elementsGetter;
+        }
+        this.elementsGetter = elementsGetter;
+        if (changeDetector) {
+            this.detectChange = changeDetector;
+        }
 
         this.onTick = this.onTick.bind(this);
     }
@@ -54,26 +55,47 @@ export default class DomEventHandler {
 
     onTick() {
         const currentElements = this.elementsExists(this.lastElements) ?
-            this.lastElements : this.elementsGetter(this.lastElements);
-        if (this.changeDetector(currentElements, this.lastElements)) {
+            this.lastElements : this.getElements(this.lastElements);
+        if (this.detectChange(currentElements, this.lastElements)) {
             this.triggerEvent({
                 lastElements: this.lastElements,
                 currentElements,
             });
         }
 
-        if (this.intervalId && this.notFoundTimeout && (!!this.lastElements ^ !!currentElements)) {
-            const timeout = currentElements ? this.timeout : this.notFoundTimeout;
-            clearInterval(this.intervalId);
-            this.intervalId = setInterval(this.onTick, timeout);
-        }
-
+        this.updateIntervalTime(currentElements);
         this.lastElements = currentElements;
+    }
+
+    elementsExists(last) {
+        return last instanceof Node && document.contains(last);
+    }
+
+    getElements(last) {
+        throw new Error(`Abstract function: ${this.eventName}`);
+    }
+
+    detectChange(current, last) {
+        return current !== last;
+    }
+
+    static detectObjectChange(newObj, lastObj, ...keys) {
+        return !(newObj === lastObj || (
+            newObj && lastObj && keys.flat().every(key => newObj[key] === lastObj[key])
+        ));
     }
 
     triggerEvent(args) {
         this.onChange(args);
         triggerEvent(this.eventName, args);
+    }
+
+    updateIntervalTime(currentElements) {
+        if (this.intervalId && this.notFoundTimeout && (!!this.lastElements ^ !!currentElements)) {
+            const timeout = currentElements ? this.timeout : this.notFoundTimeout;
+            clearInterval(this.intervalId);
+            this.intervalId = setInterval(this.onTick, timeout);
+        }
     }
 
     onChange(args) {

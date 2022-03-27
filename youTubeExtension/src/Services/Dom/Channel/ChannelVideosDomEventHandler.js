@@ -94,14 +94,14 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         };
     }
 
-    static getChannelVideosCountChange(newObj, lastObj) {
-        return !(newObj === lastObj || (
-            newObj && lastObj && [
-                'videosTab',
-                'videoListContainer',
-                'hasVideosFetchingContinuation',
-                'videosCount'
-            ].every(key => newObj[key] === lastObj[key])
-        ));
+    detectChange(newObj, lastObj) {
+        return DomEventHandler.detectObjectChange(
+            newObj,
+            lastObj,
+            'videosTab',
+            'videoListContainer',
+            'hasVideosFetchingContinuation',
+            'videosCount',
+        );
     }
 }

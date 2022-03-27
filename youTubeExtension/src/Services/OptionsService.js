@@ -19,6 +19,26 @@ const optionKeys = {
         key: 'IS_SUBSCRIPTION_BOX_RELOAD_ENABLED',
         defaultValue: false,
     },
+    HIDE_DISLIKE_VIDEO_BUTTON: {
+        key: 'HIDE_DISLIKE_VIDEO_BUTTON',
+        defaultValue: false,
+    },
+    HIDE_DOWNLOAD_VIDEO_BUTTON: {
+        key: 'HIDE_DOWNLOAD_VIDEO_BUTTON',
+        defaultValue: false,
+    },
+    HIDE_CLIP_VIDEO_BUTTON: {
+        key: 'HIDE_CLIP_VIDEO_BUTTON',
+        defaultValue: false,
+    },
+    HIDE_THANK_VIDEO_BUTTON: {
+        key: 'HIDE_THANK_VIDEO_BUTTON',
+        defaultValue: false,
+    },
+    HIDE_SAVE_VIDEO_BUTTON: {
+        key: 'HIDE_SAVE_VIDEO_BUTTON',
+        defaultValue: false,
+    },
     API_BASE_URL: {
         key: 'API_BASE_URL',
         defaultValue: null,
@@ -101,6 +121,46 @@ export default class OptionsService {
 
     set isSubscriptionBoxReloadEnabled(value) {
         return this.set(optionKeys.IS_SUBSCRIPTION_BOX_RELOAD_ENABLED.key, value);
+    }
+
+    get hideDislikeVideoButton() {
+        return this.get(optionKeys.HIDE_DISLIKE_VIDEO_BUTTON.key);
+    }
+
+    set hideDislikeVideoButton(value) {
+        return this.set(optionKeys.HIDE_DISLIKE_VIDEO_BUTTON.key, value);
+    }
+
+    get hideDownloadVideoButton() {
+        return this.get(optionKeys.HIDE_DOWNLOAD_VIDEO_BUTTON.key);
+    }
+
+    set hideDownloadVideoButton(value) {
+        return this.set(optionKeys.HIDE_DOWNLOAD_VIDEO_BUTTON.key, value);
+    }
+
+    get hideClipVideoButton() {
+        return this.get(optionKeys.HIDE_CLIP_VIDEO_BUTTON.key);
+    }
+
+    set hideClipVideoButton(value) {
+        return this.set(optionKeys.HIDE_CLIP_VIDEO_BUTTON.key, value);
+    }
+
+    get hideThankVideoButton() {
+        return this.get(optionKeys.HIDE_THANK_VIDEO_BUTTON.key);
+    }
+
+    set hideThankVideoButton(value) {
+        return this.set(optionKeys.HIDE_THANK_VIDEO_BUTTON.key, value);
+    }
+
+    get hideSaveVideoButton() {
+        return this.get(optionKeys.HIDE_SAVE_VIDEO_BUTTON.key);
+    }
+
+    set hideSaveVideoButton(value) {
+        return this.set(optionKeys.HIDE_SAVE_VIDEO_BUTTON.key, value);
     }
 
     get apiBaseUrl() {

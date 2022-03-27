@@ -2,6 +2,7 @@ import { navigationChange } from '../../constants';
 import ChannelDomEventHandler from './Channel/ChannelDomEventHandler';
 import ChannelVideosDomEventHandler from './Channel/ChannelVideosDomEventHandler';
 import DomEventHandler from './DomEventHandler';
+import HideWatchVideoElementsService from './HideWatchVideoElementsService';
 import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
 
 export default class DomEventService {
@@ -17,6 +18,7 @@ export default class DomEventService {
             notFoundTimeout: 100,
         });
         this.reloadSubscriptionBoxDomEventHandler = new ReloadSubscriptionBoxDomEventHandler(optionsService);
+        this.hideWatchVideosElementsHandler = new HideWatchVideoElementsService({ optionsService });
 
         this.navigationService = navigationService;
         this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange.bind(this));
@@ -48,6 +50,12 @@ export default class DomEventService {
             this.reloadSubscriptionBoxDomEventHandler.start();
         } else if (detail.isSubscriptionBoxSite === navigationChange.LEFT) {
             this.reloadSubscriptionBoxDomEventHandler.stop();
+        }
+
+        if (detail.isVideoWatchSite === navigationChange.ENTERED) {
+            this.hideWatchVideosElementsHandler.start();
+        } else if (detail.isVideoWatchSite === navigationChange.LEFT) {
+            this.hideWatchVideosElementsHandler.stop();
         }
     }
 }

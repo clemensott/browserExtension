@@ -1,0 +1,3 @@
+body.yt-extension-hide-shorts-thumbnail-overlay #overlays > ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"] {
+    display: none;   
+}

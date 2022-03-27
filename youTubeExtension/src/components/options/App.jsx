@@ -19,6 +19,11 @@ async function pingApi(baseUrl) {
 export default function App() {
     const [enableDomManipulation, setEnableDomManipulation] = useState(false);
     const [enableVideoPlayerManipulation, setEnableVideoPlayerManipulation] = useState(true);
+    const [hideDislikeVideoButton, setHideDislikeVideoButton] = useState(false);
+    const [hideDownloadVideoButton, setHideDownloadVideoButton] = useState(false);
+    const [hideClipVideoButton, setHideClipVideoButton] = useState(false);
+    const [hideThankVideoButton, setHideThankVideoButton] = useState(false);
+    const [hideSaveVideoButton, setHideSaveVideoButton] = useState(false);
     const [apiBaseUrl, setApiBaseUrl] = useState();
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState();
@@ -33,13 +38,20 @@ export default function App() {
     useEffect(() => {
         (async () => {
             await options.load();
-            
+
             setEnableDomManipulation(!!options.isDomManipulationEnabled);
             setEnableVideoPlayerManipulation(!!options.isVideoPlayerManipulationEnabled);
+
+            setHideDislikeVideoButton(!!options.hideDislikeVideoButton);
+            setHideDownloadVideoButton(!!options.hideDownloadVideoButton);
+            setHideClipVideoButton(!!options.hideClipVideoButton);
+            setHideThankVideoButton(!!options.hideThankVideoButton);
+            setHideSaveVideoButton(!!options.hideSaveVideoButton);
+
             setApiBaseUrl(options.apiBaseUrl);
             setApiUsername(options.apiUsername);
             setApiPassword(options.apiPassword);
-            
+
             checkBaseUrlValid(options.apiBaseUrl);
         })();
     }, [options]);
@@ -54,6 +66,12 @@ export default function App() {
 
         options.isVideoPlayerManipulationEnabled = !!enableVideoPlayerManipulation;
         options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
+
+        options.hideDislikeVideoButton = !!hideDislikeVideoButton;
+        options.hideDownloadVideoButton = !!hideDownloadVideoButton;
+        options.hideClipVideoButton = !!hideClipVideoButton;
+        options.hideThankVideoButton = !!hideThankVideoButton;
+        options.hideSaveVideoButton = !!hideSaveVideoButton;
 
         options.apiBaseUrl = apiBaseUrl;
         options.apiUsername = apiUsername;
@@ -124,6 +142,64 @@ export default function App() {
                         disabled={!enableVideoPlayerManipulation}
                     />
                     <label htmlFor="enable-end-video-button">Enable end video button</label>
+                </div>
+            </div>
+
+            <div className="form-section">
+                <h2>Hide Elements</h2>
+
+                <div className="info-text">
+                    Hide certain GUI elements on site.
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-dislike-video-button"
+                        type="checkbox"
+                        checked={hideDislikeVideoButton}
+                        onChange={e => setHideDislikeVideoButton(e.target.checked)}
+                    />
+                    <label htmlFor="hide-dislike-video-button">Dislike video Button</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-download-video-button"
+                        type="checkbox"
+                        checked={hideDownloadVideoButton}
+                        onChange={e => setHideDownloadVideoButton(e.target.checked)}
+                    />
+                    <label htmlFor="hide-download-video-button">Download video button</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-clip-video-button"
+                        type="checkbox"
+                        checked={hideClipVideoButton}
+                        onChange={e => setHideClipVideoButton(e.target.checked)}
+                    />
+                    <label htmlFor="hide-clip-video-button">Clip video button</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-thank-video-button"
+                        type="checkbox"
+                        checked={hideThankVideoButton}
+                        onChange={e => setHideThankVideoButton(e.target.checked)}
+                    />
+                    <label htmlFor="hide-thank-video-button">Thank video button</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-save-video-button"
+                        type="checkbox"
+                        checked={hideSaveVideoButton}
+                        onChange={e => setHideSaveVideoButton(e.target.checked)}
+                    />
+                    <label htmlFor="hide-save-video-button">Save video button</label>
                 </div>
             </div>
 
