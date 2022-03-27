@@ -56,6 +56,10 @@ const actionConfigs = [
         clearOverflow('body'),
     ],
     [
+        getHide('#CybotCookiebotDialog[name=CybotCookiebotDialog]'),
+        clearOverflow('body'),
+    ],
+    [
         getHide('body > .tp-modal'),
         getRemove('body > .tp-backdrop.tp-active'),
         getRemoveClasses('html', 'tp-modal-open'),
@@ -139,6 +143,8 @@ const bannerIntervalId = setInterval(() => {
     checkSimpleContainers(actionConfigs);
 }, 100);
 
+let foundCookieBanner = false;
+
 function clearBannerInterval() {
     clearInterval(bannerIntervalId);
 }
@@ -185,10 +191,10 @@ async function handleElement({ element, config }) {
     }
 }
 
-function checkSimpleContainers(actions) {
-    for (let i = 0; i < actions.length; i++) {
-        const debug = actions[i].includes(debugKey);
-        const list = debug ? actions[i].filter(item => typeof item === 'object') : actions[i];
+function checkSimpleContainers(configs) {
+    const found = configs.some(actions => {
+        const debug = actions.includes(debugKey);
+        const list = debug ? actions.filter(item => typeof item === 'object') : actions;
         const elements = list.map(config => ({
             element: getElementFromSelectors(config.selector),
             config,
@@ -198,8 +204,13 @@ function checkSimpleContainers(actions) {
         }
         if (elements.every(element => element.element)) {
             elements.forEach(handleElement);
-            setTimeout(() => clearBannerInterval(), 1000);
-            break;
+            return true;
         }
+        return false;
+    });
+    if (!foundCookieBanner && found) {
+        foundCookieBanner = true;
+        setTimeout(clearBannerInterval, 1000);
+        console.log('found cookie banner');
     }
 }
