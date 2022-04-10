@@ -20,7 +20,7 @@ function getVideoIdOfShortVideoContainer(container) {
         videoContainer.style['background-image'] &&
         videoContainer.style['background-image'].match(/\/vi\/([a-zA-Z0-9-_]*)\//);
     return match && match[1] || (
-        videoContainer.id === 'player-container-0' ? getVideoIdFromUrl(window.location.href) : null
+        parent && parent.id === '0' ? getVideoIdFromUrl(window.location.href) : null
     );
 }
 
