@@ -27,6 +27,8 @@ div.amgdprcookie-bar-template,
     display: none!important;
 }
 
+html[is_cookie_banner_initial_overflow],
+body[is_cookie_banner_initial_overflow],
 *[is_cookie_banner_initial_overflow] {
     overflow: initial!important;
 }
