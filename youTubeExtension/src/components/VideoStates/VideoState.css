@@ -1,3 +1,7 @@
+.yt-video-user-state-container {
+    z-index: 5;
+}
+
 .yt-video-user-state-container > div {
     font-size: 13px;
     display: flex;
