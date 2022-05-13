@@ -3,6 +3,10 @@ const optionKeys = {
         key: 'IS_VIDEO_PLAYER_MANIPULATION_ENABLED',
         defaultValue: true,
     },
+    IS_PAUSE_CHANNEL_TRAILER_ENABLED: {
+        key: 'IS_PAUSE_CHANNEL_TRAILER_ENABLED',
+        defaultValue: false,
+    },
     IS_END_VIDEO_BUTTON_ENABLED: {
         key: 'IS_END_VIDEO_BUTTON_ENABLED',
         defaultValue: false,
@@ -89,6 +93,14 @@ export default class OptionsService {
 
     set isVideoPlayerManipulationEnabled(value) {
         return this.set(optionKeys.IS_VIDEO_PLAYER_MANIPULATION_ENABLED.key, value);
+    }
+
+    get isPauseChannelTrailerEnabled() {
+        return this.get(optionKeys.IS_PAUSE_CHANNEL_TRAILER_ENABLED.key);
+    }
+
+    set isPauseChannelTrailerEnabled(value) {
+        return this.set(optionKeys.IS_PAUSE_CHANNEL_TRAILER_ENABLED.key, value);
     }
 
     get isEndVideoButtonEnabled() {

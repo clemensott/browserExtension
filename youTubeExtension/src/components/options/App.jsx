@@ -18,16 +18,17 @@ async function pingApi(baseUrl) {
 
 export default function App() {
     const [enableDomManipulation, setEnableDomManipulation] = useState(false);
+    const [enablePauseChannelTrailer, setEnablePauseChannelTrailer] = useState(false);
     const [enableVideoPlayerManipulation, setEnableVideoPlayerManipulation] = useState(true);
     const [hideDislikeVideoButton, setHideDislikeVideoButton] = useState(false);
     const [hideDownloadVideoButton, setHideDownloadVideoButton] = useState(false);
     const [hideClipVideoButton, setHideClipVideoButton] = useState(false);
     const [hideThankVideoButton, setHideThankVideoButton] = useState(false);
     const [hideSaveVideoButton, setHideSaveVideoButton] = useState(false);
-    const [apiBaseUrl, setApiBaseUrl] = useState();
+    const [apiBaseUrl, setApiBaseUrl] = useState('');
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
-    const [apiUsername, setApiUsername] = useState();
-    const [apiPassword, setApiPassword] = useState();
+    const [apiUsername, setApiUsername] = useState('');
+    const [apiPassword, setApiPassword] = useState('');
     const enableEndVideoButton = useRef();
     const subscriptionboxReloadSeconds = useRef();
 
@@ -40,6 +41,7 @@ export default function App() {
             await options.load();
 
             setEnableDomManipulation(!!options.isDomManipulationEnabled);
+            setEnablePauseChannelTrailer(!!options.isPauseChannelTrailerEnabled);
             setEnableVideoPlayerManipulation(!!options.isVideoPlayerManipulationEnabled);
 
             setHideDislikeVideoButton(!!options.hideDislikeVideoButton);
@@ -65,6 +67,7 @@ export default function App() {
         options.subscriptionBoxReloadSeconds = parseInt(subscriptionboxReloadSeconds.current.value, 10);
 
         options.isVideoPlayerManipulationEnabled = !!enableVideoPlayerManipulation;
+        options.isPauseChannelTrailerEnabled = !!enablePauseChannelTrailer;
         options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
 
         options.hideDislikeVideoButton = !!hideDislikeVideoButton;
@@ -131,6 +134,16 @@ export default function App() {
                         onChange={e => setEnableVideoPlayerManipulation(e.target.checked)}
                     />
                     <label htmlFor="enable-player-manipulation-video-button">Enable video player manipulation</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="enable-pause-channel-trailer-button"
+                        type="checkbox"
+                        checked={enablePauseChannelTrailer}
+                        onChange={e => setEnablePauseChannelTrailer(e.target.checked)}
+                    />
+                    <label htmlFor="enable-pause-channel-trailer-button">Enable pausing channel trailer</label>
                 </div>
 
                 <div className="form-group">

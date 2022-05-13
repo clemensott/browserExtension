@@ -6,6 +6,7 @@ export default class DomEventHandler {
         this.eventName = eventName;
         this.notFoundTimeout = notFoundTimeout;
         this.timeout = timeout;
+        this.lastTimeout = null;
         this.triggerEventOnRunChange = triggerEventOnRunChange || false;
         this.intervalId = null;
         this.lastElements = null;
@@ -26,8 +27,9 @@ export default class DomEventHandler {
 
     start() {
         if (!this.intervalId) {
-            const timeout = this.notFoundTimeout && !this.lastElements ? this.notFoundTimeout : this.timeout;
+            const timeout = this.getIntervalTimeount(this.lastElements);
             this.intervalId = setInterval(this.onTick, timeout);
+            this.lastTimeout = timeout;
 
             if (this.triggerEventOnRunChange) {
                 this.triggerEvent({
@@ -91,11 +93,16 @@ export default class DomEventHandler {
     }
 
     updateIntervalTime(currentElements) {
-        if (this.intervalId && this.notFoundTimeout && (!!this.lastElements ^ !!currentElements)) {
-            const timeout = currentElements ? this.timeout : this.notFoundTimeout;
+        const timeout = this.getIntervalTimeount(currentElements);
+        if (timeout !== this.lastTimeout) {
             clearInterval(this.intervalId);
             this.intervalId = setInterval(this.onTick, timeout);
+            this.lastTimeout = timeout;
         }
+    }
+
+    getIntervalTimeount(currentElements) {
+        return !currentElements && this.notFoundTimeout ? this.notFoundTimeout : this.timeout;
     }
 
     onChange(args) {

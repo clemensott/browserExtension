@@ -38,6 +38,10 @@ export default class NavigationEventService {
         return !!getCurrentVideoId();
     }
 
+    static isChannelFeaturedSite() {
+        return NavigationEventService.isChannelSite('featured');
+    }
+
     static isChannelVideosSite() {
         return NavigationEventService.isChannelSite('videos');
     }
@@ -47,13 +51,14 @@ export default class NavigationEventService {
         const mismatchList = ['watch', 'shorts', 'playlist', 'feed', 'premium ', 'results', ''];
         const channelTabs = ['featured', 'videos', 'playlists', 'community', 'store', 'channels', 'about'];
 
+        const isFeaturedTab = tab === 'featured';
         const pathParts = window.location.pathname.split('/');
         switch (pathParts.length) {
             case 2:
-                return !tab && !mismatchList.includes(pathParts[1]);
+                return (!tab || isFeaturedTab) && !mismatchList.includes(pathParts[1]);
 
             case 3:
-                return (!tab && channelMatchList.includes(pathParts[1])) ||
+                return ((!tab || isFeaturedTab) && channelMatchList.includes(pathParts[1])) ||
                     (!mismatchList.includes(pathParts[1]) && checkValue(tab || channelTabs, pathParts[2]));
 
             case 4:
@@ -90,6 +95,7 @@ export default class NavigationEventService {
         const state = {
             isVideoWatchSite: NavigationEventService.isVideoWatchSite(),
             isChannelSite: NavigationEventService.isChannelSite(),
+            isChannelFeaturedSite: NavigationEventService.isChannelFeaturedSite(),
             isChannelVideosSite: NavigationEventService.isChannelVideosSite(),
             isSubscriptionBoxSite: NavigationEventService.isSubscriptionBoxSite(),
         };

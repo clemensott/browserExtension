@@ -43,7 +43,6 @@ export default class HideWatchVideoElementsService extends DomEventHandler {
             [name]: allElementDetectorConfigs[name],
         })));
 
-        console.log('const:', this.elementDetectorConfigs);
     }
 
     start() {

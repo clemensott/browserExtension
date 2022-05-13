@@ -1,6 +1,7 @@
 import { navigationChange } from '../../constants';
 import ChannelDomEventHandler from './Channel/ChannelDomEventHandler';
 import ChannelVideosDomEventHandler from './Channel/ChannelVideosDomEventHandler';
+import ChannelPlayerDomEventHandler from './Channel/ChannelPlayerDomEventHandler';
 import DomEventHandler from './DomEventHandler';
 import HideWatchVideoElementsService from './HideWatchVideoElementsService';
 import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
@@ -11,6 +12,7 @@ export default class DomEventService {
         this.channelVideosCount = new ChannelVideosDomEventHandler({
             updateTrackerService: updateSourcesTrackerService,
         });
+        this.channelPlayer = new ChannelPlayerDomEventHandler();
         this.masterHeadContainer = new DomEventHandler({
             eventName: 'DomEventService.masterHeadContainer',
             elementsGetter: this.getMasterHeadContianer,
@@ -38,6 +40,12 @@ export default class DomEventService {
             this.channel.start();
         } else if (detail.isChannelSite === navigationChange.LEFT) {
             this.channel.stop();
+        }
+
+        if (detail.isChannelFeaturedSite === navigationChange.ENTERED) {
+            this.channelPlayer.start();
+        } else if (detail.isChannelFeaturedSite === navigationChange.LEFT) {
+            this.channelPlayer.stop();
         }
 
         if (detail.isChannelVideosSite === navigationChange.ENTERED) {
