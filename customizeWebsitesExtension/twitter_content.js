@@ -1,13 +1,32 @@
 console.log('twitter content script');
 
+const buttonTexts = {
+    login: [
+        'ANMELDEN',
+        'LOGIN',
+        'SIGN IN',
+    ],
+    signUp: [
+        'REGISTRIEREN',
+        'SIGN UP',
+    ],
+};
+
 function equalsLink(href, path) {
     return href === (window.location.origin + path);
 }
 
 function hasLoginButtons(element) {
     const links = Array.from(element.querySelectorAll('a'));
-    return links.some(a => equalsLink(a.href, '/login')) &&
-        links.some(a => equalsLink(a.href, '/i/flow/signup'));
+    if (links.some(a => equalsLink(a.href, '/login')) &&
+        links.some(a => equalsLink(a.href, '/i/flow/signup'))) {
+        return true;
+    }
+
+    const texts = Array.from(element.querySelectorAll('div[role="button"]'))
+        .map(div => div.innerText.toUpperCase());
+    return texts.some(t => buttonTexts.login.includes(t)) &&
+        texts.some(t => buttonTexts.signUp.includes(t));
 }
 
 function createCssSelector(element) {
