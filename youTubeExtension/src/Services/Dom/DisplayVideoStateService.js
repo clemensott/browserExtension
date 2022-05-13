@@ -31,10 +31,11 @@ function getVideoIdFromVideoContainer(container) {
 
 function getVideoContainers() {
     const watchVideos = [{
-        container: document.querySelector('ytd-video-primary-info-renderer #info'),
+        container: document.querySelector('ytd-video-owner-renderer.ytd-watch-metadata,' +
+            'ytd-video-primary-info-renderer #info'),
         getVideoId: () => getVideoIdFromUrl(window.location.href),
         additionalClassName: 'yt-video-user-state-watch',
-        insertReferenceNodeSelector: '#flex',
+        insertReferenceNodeSelector: '#purchase-button, #flex',
     }];
 
     const shortVideos = [
