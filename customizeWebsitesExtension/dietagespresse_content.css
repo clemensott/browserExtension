@@ -1,0 +1,7 @@
+.s-post-main.has-paywall .s-post-content:after {
+    display: none!important;
+}
+
+.s-post-main.has-paywall .s-post-content {
+    max-height: initial!important;
+}

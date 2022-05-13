@@ -57,6 +57,14 @@
         },
         {
             "matches": [
+                "https://dietagespresse.com/*"
+            ],
+            "css": [
+                "dietagespresse_content.css"
+            ]
+        },
+        {
+            "matches": [
                 "http://*/*",
                 "https://*/*"
             ],
