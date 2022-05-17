@@ -19,10 +19,37 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
             id: 'reload_subscription_box_container',
             beforeSelector: '#spacer',
         });
+        this.reloadTimeoutId = null;
     }
 
     static getContainer() {
         return document.querySelector('#title-container');
+    }
+
+    start() {
+        super.start();
+
+        this.startBackupReload();
+    }
+
+    startBackupReload() {
+        clearTimeout(this.reloadTimeoutId);
+        this.reloadTimeoutId = setTimeout(() => {
+            if (this.getReloadingEnabled() && !this.elementsExists(this.lastElements)) {
+                this.reloadTimeoutId = setTimeout(() => {
+                    if (this.getReloadingEnabled() &&
+                        window.location.pathname.startsWith('/feed/subscriptions')) {
+                        window.location.reload();
+                    }
+                }, this.getReloadingSeconds() * 1000);
+            }
+        }, 5000);
+    }
+
+    stop() {
+        super.stop();
+
+        clearTimeout(this.reloadTimeoutId);
     }
 
     getReloadingSeconds() {
@@ -45,8 +72,10 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
                     defaultChecked={this.getReloadingEnabled()}
                     onChange={this.onChangeReloadEnabled.bind(this)}
                 />, container);
+            clearTimeout(this.reloadTimeoutId);
         } else {
             this.reloadIndicatorRenderer.unmount();
+            this.startBackupReload();
         }
     }
 }
