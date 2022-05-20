@@ -1,6 +1,7 @@
 import React from 'react';
 import ReloadCheckbox from '../../components/ReloadCheckbox';
 import ReactRenderer from '../../utils/ReactRenderer';
+import tryReloadSubscriptions from '../../utils/tryReloadSubscriptions';
 import DomEventHandler from './DomEventHandler';
 
 
@@ -36,12 +37,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
         clearTimeout(this.reloadTimeoutId);
         this.reloadTimeoutId = setTimeout(() => {
             if (this.getReloadingEnabled() && !this.elementsExists(this.lastElements)) {
-                this.reloadTimeoutId = setTimeout(() => {
-                    if (this.getReloadingEnabled() &&
-                        window.location.pathname.startsWith('/feed/subscriptions')) {
-                        window.location.reload();
-                    }
-                }, this.getReloadingSeconds() * 1000);
+                this.reloadTimeoutId = setTimeout(tryReloadSubscriptions, this.getReloadingSeconds() * 1000);
             }
         }, 5000);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import tryReloadSubscriptions from '../utils/tryReloadSubscriptions';
 import './ReloadCheckbox.css';
 
 function RemainingText({ until, onRanDown }) {
@@ -59,12 +60,6 @@ export default function ReloadCheckbox({ runDownSeconds, defaultChecked, onChang
         updateUntil(e.target.checked);
     };
 
-    const reload = () => {
-        if (window.location.pathname.startsWith('/feed/subscriptions')) {
-            window.location.reload();
-        }
-    };
-
     useEffect(() => {
         updateUntil(defaultChecked);
     }, [defaultChecked]);
@@ -74,7 +69,7 @@ export default function ReloadCheckbox({ runDownSeconds, defaultChecked, onChang
             <input id="auto-reload-page" type="checkbox" defaultChecked={defaultChecked} onChange={onCheckboxChange} />
             <label htmlFor="auto-reload-page">
                 Auto Reloading
-                <RemainingText until={until} onRanDown={reload} />
+                <RemainingText until={until} onRanDown={tryReloadSubscriptions} />
             </label>
         </div>
     );
