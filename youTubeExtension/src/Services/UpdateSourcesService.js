@@ -312,7 +312,7 @@ export default class UpdateSourcesService {
         await Promise.all(thumbnailUpdatePromises);
     }
 
-    async onFetchText({ detail: { url, text } }) {
+    async onFetchText({ detail: { url, text, json } }) {
         if ([
             'https://www.youtube.com/youtubei/v1/next',
             'https://www.youtube.com/youtubei/v1/browse',
@@ -320,7 +320,7 @@ export default class UpdateSourcesService {
             'https://www.youtube.com/youtubei/v1/search',
         ].some(u => url.startsWith(u))) {
             try {
-                await this.handleData(JSON.parse(text));
+                await this.handleData(json || JSON.parse(text));
             } catch (e) {
                 console.error(e)
             }
