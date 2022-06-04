@@ -52,6 +52,7 @@
                 "https://www.reddit.com/*"
             ],
             "js": [
+                "reddit_notification_bug.js",
                 "reddit_content.js"
             ]
         },
