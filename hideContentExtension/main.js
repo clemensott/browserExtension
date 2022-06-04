@@ -1,13 +1,14 @@
 let lastInfos = null;
 let lastModalContainer = null;
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
     // console.log('main message:', msg);
     if (msg.type === 'show_hide_element_modal' && lastInfos) {
         showModal(lastInfos.elements);
     } else if (msg.type === 'element_infos' && (!lastModalContainer || !lastModalContainer.parentElement)) {
         lastInfos = msg.data;
     }
+    sendResponse(null);
 });
 
 function sendHideMessage(elementId, type) {
@@ -172,5 +173,6 @@ function getElementDescription(node) {
 }
 
 function getElementText(node) {
-    return node.innerText.split('\n').filter(Boolean)[0].substring(0, 70);
+    const firstNonEmptyLine = node.innerText.split('\n').filter(Boolean)[0];
+    return firstNonEmptyLine && firstNonEmptyLine.substring(0, 70);
 }

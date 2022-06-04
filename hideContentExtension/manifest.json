@@ -2,7 +2,7 @@
     "name": "Hider",
     "version": "1.0",
     "description": "Hides stuff from webpage",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "icons": {
         "16": "657564_eraser_16x16.png",
         "48": "657564_eraser_48x48.png",
@@ -13,10 +13,7 @@
         "activeTab"
     ],
     "background": {
-        "scripts": [
-            "contextMenu.js"
-        ],
-        "persistent": false
+        "service_worker": "contextMenu.js"
     },
     "content_scripts": [
         {
