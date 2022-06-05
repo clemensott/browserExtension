@@ -2,7 +2,7 @@
     "name": "YouTube utils extension",
     "version": "1.0",
     "description": "does some useful stuff on youtube",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
@@ -26,6 +26,13 @@
         "storage"
     ],
     "web_accessible_resources": [
-        "insite.bundle.js"
+        {
+            "resources": [
+                "insite.bundle.js"
+            ],
+            "matches": [
+                "https://www.youtube.com/*"
+            ]
+        }
     ]
 }
