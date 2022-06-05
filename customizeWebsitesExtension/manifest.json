@@ -2,7 +2,7 @@
     "name": "Customize Websites",
     "version": "1.0",
     "description": "does usefull stuff on websites",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "icons": {
         "16": "icon_16.png",
         "48": "icon_48.png",
@@ -12,10 +12,7 @@
         "contextMenus"
     ],
     "background": {
-        "scripts": [
-            "contextMenu.js"
-        ],
-        "persistent": false
+        "service_worker": "download_content_context_menu.js"
     },
     "content_scripts": [
         {
@@ -77,6 +74,15 @@
                 "remove_ad.css"
             ],
             "all_frames": true
+        },
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "download_content.js"
+            ]
         }
     ]
 }

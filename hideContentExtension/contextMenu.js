@@ -1,12 +1,16 @@
 console.log('context Menu');
 
 const menuId = 'hideElementItem';
-chrome.contextMenus.removeAll(function () {
-    chrome.contextMenus.create({
-        id: menuId,
-        title: 'Hide Element',
-        contexts: ['all'],
-    });
+self.addEventListener('install', function (e) {
+    e.waitUntil(new Promise(resolve => {
+        chrome.contextMenus.removeAll(function () {
+            chrome.contextMenus.create({
+                id: menuId,
+                title: 'Hide Element',
+                contexts: ['all'],
+            }, resolve);
+        });
+    }));
 });
 
 chrome.contextMenus.onClicked.addListener((e, tab, ...params) => {
