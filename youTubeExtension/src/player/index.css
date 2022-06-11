@@ -17,7 +17,8 @@ body:not(.disable-video-player-manipulation) #player-ads,
 body:not(.disable-video-player-manipulation) ytd-promoted-sparkles-web-renderer,
 body:not(.disable-video-player-manipulation) #masthead-ad,
 body:not(.disable-video-player-manipulation) a.yt-extension-next-video,
-body:not(.disable-video-player-manipulation) div.ytp-ad-underlay {
+body:not(.disable-video-player-manipulation) div.ytp-ad-underlay,
+body:not(.disable-video-player-manipulation) ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"] {
     display: none!important;
 }
 
