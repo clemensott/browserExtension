@@ -23,6 +23,7 @@ div.cc_overlay_lock,
 #cookieman-modal,
 #cc-banner-wrap,
 div.amgdprcookie-bar-template,
+div.CookieBanner.output,
 div[is_cookie_banner_hide],
 *[is_cookie_banner_hide] {
     display: none!important;
