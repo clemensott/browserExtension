@@ -4,8 +4,8 @@ import VideoStateDropdownVideoActionButtons from './VideoStateDropdownVideoActio
 import './VideoStateDropdown.css';
 
 
-export default function VideoStateDropdown({ videoId, apiUrl, actionButtons, onDropdownOpenChange }) {
-    const [showMenu, setShowMenu] = useState(false);
+export default function VideoStateDropdown({ videoId, apiUrl, actionButtons, defaultOpen, onDropdownOpenChange }) {
+    const [showMenu, setShowMenu] = useState(defaultOpen);
     const dropdown = useRef(null);
     const closeMenu = useRef(e => {
         if (dropdown.current && !dropdown.current.contains(e.target)) {

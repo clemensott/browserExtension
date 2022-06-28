@@ -91,18 +91,27 @@ export default class NavigationEventService {
         }
     }
 
-    onUrlChange() {
-        const state = {
+    getCurrentState() {
+        return {
             isVideoWatchSite: NavigationEventService.isVideoWatchSite(),
             isChannelSite: NavigationEventService.isChannelSite(),
             isChannelFeaturedSite: NavigationEventService.isChannelFeaturedSite(),
             isChannelVideosSite: NavigationEventService.isChannelVideosSite(),
             isSubscriptionBoxSite: NavigationEventService.isSubscriptionBoxSite(),
-        };
+        }
+    }
+
+    onUrlChange() {
+        const state = this.getCurrentState();
         triggerEvent(constants.URL_CHANGE_EVENTNAME, createArgs(state, this.lastState));
 
         this.lastState = state;
         this.lastUrl = window.location.href;
+    }
+
+    getInitalArgs() {
+        const state = this.getCurrentState();
+        return createArgs(state, null);
     }
 
     addOnUrlChangeEventHandler(callback) {

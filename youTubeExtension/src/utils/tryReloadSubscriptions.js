@@ -1,3 +1,5 @@
+import sleep from './sleep';
+
 async function isOnline() {
     try {
         const { ok } = await fetch(window.location.href);
@@ -13,6 +15,6 @@ export default async function tryReloadSubscriptions() {
             window.location.reload();
             return;
         }
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await sleep(5000);
     }
 }

@@ -95,8 +95,8 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     top: 35px;
 }
 
-*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item,
-.yt-video-user-state-container.yt-video-user-state-container-not-collapse > .yt-video-user-state-list-item {
+*:hover > .yt-video-user-state-container.yt-video-user-state-list-item > .yt-video-user-state-item,
+.yt-video-user-state-container.yt-video-user-state-container-not-collapse.yt-video-user-state-list-item > .yt-video-user-state-item {
     height: initial;
     padding-top: initial;
 }
@@ -115,12 +115,12 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     flex-grow: 1;
 }
 
-.yt-video-user-state-list-item > .yt-video-user-state-action-button {
+.yt-video-user-state-list-item > .yt-video-user-state-item > .yt-video-user-state-action-button {
     display: none;
 }
 
-*:hover > .yt-video-user-state-container > .yt-video-user-state-list-item > .yt-video-user-state-action-button,
-.yt-video-user-state-container.yt-video-user-state-container-not-collapse > .yt-video-user-state-list-item > .yt-video-user-state-action-button {
+*:hover > .yt-video-user-state-container.yt-video-user-state-list-item > .yt-video-user-state-item > .yt-video-user-state-action-button,
+.yt-video-user-state-container.yt-video-user-state-container-not-collapse.yt-video-user-state-list-item > .yt-video-user-state-item > .yt-video-user-state-action-button {
     display: initial;
 }
 
@@ -133,7 +133,7 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     cursor: default;
 }
 
-.yt-video-user-state-watch {
+.yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
     margin-left: 5px;
     width: 200px;
 }

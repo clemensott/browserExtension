@@ -1,14 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import getVideoIdFromUrl from '../../utils/getVideoIdFromUrl';
-import setIntervalUntil from '../../utils/setIntervalUntil';
-import AtOnceService from '../AtOnceService';
-import addToggleDisplayVideoState from '../../components/addToggleDisplayVideoState';
-import VideoState from '../../components/VideoStates/VideoState';
-import './DisplayVideoStateService.css';
+import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
+import setIntervalUntil from '../../../utils/setIntervalUntil';
+import AtOnceService from '../../AtOnceService';
+import addToggleDisplayVideoState from '../../../components/addToggleDisplayVideoState';
+import VideoOverlayRenderer from './VideoOverlayRenderer';
+import './VideoOverlayService.css';
 
-const videoUserStateClassName = 'yt-video-user-state-container';
-const videoUserStateNotCollapse = 'yt-video-user-state-container-not-collapse';
+const videoStateContainerClassName = 'yt-video-user-state-container';
+const videoOpenContainerClassName = 'yt-video-open-container';
 
 function getVideoIdOfShortVideoContainer(container) {
     let parent = container;
@@ -72,8 +70,9 @@ function getVideoContainers() {
 }
 
 export default class DisplayVideoStateService {
-    constructor(api) {
+    constructor(api, videoOpenStorageService) {
         this.api = api;
+        this.videoOpenStorageService = videoOpenStorageService;
         this.videoContainers = null;
         this.loop = new AtOnceService(async (fast = false, forceUserStateUpdate = false) => {
             try {
@@ -94,6 +93,13 @@ export default class DisplayVideoStateService {
             }
         });
         this.runLoopNonAsync = this.runLoopNonAsync.bind(this);
+        this.overlayRender = new VideoOverlayRenderer({
+            api,
+            videoOpenStorageService,
+            videoStateContainerClassName,
+            videoOpenContainerClassName,
+            onUpdate: this.runLoopNonAsync,
+        });
     }
 
     loadSourcesOfVideos(videoIds) {
@@ -111,57 +117,9 @@ export default class DisplayVideoStateService {
     updateUI(videoIdsToUpdate) {
         this.videoContainers.forEach(container => {
             if (container.videoId && (!videoIdsToUpdate?.length || videoIdsToUpdate.includes(container.videoId))) {
-                this.updateVideoUserStateUI(container);
+                this.overlayRender.render(container);
             }
         });
-    }
-
-    updateVideoUserStateUI({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
-        if (!container || !document.contains(container)) {
-            return;
-        }
-
-        const videoUserState = this.api.getVideoUserState(videoId);
-        let element = container.querySelector(`.${videoUserStateClassName}`);
-        if (!element) {
-            element = document.createElement('span');
-            element.classList.add(videoUserStateClassName);
-            const refNode = insertReferenceNodeSelector && container.querySelector(insertReferenceNodeSelector);
-            container.insertBefore(element, refNode);
-        }
-
-        const timestamp = videoUserState?.timestamp || 0;
-        if (element.dataset.id === videoId && element.dataset.timestamp >= timestamp) {
-            return;
-        }
-        element.dataset.id = videoId;
-        element.dataset.timestamp = timestamp;
-
-        const videoUserStateWithSourcesData = videoUserState ? {
-            ...videoUserState,
-            sources: videoUserState.sources && videoUserState.sources.map(source => ({
-                ...source,
-                data: this.api.getSourceFromId(source.sourceId),
-            })),
-        } : null;
-
-        ReactDOM.render(
-            <VideoState
-                videoId={videoId}
-                videoUserState={videoUserStateWithSourcesData}
-                additionalClassName={additionalClassName}
-                api={this.api}
-                onVideoUpdate={() => this.loop.run()}
-                onDropdownOpenChange={open => {
-                    if (open) {
-                        element.classList.add(videoUserStateNotCollapse);
-                    } else {
-                        element.classList.remove(videoUserStateNotCollapse);
-                    }
-                }}
-            />,
-            element,
-        );
     }
 
     runLoopNonAsync() {
@@ -188,7 +146,7 @@ export default class DisplayVideoStateService {
             const element = document.getElementById('voice-search-button');
             if (!element) return true;
 
-            addToggleDisplayVideoState(element, videoUserStateClassName);
+            addToggleDisplayVideoState(element, [videoStateContainerClassName, videoOpenContainerClassName]);
             return false;
         }, 100);
 

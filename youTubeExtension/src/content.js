@@ -5,7 +5,7 @@ import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
 import UpdateSourcesService from './Services/UpdateSourcesService';
 import IsUpdatingSourcesService from './Services/Dom/IsUpdatingSourcesService';
-import DisplayVideoStateService from './Services/Dom/DisplayVideoStateService';
+import VideoOverlayService from './Services/Dom/VideoOverlay/VideoOverlayService';
 import ChannelVideoHidingService from './Services/Dom/Channel/ChannelVideoHidingService';
 import DomEventService from './Services/Dom/DomEventService';
 import NavigationEventService from './Services/NavigationEventService';
@@ -13,7 +13,7 @@ import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService'
 import checkExclusivity from './utils/checkExclusivity';
 import StorageService from './Services/StorageService';
 import OptionsService from './Services/OptionsService';
-
+import VideoOpenStorageService from './Services/VideoOpenStorageService';
 
 async function main() {
     const optionsService = new OptionsService(new StorageService());
@@ -33,6 +33,7 @@ async function main() {
         domService,
         trackerService: updateSourcesTrackerService,
     });
+    const videoOpenStorageService = new VideoOpenStorageService(navigationService);
 
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler(optionsService);
@@ -43,6 +44,8 @@ async function main() {
         domService.start();
         navigationService.start();
         updateSourcesTrackerService.init();
+        videoOpenStorageService.start();
+        window.videoOpenStorage = videoOpenStorageService;
     }
 
     if (apiHandler) {
@@ -61,7 +64,7 @@ async function main() {
         }
 
         try {
-            const displayVideoStateService = new DisplayVideoStateService(apiHandler);
+            const displayVideoStateService = new VideoOverlayService(apiHandler, videoOpenStorageService);
             displayVideoStateService.start();
         } catch (err) {
             console.error('init display video state service:', err);

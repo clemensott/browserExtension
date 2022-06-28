@@ -67,15 +67,15 @@ const actionButtonConfig = {
 };
 
 
-export default function VideoState({ videoId, videoUserState, additionalClassName, api, onVideoUpdate, onDropdownOpenChange }) {
+export default function VideoState({ videoId, videoUserState, api, defaultDropdownOpen, onVideoUpdate, onDropdownOpenChange }) {
     if (!videoUserState) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-unkown`} />
+            <div className="yt-video-user-state-item yt-video-user-state-unkown" />
         );
     }
     if (!videoUserState?.sources?.length) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-missing`}>
+            <div className="yt-video-user-state-item yt-video-user-state-missing">
                 <VideoStateButton />
             </div>
         );
@@ -138,6 +138,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
                 <VideoStateDropdown
                     videoId={videoId}
                     apiUrl={api.api.baseUrl}
+                    defaultOpen={defaultDropdownOpen}
                     onDropdownOpenChange={onDropdownOpenChange}
                     actionButtons={actionButtons}
                 />
@@ -147,7 +148,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
 
     if (videoUserState.isWatched) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-watched`}>
+            <div className="yt-video-user-state-item yt-video-user-state-watched">
                 <VideoStateButton {...createActionButton(actionButtonConfig.setNotWatched)} />
                 <AdditionalActionButtons
                     actionButtons={[
@@ -160,7 +161,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     }
     if (isSingleDeprecatedInactive && videoUserState.sources.length === 1) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-inactive-depricated`}>
+            <div className="yt-video-user-state-item yt-video-user-state-inactive-depricated">
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setDisableDeprecated, inactiveDeprecatedForSources)
@@ -170,7 +171,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     }
     if (isSingleInactive && videoUserState.sources.length === 1) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-inactive`}>
+            <div className="yt-video-user-state-item yt-video-user-state-inactive">
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setActive, inactiveForSources)
@@ -180,7 +181,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
     }
     if (isSingleActive && videoUserState.sources.length === 1) {
         return (
-            <div className={`${additionalClassName} yt-video-user-state-active`}>
+            <div className="yt-video-user-state-item yt-video-user-state-active">
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, activeForSources)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setInactive, activeForSources)
@@ -189,7 +190,7 @@ export default function VideoState({ videoId, videoUserState, additionalClassNam
         );
     }
     return (
-        <div className={`${additionalClassName} yt-video-user-state-active`}>
+        <div className="yt-video-user-state-item yt-video-user-state-active">
             <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, videoUserState.sources)} />
             <AdditionalActionButtons
                 actionButtons={[
