@@ -43,6 +43,10 @@ const optionKeys = {
         key: 'HIDE_SAVE_VIDEO_BUTTON',
         defaultValue: false,
     },
+    HIDE_RECOMMENDATION_PROPS: {
+        key: 'HIDE_RECOMMENDATION_PROPS',
+        defaultValue: false,
+    },
     API_BASE_URL: {
         key: 'API_BASE_URL',
         defaultValue: null,
@@ -173,6 +177,14 @@ export default class OptionsService {
 
     set hideSaveVideoButton(value) {
         return this.set(optionKeys.HIDE_SAVE_VIDEO_BUTTON.key, value);
+    }
+
+    get hideRecommendationPromps() {
+        return this.get(optionKeys.HIDE_RECOMMENDATION_PROPS.key);
+    }
+
+    set hideRecommendationPromps(value) {
+        return this.set(optionKeys.HIDE_RECOMMENDATION_PROPS.key, value);
     }
 
     get apiBaseUrl() {

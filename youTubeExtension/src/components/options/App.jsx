@@ -25,6 +25,7 @@ export default function App() {
     const [hideClipVideoButton, setHideClipVideoButton] = useState(false);
     const [hideThankVideoButton, setHideThankVideoButton] = useState(false);
     const [hideSaveVideoButton, setHideSaveVideoButton] = useState(false);
+    const [hideRecommendationPromps, setHideRecommendationPromps] = useState(false);
     const [apiBaseUrl, setApiBaseUrl] = useState('');
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState('');
@@ -49,6 +50,7 @@ export default function App() {
             setHideClipVideoButton(!!options.hideClipVideoButton);
             setHideThankVideoButton(!!options.hideThankVideoButton);
             setHideSaveVideoButton(!!options.hideSaveVideoButton);
+            setHideRecommendationPromps(!!options.hideRecommendationPromps);
 
             setApiBaseUrl(options.apiBaseUrl);
             setApiUsername(options.apiUsername);
@@ -75,6 +77,7 @@ export default function App() {
         options.hideClipVideoButton = !!hideClipVideoButton;
         options.hideThankVideoButton = !!hideThankVideoButton;
         options.hideSaveVideoButton = !!hideSaveVideoButton;
+        options.hideRecommendationPromps = !!hideRecommendationPromps;
 
         options.apiBaseUrl = apiBaseUrl;
         options.apiUsername = apiUsername;
@@ -213,6 +216,16 @@ export default function App() {
                         onChange={e => setHideSaveVideoButton(e.target.checked)}
                     />
                     <label htmlFor="hide-save-video-button">Save video button</label>
+                </div>
+
+                <div className="form-group">
+                    <input
+                        id="hide-recommendation-props"
+                        type="checkbox"
+                        checked={hideRecommendationPromps}
+                        onChange={e => setHideRecommendationPromps(e.target.checked)}
+                    />
+                    <label htmlFor="hide-recommendation-props">Recommendation promps</label>
                 </div>
             </div>
 
