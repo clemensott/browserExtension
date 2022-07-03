@@ -2,6 +2,7 @@
     pointer-events: none;
 }
 
+tp-yt-iron-overlay-backdrop,
 #lightbox {
     display: none;
 }
