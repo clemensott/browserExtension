@@ -1,4 +1,5 @@
 import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
+import getCurrentVideoId from '../../../utils/getCurrentVideoId';
 import setIntervalUntil from '../../../utils/setIntervalUntil';
 import AtOnceService from '../../AtOnceService';
 import addToggleDisplayVideoState from '../../../components/addToggleDisplayVideoState';
@@ -18,22 +19,25 @@ function getVideoIdOfShortVideoContainer(container) {
         videoContainer.style['background-image'] &&
         videoContainer.style['background-image'].match(/\/vi\/([a-zA-Z0-9-_]*)\//);
     return match && match[1] || (
-        parent && parent.id === '0' ? getVideoIdFromUrl(window.location.href) : null
+        parent && parent.id === '0' ? getCurrentVideoId() : null
     );
 }
 
 function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
-    return a && getVideoIdFromUrl(a.href);
+    return a && a.href && getVideoIdFromUrl(a.href);
 }
 
 function getVideoContainers() {
     const watchVideos = [{
-        container: document.querySelector('ytd-video-owner-renderer.ytd-watch-metadata,' +
-            'ytd-video-primary-info-renderer #info'),
-        getVideoId: () => getVideoIdFromUrl(window.location.href),
+        container: document.querySelector(
+            '#owner-and-teaser'
+        ) || document.querySelector(
+            'ytd-video-primary-info-renderer #info'
+        ),
+        getVideoId: () => getCurrentVideoId(),
         additionalClassName: 'yt-video-user-state-watch',
-        insertReferenceNodeSelector: '#purchase-button, #flex',
+        insertReferenceNodeSelector: '#comment-teaser, #flex',
     }];
 
     const shortVideos = [

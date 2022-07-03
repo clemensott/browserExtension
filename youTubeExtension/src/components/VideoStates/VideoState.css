@@ -133,9 +133,21 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     cursor: default;
 }
 
+#owner-and-teaser > .yt-video-user-state-container.yt-video-user-state-watch {
+    margin-top: 12px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+
+#owner-and-teaser > .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
+    margin-left: 0px;
+}
+
 .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
     margin-left: 5px;
     width: 200px;
+    height: 25px;
 }
 
 .yt-video-user-state-unkown {

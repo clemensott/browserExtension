@@ -91,7 +91,7 @@ export default class VideoOverlayRenderer {
     }
 
     render({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
-        if (!container || !document.contains(container)) {
+        if (!container || !document.contains(container) || !videoId) {
             return;
         }
 
