@@ -56,11 +56,11 @@ export default class VideoOpenStorageService {
 
             if (oldValue) {
                 const { videoId } = JSON.parse(oldValue);
-                this.videoOpenCache.delete(videoId);
+                this.decreaseVideoOpenCount(videoId);
             }
             if (newValue) {
                 const { videoId } = JSON.parse(newValue);
-                this.videoOpenCache.set(videoId, true);
+                this.increaseVideoOpenCount(videoId);
             }
         }
     }
@@ -105,22 +105,11 @@ export default class VideoOpenStorageService {
             videoId,
             timestamp: Date.now(),
         }));
-
-        if (this.lastVideoId) {
-            this.videoOpenCache.delete(this.lastVideoId);
-        }
-        this.videoOpenCache.set(videoId, true);
-        this.lastVideoId = videoId;
     }
 
     removeVideoOpen() {
         clearInterval(this.setVideoIdIntervalId);
         localStorage.removeItem(this.videoOpenTabStorageKey);
-
-        if (this.lastVideoId) {
-            this.videoOpenCache.delete(this.lastVideoId);
-            this.lastVideoId = null;
-        }
     }
 
     isVideoOpen(videoId) {
@@ -140,7 +129,21 @@ export default class VideoOpenStorageService {
             .map(key => JSON.parse(localStorage.getItem(key)))
             .filter(entry => Date.now() < entry.timestamp + this.validSeconds * 1000)
             .map(entry => entry.videoId)
-            .forEach(videoId => this.videoOpenCache.set(videoId, true));
+            .forEach(videoId => this.increaseVideoOpenCount(videoId));
+    }
+
+    increaseVideoOpenCount(videoId) {
+        const count = this.videoOpenCache.get(videoId) || 0;
+        this.videoOpenCache.set(videoId, count + 1);
+    }
+
+    decreaseVideoOpenCount(videoId) {
+        const count = this.videoOpenCache.get(videoId) || 0;
+        if (count > 1) {
+            this.videoOpenCache.set(videoId, count - 1);
+        } else {
+            this.videoOpenCache.delete(videoId);
+        }
     }
 
     isVideoOpenFromCache(videoId) {

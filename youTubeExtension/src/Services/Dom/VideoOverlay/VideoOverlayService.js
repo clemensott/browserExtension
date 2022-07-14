@@ -31,6 +31,8 @@ function getVideoIdFromVideoContainer(container) {
 function getVideoContainers() {
     const watchVideos = [{
         container: document.querySelector(
+            '#bottom-row'
+        ) || document.querySelector(
             '#owner-and-teaser'
         ) || document.querySelector(
             'ytd-video-primary-info-renderer #info'

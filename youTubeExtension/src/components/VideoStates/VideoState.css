@@ -133,6 +133,7 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     cursor: default;
 }
 
+#bottom-row > .yt-video-user-state-container.yt-video-user-state-watch,
 #owner-and-teaser > .yt-video-user-state-container.yt-video-user-state-watch {
     margin-top: 12px;
     margin-right: 12px;
@@ -140,12 +141,11 @@ ytd-playlist-panel-video-renderer > .yt-video-user-state-container.yt-video-user
     align-items: center;
 }
 
-#owner-and-teaser > .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
-    margin-left: 0px;
+div#info-text.style-scope.ytd-video-primary-info-renderer {
+    margin-right: 5px;
 }
 
 .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
-    margin-left: 5px;
     width: 200px;
     height: 25px;
 }

@@ -5,7 +5,7 @@ export default function VideoOpenIndicator({
     videoOpen,
 }) {
     return videoOpen ? (
-        <div className="yt-video-open-indicator-container">
+        <div className="yt-video-open-indicator-container" title="Video is open in other tab">
             O
         </div>
     ) : null;

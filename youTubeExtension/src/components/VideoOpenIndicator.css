@@ -1,4 +1,22 @@
-.yt-video-open-indicator-container {
+span.yt-video-open-container.yt-video-user-state-watch {
+    display: flex;
+    align-items: center;
+}
+
+#bottom-row > span.yt-video-open-container.yt-video-user-state-watch,
+#owner-and-teaser > span.yt-video-open-container.yt-video-user-state-watch {
+    margin-top: 12px;
+}
+
+span.yt-video-open-container.yt-video-user-state-watch > .yt-video-open-indicator-container {
+    padding: 6.5px 9px;
+    background-color: black;
+    color: white;
+    cursor: default;
+    pointer-events: none;
+}
+
+span.yt-video-open-container.yt-video-user-state-list-item > .yt-video-open-indicator-container {
     position: absolute;
     top: 0;
     left: 0;
