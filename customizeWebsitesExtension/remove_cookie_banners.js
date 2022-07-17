@@ -193,7 +193,7 @@ async function handleElement({ element, config }) {
 }
 
 function checkSimpleContainers(configs) {
-    const found = configs.some(actions => {
+    const found = configs.find(actions => {
         const debug = actions.includes(debugKey);
         const list = debug ? actions.filter(item => typeof item === 'object') : actions;
         const elements = list.map(config => ({
@@ -212,6 +212,6 @@ function checkSimpleContainers(configs) {
     if (!foundCookieBanner && found) {
         foundCookieBanner = true;
         setTimeout(clearBannerInterval, 1000);
-        console.log('found cookie banner');
+        console.log('found cookie banner', found);
     }
 }
