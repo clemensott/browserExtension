@@ -149,15 +149,30 @@ function getHomeExtendedVideo(raw) {
 
 function getHomeVideoData({ richItemRenderer: raw }) {
     try {
-        const video = raw?.content?.videoRenderer;
-        return video?.videoId && {
-            id: video?.videoId,
-            title: video.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
-            channelTitle: video?.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
-            channelId: video?.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
-            duration: parseDuration(video?.lengthText?.simpleText),
-            views: parseFormattedInt(video.viewCountText?.simpleText),
-        };
+        if (raw?.content?.videoRenderer?.videoId) {
+            const video = raw?.content?.videoRenderer;
+            return {
+                id: video?.videoId,
+                title: video.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelTitle: video?.longBylineText?.runs?.map(r => r?.text).filter(Boolean).join(''),
+                channelId: video?.longBylineText?.runs?.map(r => r?.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+                duration: parseDuration(video?.lengthText?.simpleText),
+                views: parseFormattedInt(video.viewCountText?.simpleText),
+            };
+        } else if (raw?.content?.reelItemRenderer?.videoId) {
+            const video = raw?.content?.reelItemRenderer;
+            return {
+                id: video?.videoId,
+                title: video.headline?.simpleText,
+                channelTitle: video?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
+                    ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.channelTitleText?.runs
+                    ?.map(r=>r?.text).filter(Boolean).join(''),
+                channelId: video?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
+                    ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer
+                    ?.channelNavigationEndpoint?.browseEndpoint?.browseId,
+            };
+        }
+        return null;
     } catch {
         return null;
     }

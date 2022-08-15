@@ -49,9 +49,19 @@ ytd-rich-item-renderer > .yt-video-user-state-container {
     margin-top: calc(56.25% - 4px);
 }
 
+ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container {
+    margin-top: calc(177.78% - 4px);
+}
+
 ytd-rich-item-renderer:hover > .yt-video-user-state-container,
 ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     margin-top: calc(56.25% - 25px);
+    height: initial;
+}
+
+ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:hover > .yt-video-user-state-container,
+ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
+    margin-top: calc(177.78% - 25px);
     height: initial;
 }
 
