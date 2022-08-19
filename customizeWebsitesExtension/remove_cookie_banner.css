@@ -24,7 +24,10 @@ div.cc_overlay_lock,
 #cc-banner-wrap,
 div.amgdprcookie-bar-template,
 div.CookieBanner.output,
-div[is_cookie_banner_hide],
+html > body div[is_cookie_banner_hide],
+html > body > div[is_cookie_banner_hide],
+html > body *[is_cookie_banner_hide],
+html > body > *[is_cookie_banner_hide],
 *[is_cookie_banner_hide] {
     display: none!important;
 }
