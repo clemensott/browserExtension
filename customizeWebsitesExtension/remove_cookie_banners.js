@@ -138,6 +138,10 @@ const actionConfigs = [
         getHide('#usercentrics-root'),
         clearOverflow('body'),
     ],
+    [
+        getHide('div[data-tracking-opt-in-overlay]'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
