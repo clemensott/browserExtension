@@ -1,0 +1,4 @@
+div > div > div[id^=t3_z],
+div[data-adclicklocation="background"] + div:not([class]) > div:not([class]) {
+    display: none!important;
+}

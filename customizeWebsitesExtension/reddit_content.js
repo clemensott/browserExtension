@@ -1,10 +1,16 @@
-setInterval(() => {
-    const ads = Array.from(document.querySelectorAll('div > div > div[id*=t3_z]'))
-        .filter(e => e.id.startsWith('t3_z='));
+function muteVideo({ target }) {
+    console.log('mute:', target.volume);
+    target.volume = 0;
+}
 
-    ads.forEach(e => {
-        e.parentElement.parentElement.style.setProperty('display', 'none');
-        e.querySelectorAll('video').forEach(v => v.remove());
-        e.removeAttribute('id');
+setInterval(() => {
+    const adPlayers = document.querySelectorAll(
+        'div > div > div[id^=t3_z] div[data-isvideoplayer] > video:not([rdt-extension-muted])'
+    );
+    adPlayers.forEach(video => {
+        console.log('found:', video.volume);
+        video.addEventListener('volumechange', muteVideo);
+        video.volume = 0;
+        video.setAttribute('rdt-extension-muted', 1);
     });
 }, 500);
