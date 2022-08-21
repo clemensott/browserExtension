@@ -142,6 +142,11 @@ const actionConfigs = [
         getHide('div[data-tracking-opt-in-overlay]'),
         clearOverflow('body'),
     ],
+    [
+        getHide('#onetrust-consent-sdk'),
+        getRemoveClasses('body', 'onetrust-no-scroll'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
