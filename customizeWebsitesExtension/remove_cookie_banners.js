@@ -122,6 +122,9 @@ const actionConfigs = [
         clearOverflow('body'),
     ],
     [
+        getHide('#cmpbox'),
+    ],
+    [
         getHide('#didomi-host'),
         getRemoveClasses('body', 'didomi-popup-open'),
     ],
@@ -145,6 +148,10 @@ const actionConfigs = [
     [
         getHide('#onetrust-consent-sdk'),
         getRemoveClasses('body', 'onetrust-no-scroll'),
+        clearOverflow('body'),
+    ],
+    [
+        getHide('#cc-overlay'),
         clearOverflow('body'),
     ],
 ];
