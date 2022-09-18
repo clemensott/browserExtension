@@ -68,10 +68,15 @@ function getWatchVideoData(raw, videoId) {
             channelTitle: channelSection?.owner?.videoOwnerRenderer?.title?.runs?.map(r => r?.text).find(Boolean),
             channelId: channelSection?.owner?.videoOwnerRenderer?.navigationEndpoint?.browseEndpoint?.browseId,
             views: parseFormattedInt(videoSection?.viewCount?.videoViewCountRenderer?.viewCount?.simpleText),
-            likes: parseFormattedInt(videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
-                map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'LIKE')?.defaultText.simpleText),
-            dislikes: parseFormattedInt(videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
-                map(b => b.toggleButtonRenderer).find(b => b.defaultIcon.iconType === 'DISLIKE')?.defaultText.simpleText),
+            likes: parseFormattedInt(
+                (
+                    videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
+                        map(b => b.toggleButtonRenderer)?.find(b => b?.defaultIcon?.iconType === 'LIKE')?.defaultText?.simpleText
+                ) || (
+                    videoSection?.videoActions?.menuRenderer?.topLevelButtons?.
+                        map(b => b?.segmentedLikeDislikeButtonRenderer?.likeButton?.toggleButtonRenderer?.defaultText?.simpleText).find(Boolean)
+                )
+            ),
             comments: parseFormattedInt(commentSection?.header?.map(h => h?.commentsHeaderRenderer).find(Boolean)?.countText?.runs?.
                 map(r => parseInt(r?.text, 10)).find(t => !Number.isNaN(t))),
         };
@@ -166,7 +171,7 @@ function getHomeVideoData({ richItemRenderer: raw }) {
                 title: video.headline?.simpleText,
                 channelTitle: video?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
                     ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.channelTitleText?.runs
-                    ?.map(r=>r?.text).filter(Boolean).join(''),
+                    ?.map(r => r?.text).filter(Boolean).join(''),
                 channelId: video?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
                     ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer
                     ?.channelNavigationEndpoint?.browseEndpoint?.browseId,
