@@ -154,6 +154,12 @@ const actionConfigs = [
         getHide('#cc-overlay'),
         clearOverflow('body'),
     ],
+    [
+        getHide('div.b-modal-banner__banner.js-privacy-consent-banner__banner.b-modal-banner__banner--center'),
+        getHide('div.b-modal-banner__overlay.js-privacy-consent-banner__overlay'),
+        getRemoveClasses('html', 'b-modal-banner--disabled'),
+        getRemoveClasses('body', 'b-modal-banner--disabled'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
