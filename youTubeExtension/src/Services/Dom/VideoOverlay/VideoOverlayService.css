@@ -3,7 +3,7 @@ body.yt-extension-display-video-states .overlay.ytd-reel-video-renderer {
 }
 
 body.yt-extension-display-video-states ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer {
-    align-items: flex-start;
+    align-items: flex-end;
 }
 
 body.yt-extension-display-video-states ytd-video-owner-renderer.ytd-watch-metadata {
