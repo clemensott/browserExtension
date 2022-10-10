@@ -66,8 +66,10 @@ const actionButtonConfig = {
     },
 };
 
+const broadcast = new BroadcastChannel('videoState');
 
-export default function VideoState({ videoId, videoUserState, api, defaultDropdownOpen, onVideoUpdate, onDropdownOpenChange }) {
+
+export default function VideoState({ videoId, videoUserState, api, defaultDropdownOpen, onDropdownOpenChange }) {
     if (!videoUserState) {
         return (
             <div className="yt-video-user-state-item yt-video-user-state-unkown" />
@@ -86,8 +88,11 @@ export default function VideoState({ videoId, videoUserState, api, defaultDropdo
             try {
                 const sourceIds = sources && sources.map(s => s.sourceId);
                 await func({ api, videoId, sourceIds });
-                await api.updateUserStateOfVideos([videoId], true);
-                onVideoUpdate && await onVideoUpdate();
+                broadcast.postMessage({
+                    type: 'update',
+                    videoId,
+                    sourceIds,
+                });
             } catch (e) {
                 console.error('delete video error', e);
             }

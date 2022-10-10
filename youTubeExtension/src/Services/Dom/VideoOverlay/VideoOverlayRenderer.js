@@ -11,13 +11,11 @@ export default class VideoOverlayRenderer {
         videoOpenStorageService,
         videoStateContainerClassName,
         videoOpenContainerClassName,
-        onUpdate,
     }) {
         this.api = api;
         this.videoOpenStorageService = videoOpenStorageService;
         this.videoStateContainerClassName = videoStateContainerClassName;
         this.videoOpenContainerClassName = videoOpenContainerClassName;
-        this.onUpdate = onUpdate;
         this.dropdownVideoId = null;
     }
 
@@ -59,7 +57,6 @@ export default class VideoOverlayRenderer {
                 additionalClassName={additionalClassName}
                 api={this.api}
                 defaultDropdownOpen={videoId === this.dropdownVideoId}
-                onVideoUpdate={this.onUpdate}
                 onDropdownOpenChange={open => {
                     if (open) {
                         element.classList.add(videoUserStateNotCollapse);
