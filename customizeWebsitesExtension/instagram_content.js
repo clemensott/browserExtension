@@ -21,11 +21,8 @@ function setupInterval(intervalName, callback, timeout) {
 
 function setupIntervals() {
     function getLoginOverlay() {
-        let element = document.querySelector("a[href='/accounts/password/reset/']");
-        while (element && element.parentNode != document.body) {
-            element = element.parentNode;
-        }
-        return element;
+        const overlay = document.querySelector('#scrollview + div');
+        return overlay && overlay.querySelector('input[name="username"]') ? overlay : null;
     }
 
     if (!window.location.href.startsWith('https://www.instagram.com/accounts/login')) {
@@ -61,11 +58,15 @@ function setupIntervals() {
     }, 100);
 
     function getCookieBannerOverlay() {
+        let overlay = document.querySelector('#scrollview + div');
+        if (overlay) {
+            return overlay;
+        }
         const headers = Array.from(document.querySelectorAll('h2'));
         const cookieHeader = headers.find(h => h.innerText.includes('Cookies'));
 
-        let overlay = cookieHeader;
-        while (overlay && overlay.parentElement !== document.body) {
+        overlay = cookieHeader;
+        while (overlay && overlay.role !== 'presentation') {
             overlay = overlay.parentElement;
         }
         return overlay;
