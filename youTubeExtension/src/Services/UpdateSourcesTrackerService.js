@@ -1,3 +1,4 @@
+import getTabId from '../utils/getTabId';
 import KeysTracker from '../utils/KeysTracker';
 import triggerEvent from '../utils/triggerEvent';
 
@@ -11,16 +12,28 @@ export default class UpdateSourcesTrackerService {
     constructor() {
         this.videoData = new KeysTracker();
         this.videoThumbnails = new KeysTracker();
+        this.updateBroadcast = new BroadcastChannel('updateSources');
     }
 
     init() {
-        document.addEventListener('updateSources.startHandleVideos', this.onStartHandleVideos.bind(this));
-        document.addEventListener('updateSources.endHandleVideos', this.onEndHandleVideos.bind(this));
-        document.addEventListener('updateSources.startUpdateThumbnails', this.onStartUpdateThumbnails.bind(this));
-        document.addEventListener('updateSources.endUpdateThumbnails', this.onEndUpdateThumbnails.bind(this));
+        this.updateBroadcast.addEventListener('message', ({ data }) => {
+            if (data.tabId !== getTabId()) {
+                return;
+            }
+            switch (data.type) {
+                case 'startHandleVideos':
+                    return this.onStartHandleVideos(data);
+                case 'endHandleVideos':
+                    return this.onEndHandleVideos(data);
+                case 'startUpdateThumbnails':
+                    return this.onStartUpdateThumbnails(data);
+                case 'endUpdateThumbnails':
+                    return this.onEndUpdateThumbnails(data);
+            }
+        });
     }
 
-    onStartHandleVideos({ detail: videos }) {
+    onStartHandleVideos({ videos }) {
         this.videoData.add(videos.map(v => v.id));
 
         triggerEvent(constants.VIDEO_DATA_CHANGE_EVENTNAME, {
@@ -30,7 +43,7 @@ export default class UpdateSourcesTrackerService {
         });
     }
 
-    onEndHandleVideos({ detail: videos }) {
+    onEndHandleVideos({ videos }) {
         this.videoData.remove(videos.map(v => v.id));
 
         triggerEvent(constants.VIDEO_DATA_CHANGE_EVENTNAME, {
@@ -40,7 +53,7 @@ export default class UpdateSourcesTrackerService {
         });
     }
 
-    onStartUpdateThumbnails({ detail: videoIds }) {
+    onStartUpdateThumbnails({ videoIds }) {
         this.videoThumbnails.add(videoIds);
 
         triggerEvent(constants.VIDEO_THUMBNAILS_CHANGE_EVENTNAME, {
@@ -50,7 +63,7 @@ export default class UpdateSourcesTrackerService {
         });
     }
 
-    onEndUpdateThumbnails({ detail: videoIds }) {
+    onEndUpdateThumbnails({ videoIds }) {
         this.videoThumbnails.remove(videoIds);
 
         triggerEvent(constants.VIDEO_THUMBNAILS_CHANGE_EVENTNAME, {

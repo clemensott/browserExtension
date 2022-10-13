@@ -1,6 +1,6 @@
+import getTabId from '../utils/getTabId';
 import groupBy from '../utils/groupBy';
 import tryIgnore from '../utils/tryIgnore';
-import triggerEvent from '../utils/triggerEvent';
 import fetchIntersectorService from './FetchIntersectorService';
 
 function fullFlat(array) {
@@ -187,7 +187,16 @@ function getHomeVideoData({ richItemRenderer: raw }) {
 export default class UpdateSourcesService {
     constructor(api) {
         this.api = api;
+        this.broadcast = new BroadcastChannel('updateSources');
         this.onFetchText = this.onFetchText.bind(this);
+    }
+
+    broadcastMessage(type, data) {
+        this.broadcast.postMessage({
+            tabId: getTabId(),
+            type,
+            ...data,
+        });
     }
 
     async handleVideosUpdates(videos, fetchTime) {
@@ -195,23 +204,23 @@ export default class UpdateSourcesService {
             console.log('handleVideosUpdates1:', videos.length, fetchTime);
 
             try {
-                triggerEvent('updateSources.startHandleVideos', videos);
+                this.broadcastMessage('startHandleVideos', { videos });
 
                 const channels = groupBy(videos, video => video.channelId);
                 await this.api.createChannels(Array.from(channels.keys()));
                 await this.api.updateChannels(channels, fetchTime);
             } finally {
-                triggerEvent('updateSources.endHandleVideos', videos);
+                this.broadcastMessage('endHandleVideos', { videos });
             }
         }
     }
 
     async handleThumbnailsUpdate(videoIds) {
         if (videoIds && videoIds.length) {
-            triggerEvent('updateSources.startUpdateThumbnails', videoIds);
+            this.broadcastMessage('startUpdateThumbnails', { videoIds });
             const distinctVideoIds = Array.from(new Set(videoIds));
             await this.api.updateThumbnails(distinctVideoIds);
-            triggerEvent('updateSources.endUpdateThumbnails', videoIds);
+            this.broadcastMessage('endUpdateThumbnails', { videoIds });
         }
     }
 

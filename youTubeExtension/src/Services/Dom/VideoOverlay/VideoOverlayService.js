@@ -104,8 +104,9 @@ export default class DisplayVideoStateService {
             videoOpenStorageService,
             videoStateContainerClassName,
             videoOpenContainerClassName,
-            onUpdate: this.runLoopNonAsync,
         });
+        this.updateBroadcast = new BroadcastChannel('updateSources');
+        this.videoStateBroadcast = new BroadcastChannel('videoState');
     }
 
     loadSourcesOfVideos(videoIds) {
@@ -156,10 +157,18 @@ export default class DisplayVideoStateService {
             return false;
         }, 100);
 
-        document.addEventListener('updateSources.startHandleVideos', this.runLoopNonAsync);
-        document.addEventListener('updateSources.endHandleVideos', async ({ detail: videos }) => {
-            await this.api.updateUserStateOfVideos(videos.map(video => video.id), true);
-            this.runLoopNonAsync();
+        this.updateBroadcast.addEventListener('message', async ({ data }) => {
+            switch (data.type) {
+                case 'startHandleVideos':
+                    return this.runLoopNonAsync();
+                case 'endHandleVideos':
+                    await this.api.updateUserStateOfVideos(data.videos.map(video => video.id), true);
+                    return this.runLoopNonAsync();
+            }
+        });
+        this.videoStateBroadcast.addEventListener('message', async ({ data }) => {
+            await this.api.updateUserStateOfVideos([data.videoId], true);
+            return this.runLoopNonAsync();
         });
     }
 }
