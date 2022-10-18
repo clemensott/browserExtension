@@ -3,7 +3,7 @@
 }
 
 .yt-is-updating-indication-container > div {
-    width: 1000px;
+    width: 110px;
     text-align: center;
     transform: translate(-50%, 0);
 }
