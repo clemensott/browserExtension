@@ -160,6 +160,10 @@ const actionConfigs = [
         getRemoveClasses('html', 'b-modal-banner--disabled'),
         getRemoveClasses('body', 'b-modal-banner--disabled'),
     ],
+    [
+        getHide('privacy-layer'),
+        clearOverflow('html'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
