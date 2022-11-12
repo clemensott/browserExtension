@@ -1,6 +1,14 @@
 import DomEventHandler from '../DomEventHandler';
 
 
+function getCountFactor(container) {
+    if (!container.firstElementChild.tagName === 'ytd-rich-grid-row'.toUpperCase()) {
+        return 1;
+    }
+    const firstVideo = container.querySelector('ytd-rich-grid-row > div > ytd-rich-item-renderer');
+    return firstVideo && parseInt(firstVideo.getAttribute('items-per-row'), 10) || 1;
+}
+
 function isContinuationElement(item) {
     return item && item.tagName === 'ytd-continuation-item-renderer'.toUpperCase();
 }
@@ -54,11 +62,8 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
     }
 
     static getVideoListContainer() {
-        return document.querySelector('#items.style-scope.ytd-grid-renderer');
-    }
-
-    static hasContinuationItem(container) {
-        return !!container.querySelector('ytd-continuation-item-renderer');
+        return document.querySelector('ytd-browse:not([hidden]) #contents.style-scope.ytd-rich-grid-renderer') ||
+            document.querySelector('#items.style-scope.ytd-grid-renderer');
     }
 
     static getVideosCount(container) {
@@ -66,8 +71,15 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
             binarySearchVideosCount(container, 0, container.childElementCount - 1) :
             container.childElementCount;
 
-        return isContinuationElement(container.children.item(visableElementsCount - 1)) ?
-            visableElementsCount - 1 : visableElementsCount;
+        const potantialContinuationElement = container.children.item(visableElementsCount - 1);
+        const hasContinuationElement = isContinuationElement(potantialContinuationElement) &&
+            !isElementHidden(potantialContinuationElement);
+        const countFactor = getCountFactor(container);
+        console.log('getVideosCount3:', hasContinuationElement, visableElementsCount, countFactor);
+        return {
+            hasContinuationElement,
+            videosCount: (hasContinuationElement ? visableElementsCount - 1 : visableElementsCount) * countFactor,
+        };
     }
 
     static getChannelVideosCount(obj) {
@@ -79,11 +91,12 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
 
         let videosCount = null;
         let hasVideosFetchingContinuation = null;
+        console.log('getChannelVideosCount3:', videoListContainer);
         if (videoListContainer) {
-            videosCount = ChannelVideosDomEventHandler.getVideosCount(videoListContainer);
-            const potantialContinuationElement = videoListContainer.children.item(videosCount);
-            hasVideosFetchingContinuation = isContinuationElement(potantialContinuationElement) &&
-                !isElementHidden(potantialContinuationElement);
+            const count = ChannelVideosDomEventHandler.getVideosCount(videoListContainer);
+            videosCount = count.videosCount;
+            hasVideosFetchingContinuation = count.hasContinuationElement;
+            console.log('getChannelVideosCount4:', videosCount, hasVideosFetchingContinuation);
         }
 
         return {

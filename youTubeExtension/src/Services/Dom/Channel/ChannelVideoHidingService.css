@@ -1,7 +1,13 @@
-#items.yt-channel-video-hiding-all > ytd-grid-video-renderer {
+#items.yt-channel-video-hiding-all > ytd-grid-video-renderer,
+#contents.yt-channel-video-hiding-all > ytd-rich-grid-row {
     display: none!important;
 }
 
-#items.yt-channel-video-hiding-not-all > ytd-grid-video-renderer:not(:nth-last-child(-n+100)) {
+#items.yt-channel-video-hiding-not-all > ytd-grid-video-renderer:not(:nth-last-child(-n+100)),
+#contents.yt-channel-video-hiding-not-all > ytd-rich-grid-row:not(:nth-last-child(-n+20)) > div > ytd-rich-item-renderer[items-per-row="5"],
+#contents.yt-channel-video-hiding-not-all > ytd-rich-grid-row:not(:nth-last-child(-n+25)) > div > ytd-rich-item-renderer[items-per-row="4"],
+#contents.yt-channel-video-hiding-not-all > ytd-rich-grid-row:not(:nth-last-child(-n+33)) > div > ytd-rich-item-renderer[items-per-row="3"],
+#contents.yt-channel-video-hiding-not-all > ytd-rich-grid-row:not(:nth-last-child(-n+50)) > div > ytd-rich-item-renderer[items-per-row="2"],
+#contents.yt-channel-video-hiding-not-all > ytd-rich-grid-row:not(:nth-last-child(-n+100)) > div > ytd-rich-item-renderer[items-per-row="1"] {
     display: none!important;
 }
