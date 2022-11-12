@@ -75,7 +75,6 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         const hasContinuationElement = isContinuationElement(potantialContinuationElement) &&
             !isElementHidden(potantialContinuationElement);
         const countFactor = getCountFactor(container);
-        console.log('getVideosCount3:', hasContinuationElement, visableElementsCount, countFactor);
         return {
             hasContinuationElement,
             videosCount: (hasContinuationElement ? visableElementsCount - 1 : visableElementsCount) * countFactor,
@@ -91,12 +90,10 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
 
         let videosCount = null;
         let hasVideosFetchingContinuation = null;
-        console.log('getChannelVideosCount3:', videoListContainer);
         if (videoListContainer) {
             const count = ChannelVideosDomEventHandler.getVideosCount(videoListContainer);
             videosCount = count.videosCount;
             hasVideosFetchingContinuation = count.hasContinuationElement;
-            console.log('getChannelVideosCount4:', videosCount, hasVideosFetchingContinuation);
         }
 
         return {
