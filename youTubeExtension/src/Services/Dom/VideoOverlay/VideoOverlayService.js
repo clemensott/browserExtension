@@ -60,6 +60,7 @@ function getVideoContainers() {
         '#contents > ytd-video-renderer',
         '#items > ytd-video-renderer',
         '#items > ytd-playlist-panel-video-renderer',
+        '#contents > ytd-playlist-video-renderer',
     ]
         .map(selector => Array.from(document.querySelectorAll(selector))).flat()
         .map(container => ({
