@@ -3,7 +3,7 @@ import setupPlayerService from './player';
 import ChannelHelperService from './Services/Dom/Channel/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
-import UpdateSourcesService from './Services/UpdateSourcesService';
+import UpdateSourcesService from './Services/UpdateSources/UpdateSourcesService';
 import IsUpdatingSourcesService from './Services/Dom/IsUpdatingSourcesService';
 import VideoOverlayService from './Services/Dom/VideoOverlay/VideoOverlayService';
 import ChannelVideoHidingService from './Services/Dom/Channel/ChannelVideoHidingService';
