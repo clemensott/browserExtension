@@ -2,7 +2,7 @@ import DomEventHandler from '../DomEventHandler';
 
 
 function getCountFactor(container) {
-    if (!container.firstElementChild.tagName === 'ytd-rich-grid-row'.toUpperCase()) {
+    if (container.firstElementChild.tagName !== 'ytd-rich-grid-row'.toUpperCase()) {
         return 1;
     }
     const firstVideo = container.querySelector('ytd-rich-grid-row > div > ytd-rich-item-renderer');
@@ -57,8 +57,8 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         });
     }
 
-    static getVideosTab() {
-        return document.querySelector('#tabsContent > tp-yt-paper-tab.style-scope:nth-child(4) > div.tab-content.style-scope.tp-yt-paper-tab');
+    static getCurrentTab() {
+        return document.querySelector('#tabsContent > tp-yt-paper-tab.style-scope.iron-selected > div.tab-content.style-scope.tp-yt-paper-tab');
     }
 
     static getVideoListContainer() {
@@ -67,24 +67,39 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
     }
 
     static getVideosCount(container) {
-        const visableElementsCount = isElementHidden(container.lastElementChild) ?
+        let videoRowsCount = isElementHidden(container.lastElementChild) ?
             binarySearchVideosCount(container, 0, container.childElementCount - 1) :
             container.childElementCount;
 
-        const potantialContinuationElement = container.children.item(visableElementsCount - 1);
+        const potantialContinuationElement = container.children.item(videoRowsCount - 1);
         const hasContinuationElement = isContinuationElement(potantialContinuationElement) &&
             !isElementHidden(potantialContinuationElement);
+        if (hasContinuationElement) {
+            videoRowsCount--;
+        }
+
+        let lastRowCount = 0;
+        const lastVidoesRow = container.children.item(videoRowsCount - 1);
+        if (lastVidoesRow) {
+            lastRowCount = lastVidoesRow.querySelectorAll('ytd-rich-grid-row > div > ytd-rich-item-renderer').length;
+            videoRowsCount--;
+        }
+
+        if (videoRowsCount < 0) {
+            videoRowsCount = 0;
+        }
+        
         const countFactor = getCountFactor(container);
         return {
             hasContinuationElement,
-            videosCount: (hasContinuationElement ? visableElementsCount - 1 : visableElementsCount) * countFactor,
+            videosCount: videoRowsCount * countFactor + lastRowCount,
         };
     }
 
     static getChannelVideosCount(obj) {
-        let { videosTab, videoListContainer } = obj || {};
-        videosTab = videosTab instanceof Node && document.contains(videosTab) ?
-            videosTab : ChannelVideosDomEventHandler.getVideosTab();
+        let { tabElement, videoListContainer } = obj || {};
+        tabElement = tabElement instanceof Node && document.contains(tabElement) ?
+        tabElement : ChannelVideosDomEventHandler.getCurrentTab();
         videoListContainer = videoListContainer instanceof Node && document.contains(videoListContainer) ?
             videoListContainer : ChannelVideosDomEventHandler.getVideoListContainer();
 
@@ -97,7 +112,7 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         }
 
         return {
-            videosTab,
+            tabElement,
             videoListContainer,
             videosCount,
             hasVideosFetchingContinuation,
@@ -108,7 +123,7 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         return DomEventHandler.detectObjectChange(
             newObj,
             lastObj,
-            'videosTab',
+            'tabElement',
             'videoListContainer',
             'hasVideosFetchingContinuation',
             'videosCount',

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRenderer from '../../../utils/ReactRenderer';
 import ChannelVideoHiding from '../../../components/ChannelVideoHiding';
-import VideosTabCount from '../../../components/VideosTabCount';
+import TabVideosCount from '../../../components/TabVideosCount';
 import './ChannelHelperService.css';
 
 
@@ -42,12 +42,31 @@ export default class ChannelHelperService {
     }
 
     onChannelVideosChange({ detail: { currentElements: newObj, lastElements: lastObj } }) {
-        if (lastObj && lastObj.videosTab instanceof Node && (!newObj || newObj.videosTab !== lastObj.videosTab)) {
-            ReactDOM.render(<VideosTabCount />, lastObj.videosTab);
+        if (lastObj && lastObj.tabElement instanceof Node && (!newObj || newObj.tabElement !== lastObj.tabElement)) {
+            ChannelHelperService.revertTabText(lastObj.tabElement);
         }
 
-        if (newObj && newObj.videosTab) {
-            ReactDOM.render(<VideosTabCount {...newObj} />, newObj.videosTab);
+        if (newObj && newObj.tabElement) {
+            ChannelHelperService.renderTabVideosCount(newObj);
         }
+    }
+
+    static revertTabText(element) {
+        console.log('restore tab text:', element.innerText, element.dataset.title, element);
+        if (element.dataset.title) {
+            ReactDOM.unmountComponentAtNode(element);
+            element.innerText = element.dataset.title;
+        }
+    }
+
+    static renderTabVideosCount({ tabElement, ...props }) {
+        console.log('render tab text:', tabElement.innerText, tabElement.dataset.title, props,tabElement);
+        if (!tabElement.dataset.title) {
+            tabElement.dataset.title = tabElement.innerText;
+        }
+        ReactDOM.render(
+            <TabVideosCount title={tabElement.dataset.title} {...props} />,
+            tabElement,
+        );
     }
 }
