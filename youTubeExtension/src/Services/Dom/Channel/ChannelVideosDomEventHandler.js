@@ -2,11 +2,14 @@ import DomEventHandler from '../DomEventHandler';
 
 
 function getCountFactor(container) {
-    if (container.firstElementChild.tagName !== 'ytd-rich-grid-row'.toUpperCase()) {
-        return 1;
+    switch (container.firstElementChild.tagName.toLowerCase()) {
+        case 'ytd-grid-playlist-renderer':
+            return 0;
+        case 'ytd-rich-grid-row':
+            const firstVideo = container.querySelector('ytd-rich-grid-row > div > ytd-rich-item-renderer');
+            return firstVideo && parseInt(firstVideo.getAttribute('items-per-row'), 10) || 1;
     }
-    const firstVideo = container.querySelector('ytd-rich-grid-row > div > ytd-rich-item-renderer');
-    return firstVideo && parseInt(firstVideo.getAttribute('items-per-row'), 10) || 1;
+    return 1;
 }
 
 function isContinuationElement(item) {
@@ -81,14 +84,16 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         let lastRowCount = 0;
         const lastVidoesRow = container.children.item(videoRowsCount - 1);
         if (lastVidoesRow) {
-            lastRowCount = lastVidoesRow.querySelectorAll('ytd-rich-grid-row > div > ytd-rich-item-renderer').length;
+            lastRowCount = lastVidoesRow.querySelectorAll(
+                'ytd-rich-grid-row > div > ytd-rich-item-renderer:not([hidden])'
+            ).length;
             videoRowsCount--;
         }
 
         if (videoRowsCount < 0) {
             videoRowsCount = 0;
         }
-        
+
         const countFactor = getCountFactor(container);
         return {
             hasContinuationElement,
@@ -99,7 +104,7 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
     static getChannelVideosCount(obj) {
         let { tabElement, videoListContainer } = obj || {};
         tabElement = tabElement instanceof Node && document.contains(tabElement) ?
-        tabElement : ChannelVideosDomEventHandler.getCurrentTab();
+            tabElement : ChannelVideosDomEventHandler.getCurrentTab();
         videoListContainer = videoListContainer instanceof Node && document.contains(videoListContainer) ?
             videoListContainer : ChannelVideosDomEventHandler.getVideoListContainer();
 

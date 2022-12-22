@@ -52,7 +52,6 @@ export default class ChannelHelperService {
     }
 
     static revertTabText(element) {
-        console.log('restore tab text:', element.innerText, element.dataset.title, element);
         if (element.dataset.title) {
             ReactDOM.unmountComponentAtNode(element);
             element.innerText = element.dataset.title;
@@ -60,7 +59,6 @@ export default class ChannelHelperService {
     }
 
     static renderTabVideosCount({ tabElement, ...props }) {
-        console.log('render tab text:', tabElement.innerText, tabElement.dataset.title, props,tabElement);
         if (!tabElement.dataset.title) {
             tabElement.dataset.title = tabElement.innerText;
         }
