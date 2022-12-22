@@ -52,7 +52,7 @@ export default class ChannelHelperService {
     }
 
     static revertTabText(element) {
-        if (element.dataset.title) {
+        if (element instanceof Node && element.dataset.title) {
             ReactDOM.unmountComponentAtNode(element);
             element.innerText = element.dataset.title;
         }
