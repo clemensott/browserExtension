@@ -1,42 +1,38 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import VideoStateButton from './VideoStateButton';
 import VideoStateDropdownVideoActionButtons from './VideoStateDropdownVideoActionButtons';
 import './VideoStateDropdown.css';
 
 
-export default function VideoStateDropdown({ videoId, apiUrl, actionButtons, defaultOpen, onDropdownOpenChange }) {
-    const [showMenu, setShowMenu] = useState(defaultOpen);
+export default function VideoStateDropdown({ videoId, apiUrl, actionButtons, open, onOpenChange }) {
     const dropdown = useRef(null);
     const closeMenu = useRef(e => {
         if (dropdown.current && !dropdown.current.contains(e.target)) {
-            setShowMenu(false);
+            onOpenChange(false);
         }
     });
 
     const toggleMenu = e => {
         e.preventDefault();
-        setShowMenu(!showMenu);
+        onOpenChange(!open);
     }
 
     useEffect(() => {
-        if (showMenu) {
+        if (open) {
             document.addEventListener('click', closeMenu.current);
         } else {
             document.removeEventListener('click', closeMenu.current);
         }
-        if (typeof onDropdownOpenChange === 'function') {
-            onDropdownOpenChange(showMenu);
-        }
         return () => {
             document.removeEventListener('click', closeMenu.current);
         }
-    }, [showMenu]);
+    }, [open]);
 
     return (
         <>
             <VideoStateButton text="" className="video-state-dropdown-action-button" onClick={toggleMenu} />
             {
-                showMenu ? (
+                open ? (
                     <div className="video-state-dropdown-container">
                         <div ref={dropdown} className="video-state-dropdown-menu-container">
                             <div className="video-state-dropdown-menu-item">

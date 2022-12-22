@@ -1,4 +1,9 @@
 import groupBy from '../utils/groupBy';
+import triggerEvent from '../utils/triggerEvent';
+
+const constants = {
+    UPDATE_USER_STATE_OF_VIDEOS: 'ApiHandler.updateUserStateOfVideos',
+};
 
 export default class ApiHandler {
     constructor(api, videoUserStateUpdateInterval) {
@@ -33,6 +38,17 @@ export default class ApiHandler {
         return this.videoUserStates.get(videoId);
     }
 
+    getVideoUserStateWithSourcesData(videoId) {
+        const videoUserState = this.videoUserStates.get(videoId);
+        return videoUserState ? {
+            ...videoUserState,
+            sources: videoUserState.sources && videoUserState.sources.map(source => ({
+                ...source,
+                data: this.getSourceFromId(source.sourceId),
+            })),
+        } : null;
+    }
+
     setVideoUserState(videoUserState) {
         return this.videoUserStates.set(videoUserState.videoId, videoUserState);
     }
@@ -50,7 +66,7 @@ export default class ApiHandler {
             return;
         }
 
-        let response = new Map();
+        const response = new Map();
         try {
             const array = await this.api.videoUserState(videoIds);
             array.forEach(item => response.set(item.videoId, item))
@@ -64,7 +80,18 @@ export default class ApiHandler {
                 timestamp: Date.now(),
             });
         });
+        triggerEvent(constants.UPDATE_USER_STATE_OF_VIDEOS, {
+            videoIds: new Set(videoIds),
+        });
         return videoIds;
+    }
+
+    addUpdateUserStateOfVideosEventListener(callback) {
+        document.addEventListener(constants.UPDATE_USER_STATE_OF_VIDEOS, callback);
+    }
+
+    removeUpdateUserStateOfVideosEventListener(callback) {
+        document.removeEventListener(constants.UPDATE_USER_STATE_OF_VIDEOS, callback);
     }
 
     async createChannels(channelIds) {

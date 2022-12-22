@@ -16,7 +16,6 @@ export default class VideoOverlayRenderer {
         this.videoOpenStorageService = videoOpenStorageService;
         this.videoStateContainerClassName = videoStateContainerClassName;
         this.videoOpenContainerClassName = videoOpenContainerClassName;
-        this.dropdownVideoId = null;
     }
 
     getBaseElement(container, className, additionalClassName, insertReferenceNodeSelector) {
@@ -32,38 +31,20 @@ export default class VideoOverlayRenderer {
 
     renderVideoState({ container, videoId, additionalClassName, insertReferenceNodeSelector }) {
         const element = this.getBaseElement(container, this.videoStateContainerClassName, additionalClassName, insertReferenceNodeSelector);
-
-        const videoUserState = this.api.getVideoUserState(videoId);
-        const timestamp = videoUserState?.timestamp || 0;
-        if (element.dataset.id === videoId &&
-            element.dataset.timestamp >= timestamp) {
+        if (element.dataset.id === videoId) {
             return;
         }
         element.dataset.id = videoId;
-        element.dataset.timestamp = timestamp;
-
-        const videoUserStateWithSourcesData = videoUserState ? {
-            ...videoUserState,
-            sources: videoUserState.sources && videoUserState.sources.map(source => ({
-                ...source,
-                data: this.api.getSourceFromId(source.sourceId),
-            })),
-        } : null;
 
         ReactDOM.render(
             <VideoState
                 videoId={videoId}
-                videoUserState={videoUserStateWithSourcesData}
-                additionalClassName={additionalClassName}
                 api={this.api}
-                defaultDropdownOpen={videoId === this.dropdownVideoId}
                 onDropdownOpenChange={open => {
                     if (open) {
                         element.classList.add(videoUserStateNotCollapse);
-                        this.dropdownVideoId = videoId;
                     } else {
                         element.classList.remove(videoUserStateNotCollapse);
-                        this.dropdownVideoId = null;
                     }
                 }}
             />,

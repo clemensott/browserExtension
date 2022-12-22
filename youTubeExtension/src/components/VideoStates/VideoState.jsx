@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import VideoStateButton from './VideoStateButton';
 import VideoStateDropdown from './VideoStateDropdown';
 import './VideoState.css';
@@ -68,8 +68,39 @@ const actionButtonConfig = {
 
 const broadcast = new BroadcastChannel('videoState');
 
+function useVideoUserState(api, videoId) {
+    const [_, forceReload] = useState(null);
+    const videoIdRef = useRef();
+    videoIdRef.current = videoId;
 
-export default function VideoState({ videoId, videoUserState, api, defaultDropdownOpen, onDropdownOpenChange }) {
+    const onUpdateUserStateOfVideos = useRef(({ detail: { videoIds } }) => {
+        if (videoIds.has(videoIdRef.current)) {
+            forceReload({});
+        }
+    });
+
+    useEffect(() => {
+        api.addUpdateUserStateOfVideosEventListener(onUpdateUserStateOfVideos.current);
+
+        return () => {
+            api.removeUpdateUserStateOfVideosEventListener(onUpdateUserStateOfVideos.current);
+        };
+    }, [api]);
+
+    return api.getVideoUserStateWithSourcesData(videoId);
+}
+
+
+export default function VideoState({ videoId, api, onDropdownOpenChange }) {
+    const videoUserState = useVideoUserState(api, videoId);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    useEffect(() => {
+        if (typeof onDropdownOpenChange === 'function') {
+            onDropdownOpenChange(dropdownOpen);
+        }
+    }, [dropdownOpen, onDropdownOpenChange]);
+
     if (!videoUserState) {
         return (
             <div className="yt-video-user-state-item yt-video-user-state-unkown" />
@@ -143,8 +174,8 @@ export default function VideoState({ videoId, videoUserState, api, defaultDropdo
                 <VideoStateDropdown
                     videoId={videoId}
                     apiUrl={api.api.baseUrl}
-                    defaultOpen={defaultDropdownOpen}
-                    onDropdownOpenChange={onDropdownOpenChange}
+                    open={dropdownOpen}
+                    onOpenChange={setDropdownOpen}
                     actionButtons={actionButtons}
                 />
             </>
