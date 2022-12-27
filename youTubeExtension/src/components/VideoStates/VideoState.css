@@ -197,22 +197,46 @@ div#info-text.style-scope.ytd-video-primary-info-renderer {
     background: transparent!important;
 }
 
+.yt-video-user-state-updating {
+    pointer-events: none;
+}
+
 .yt-video-user-state-watched {
     background: #009900;
+}
+
+.yt-video-user-state-watched.yt-video-user-state-updating {
+    background: #40B940;
 }
 
 .yt-video-user-state-active {
     background: #990000;
 }
 
+.yt-video-user-state-active.yt-video-user-state-updating {
+    background: #C94040;
+}
+
 .yt-video-user-state-inactive {
     background: purple;
+}
+
+.yt-video-user-state-inactive.yt-video-user-state-updating {
+    background: rgb(158,50,158);
 }
 
 .yt-video-user-state-inactive-depricated {
     background: #CC7600;
 }
 
+.yt-video-user-state-inactive-depricated.yt-video-user-state-updating {
+    background: #FC9660;
+}
+
 .yt-video-user-state-count {
     background: grey;
+}
+
+.yt-video-user-state-count.yt-video-user-state-updating {
+    background: rgb(180, 180, 180);
 }

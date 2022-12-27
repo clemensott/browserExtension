@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import StorageService from '../../Services/StorageService';
 import OptionsService from '../../Services/OptionsService';
 import API from '../../Services/API';
+import clsx from 'clsx';
 import './App.css';
 
 const options = new OptionsService(new StorageService());
@@ -242,7 +243,7 @@ export default function App() {
                     <input
                         id="api-base-url"
                         type="text"
-                        className={`form-control ${apiBaseUrlValid ? '' : 'form-error'}`}
+                        className={clsx('form-control', apiBaseUrlValid && 'form-error')}
                         defaultValue={apiBaseUrl}
                         onChange={async e => setApiBaseUrl(e.target.value)}
                     />
@@ -253,7 +254,7 @@ export default function App() {
                     <input
                         id="api-username"
                         type="text"
-                        className={`form-control ${!apiBaseUrlValid || apiUsername ? '' : 'form-error'}`}
+                        className={clsx('form-control', !apiBaseUrlValid || apiUsername && 'form-error')}
                         defaultValue={apiUsername}
                         onChange={async e => setApiUsername(e.target.value)}
                     />
@@ -264,7 +265,7 @@ export default function App() {
                     <input
                         id="api-username"
                         type="password"
-                        className={`form-control ${!apiBaseUrlValid || apiPassword ? '' : 'form-error'}`}
+                        className={clsx('form-control', !apiBaseUrlValid || apiPassword && 'form-error')}
                         defaultValue={apiPassword}
                         onChange={async e => setApiPassword(e.target.value)}
                     />

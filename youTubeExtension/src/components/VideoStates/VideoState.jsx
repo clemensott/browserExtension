@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import VideoStateButton from './VideoStateButton';
 import VideoStateDropdown from './VideoStateDropdown';
+import sleep from '../../utils/sleep';
+import clsx from 'clsx';
 import './VideoState.css';
 
 
@@ -94,6 +96,7 @@ function useVideoUserState(api, videoId) {
 export default function VideoState({ videoId, api, onDropdownOpenChange }) {
     const videoUserState = useVideoUserState(api, videoId);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isUpdatingVideoId, setIsUpdatingVideoId] = useState(null);
 
     useEffect(() => {
         if (typeof onDropdownOpenChange === 'function') {
@@ -101,14 +104,16 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
         }
     }, [dropdownOpen, onDropdownOpenChange]);
 
+    const isUpdatingClass = isUpdatingVideoId === videoId && 'yt-video-user-state-updating';
+
     if (!videoUserState) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-unkown" />
+            <div className={clsx('yt-video-user-state-item', 'yt-video-user-state-unkown', isUpdatingClass)} />
         );
     }
     if (!videoUserState?.sources?.length) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-missing">
+            <div className={clsx('yt-video-user-state-item', ' yt-video-user-state-missing', isUpdatingClass)}>
                 <VideoStateButton />
             </div>
         );
@@ -117,6 +122,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
     const createWrapFunction = (func, sources) => {
         return async () => {
             try {
+                setIsUpdatingVideoId(videoId);
                 const sourceIds = sources && sources.map(s => s.sourceId);
                 await func({ api, videoId, sourceIds });
                 broadcast.postMessage({
@@ -124,8 +130,11 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
                     videoId,
                     sourceIds,
                 });
+                await sleep(100);
             } catch (e) {
                 console.error('delete video error', e);
+            } finally {
+                setIsUpdatingVideoId(null);
             }
         };
     }
@@ -184,7 +193,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
 
     if (videoUserState.isWatched) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-watched">
+            <div className={clsx('yt-video-user-state-item', 'yt-video-user-state-watched', isUpdatingClass)}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setNotWatched)} />
                 <AdditionalActionButtons
                     actionButtons={[
@@ -197,7 +206,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
     }
     if (isSingleDeprecatedInactive && videoUserState.sources.length === 1) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-inactive-depricated">
+            <div className={clsx('yt-video-user-state-item', ' yt-video-user-state-inactive-depricated', isUpdatingClass)}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setDisableDeprecated, inactiveDeprecatedForSources)
@@ -207,7 +216,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
     }
     if (isSingleInactive && videoUserState.sources.length === 1) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-inactive">
+            <div className={clsx('yt-video-user-state-item', ' yt-video-user-state-inactive', isUpdatingClass)}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatched)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setActive, inactiveForSources)
@@ -217,7 +226,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
     }
     if (isSingleActive && videoUserState.sources.length === 1) {
         return (
-            <div className="yt-video-user-state-item yt-video-user-state-active">
+            <div className={clsx('yt-video-user-state-item', ' yt-video-user-state-active', isUpdatingClass)}>
                 <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, activeForSources)} />
                 <AdditionalActionButtons actionButtons={
                     createActionButtons(actionButtonConfig.setInactive, activeForSources)
@@ -226,7 +235,7 @@ export default function VideoState({ videoId, api, onDropdownOpenChange }) {
         );
     }
     return (
-        <div className="yt-video-user-state-item yt-video-user-state-active">
+        <div className={clsx('yt-video-user-state-item', ' yt-video-user-state-active', isUpdatingClass)}>
             <VideoStateButton {...createActionButton(actionButtonConfig.setWatchedAndInactive, videoUserState.sources)} />
             <AdditionalActionButtons
                 actionButtons={[
