@@ -82,16 +82,18 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         }
 
         let lastRowCount = 0;
-        const lastVidoesRow = container.children.item(videoRowsCount - 1);
-        if (lastVidoesRow) {
-            lastRowCount = lastVidoesRow.querySelectorAll(
-                'ytd-rich-grid-row > div > ytd-rich-item-renderer:not([hidden])'
-            ).length;
-            videoRowsCount--;
-        }
+        if (!hasContinuationElement) {
+            const lastVidoesRow = container.children.item(videoRowsCount - 1);
+            if (lastVidoesRow) {
+                lastRowCount = lastVidoesRow.querySelectorAll(
+                    'ytd-rich-grid-row > div > ytd-rich-item-renderer:not([hidden])'
+                ).length;
+                videoRowsCount--;
+            }
 
-        if (videoRowsCount < 0) {
-            videoRowsCount = 0;
+            if (videoRowsCount < 0) {
+                videoRowsCount = 0;
+            }
         }
 
         const countFactor = getCountFactor(container);
