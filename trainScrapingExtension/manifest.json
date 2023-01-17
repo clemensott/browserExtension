@@ -1,0 +1,52 @@
+{
+    "name": "TrainScrapingUtils",
+    "version": "1.0",
+    "description": "Does stuff with train scrapings",
+    "manifest_version": 3,
+    "icons": {
+        "16": "resources/train_16.png",
+        "48": "resources/train_48.png",
+        "128": "resources/train_128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://openrailwaymap.org/*",
+                "https://openrailwaymap.org/*",
+                "http://www.openrailwaymap.org/*",
+                "https://www.openrailwaymap.org/*"
+            ],
+            "js": [
+                "dnySample.js",
+                "utils.js",
+                "Api.js",
+                "DnyLoader.js",
+                "DnyRenderer.js",
+                "openrailwaymaps_dny.js",
+                "import.js"
+            ],
+            "css":[
+                "openrailwaymaps_dny.css"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "resources/prod_0.png",
+                "resources/prod_1.png",
+                "resources/prod_2.png",
+                "resources/prod_3.png",
+                "resources/prod_4.png",
+                "resources/prod_5.png",
+                "resources/prod_6.png"
+            ],
+            "matches": [
+                "http://openrailwaymap.org/*",
+                "https://openrailwaymap.org/*",
+                "http://www.openrailwaymap.org/*",
+                "https://www.openrailwaymap.org/*"
+            ]
+        }
+    ]
+}
