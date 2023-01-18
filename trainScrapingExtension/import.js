@@ -34,11 +34,11 @@ const importFunction = (func, run = false) => {
     importCode(code);
 };
 
-window.addEventListener('load', () => {
-    importCode(`window.dnySample = ${JSON.stringify(window.dnySample)};`);
+window.addEventListener('load', async () => {
     importFunction(utils, true);
     importFunction(Api);
     importFunction(DnyLoader);
     importFunction(DnyRenderer);
+    importCode(await getIconsCode());
     importFunction(main, true);
 });

@@ -17,11 +17,11 @@
                 "https://www.openrailwaymap.org/*"
             ],
             "js": [
-                "dnySample.js",
                 "utils.js",
                 "Api.js",
                 "DnyLoader.js",
                 "DnyRenderer.js",
+                "icons.js",
                 "openrailwaymaps_dny.js",
                 "import.js"
             ],
@@ -33,13 +33,12 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "resources/prod_0.png",
-                "resources/prod_1.png",
-                "resources/prod_2.png",
-                "resources/prod_3.png",
-                "resources/prod_4.png",
-                "resources/prod_5.png",
-                "resources/prod_6.png"
+                "resources/prod_00.png",
+                "resources/prod_01.png",
+                "resources/prod_04.png",
+                "resources/prod_08.png",
+                "resources/prod_16.png",
+                "resources/prod_32.png"
             ],
             "matches": [
                 "http://openrailwaymap.org/*",

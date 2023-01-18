@@ -165,15 +165,12 @@ async function main() {
             target.innerText = 'Play';
             lastLoop = null;
         } else {
-            console.log('play:', renderDateTime, lastLoop, lastDny);
             renderIntervalId = setInterval(renderLoop, 100);
             target.innerText = 'Pause';
         }
     }
 
     async function onResetRenderDateTime() {
-        console.log('reset');
-
         renderDateTime = getPickedDateTime().getTime();
         setRenderDateTime(renderDateTime);
         lastLoop = null;
@@ -182,8 +179,6 @@ async function main() {
     }
 
     function onSetRenderDateTime() {
-        console.log('set');
-
         setPickedDateTime(renderDateTime);
     }
 

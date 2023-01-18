@@ -27,7 +27,6 @@ class Api {
     async ping() {
         try {
             const response = await this.fetch('/ping');
-            console.log('ping response:', response);
             return response.ok;
         } catch {
             return false;
