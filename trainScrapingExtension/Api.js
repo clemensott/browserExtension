@@ -1,21 +1,22 @@
 class Api {
-    constructor(baseUrl, username, password) {
+    constructor(baseUrl, token) {
         this.baseUrl = baseUrl;
-        this.username = username;
-        this.password = password;
+        this.token = token;
     }
 
     getUrl(path, query) {
-        const search = query && Object.entries(query).map(
-            ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value.toString())}`,
-        ).join('&');
-        return `${this.baseUrl}${path}?${search}`;
+        const search = query && Object.entries(query)
+            .filter(([key, value]) => key && typeof value !== 'undefined')
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&');
+        return `${this.baseUrl}${path}${search ? '?' : ''}${search || ''}`;
     }
 
-    fetch(path, { query, method, body, headers }) {
-        return fetch(this.getUrl(path, query), {
+    fetch(path, { query, method, body, headers } = {}) {
+        return window.fetch(this.getUrl(path, query), {
             method,
             headers: {
+                authorization: `Basic ${this.token}`,
                 ...(body ? { 'Content-Type': 'application/json', } : null),
                 ...headers,
             },
@@ -23,67 +24,36 @@ class Api {
         })
     }
 
-    metaId = 1;
-    async getDnyMetas({ rangeStart, rangeEnd }) {
-        return (async () => {
-            if (!(rangeStart instanceof Date)) {
-                throw new Error('rangeStart is not a Date');
-            }
-            if (!(rangeEnd instanceof Date)) {
-                throw new Error('rangeEnd is not a Date');
-            }
-            await new Promise(r => setTimeout(r, 10));
-            const start = rangeStart.getTime();
-            const end = rangeEnd.getTime();
-            const result = [];
+    async ping() {
+        try {
+            const response = await this.fetch('/ping');
+            console.log('ping response:', response);
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
 
-            let currentPos = start;
-            while (currentPos < end) {
-                const addMinuets = 0.5 + Math.random();
-                currentPos = Math.floor(currentPos + addMinuets * 60 * 1000);
-                result.push({
-                    id: this.metaId++,
-                    timestamp: new Date(currentPos).toISOString(),
-                });
-            }
-
-            return result;
-        })();
-
-        const response = await this.fetch('/api/dny/meta', {
-            body: {
-                rangeStart,
-                rangeEnd,
+    async getDnyMetas({ rangeStart, rangeEnd, limit }) {
+        const response = await this.fetch('/trains/dnyMetas', {
+            query: {
+                rangeStart: rangeStart.toUtcIsoString(),
+                rangeEnd: rangeEnd && rangeEnd.toUtcIsoString(),
+                limit,
             },
         });
         if (response.ok) {
             return response.json();
         }
-        throw new Error(await response.text());
+        throw new Error(response.statusText);
     }
 
     async getDnys(ids) {
-        return (async () => {
-            await new Promise(r => setTimeout(r, 10));
-            const sample = window.dnySample;
-            return ids.map(id => ({
-                ...sample,
-                t: sample.t.map(t => ({
-                    ...t,
-                    x: t.p[id % t.p.length].x,
-                    y: t.p[id % t.p.length].y,
-                    p: undefined,
-                })),
-                id,
-            }));
-        })();
-
-        const response = await this.fetch('/api/dny/list', {
-            body: { ids },
-        });
+        const search = ids.map(id => `ids=${id}`).join('&');
+        const response = await this.fetch(`/trains/dnys?${search}`);
         if (response.ok) {
             return response.json();
         }
-        throw new Error(await response.text());
+        throw new Error(response.statusText);
     }
 }
