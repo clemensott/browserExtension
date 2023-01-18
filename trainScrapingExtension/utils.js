@@ -32,4 +32,8 @@ function utils() {
         const [_, year, month, day, hour, minute, second] = result;
         return Date.UTC(year, month - 1, day, hour, minute, second);
     };
+
+    window.parseCoordinate = raw => {
+        return parseInt(raw, 10) / 1000000.0;
+    };
 }
