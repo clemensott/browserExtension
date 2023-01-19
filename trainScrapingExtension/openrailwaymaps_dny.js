@@ -38,13 +38,13 @@ async function main() {
         return { slider: div };
     }
 
-    function createRenderDatePickerControls({ onPlayPauseClick, onResetClick, onSetClick }) {
+    function createRenderDatePickerControls({ onPickerChange, onPlayPauseClick, onResetClick, onSetClick }) {
         const datetimePicker = document.createElement('input');
         datetimePicker.type = 'datetime-local';
         datetimePicker.classList.add('dny-start-datetime-picker');
+        datetimePicker.addEventListener('change', onPickerChange);
 
         const renderDateTime = document.createElement('div');
-        renderDateTime.innerText = new Date(datetimePicker.value).toLocaleString();
 
         const playPauseButton = document.createElement('button');
         playPauseButton.innerText = 'Play';
@@ -72,12 +72,12 @@ async function main() {
         return {
             container,
             getPickedDateTime: () => new Date(datetimePicker.value),
-            setPickedDateTime: v => datetimePicker.value = new Date(v).toISOString().substring(0, 19),
+            setPickedDateTime: v => datetimePicker.value = new Date(v).toLocalISOString(),
             setRenderDateTime: v => renderDateTime.innerText = new Date(v).toLocaleString(),
         };
     }
 
-    function createUI({ onPlayPauseClick, onResetClick, onSetClick, speed, onSpeedChange }) {
+    function createUI({ onPickerChange, onPlayPauseClick, onResetClick, onSetClick, speed, onSpeedChange }) {
         const header = document.createElement('b');
         header.innerText = 'TrainScrapings';
 
@@ -86,7 +86,7 @@ async function main() {
             getPickedDateTime,
             setPickedDateTime,
             setRenderDateTime,
-        } = createRenderDatePickerControls({ onPlayPauseClick, onResetClick, onSetClick });
+        } = createRenderDatePickerControls({ onPickerChange, onPlayPauseClick, onResetClick, onSetClick });
         const { slider } = createSlider({
             min: 10,
             max: 500,
@@ -119,11 +119,11 @@ async function main() {
         localStorage.getItem('dny_api_token'),
     );
     const loader = new DnyLoader(api);
-    const renderer = new DnyRenderer(map);
+    const renderer = new DnyRenderer(map, parseInt(localStorage.getItem('dny_train_icon_size'), 10) || 20);
 
     let renderIntervalId = null;
     let speed = parseInt(localStorage.getItem(renderSpeedKey), 10) || 60;
-    let renderDateTime = null;
+    let renderDateTime = parseInt(localStorage.getItem(renderDateTimeKey), 10) || Date.now();
     let lastLoop = null;
     let lastDny = null;
 
@@ -133,14 +133,20 @@ async function main() {
     }
 
     const { getPickedDateTime, setPickedDateTime, setRenderDateTime } = createUI({
+        onPickerChange: onPickerValueChange,
         onPlayPauseClick: onPlayPause,
         onResetClick: onResetRenderDateTime,
         onSetClick: onSetRenderDateTime,
         speed,
         onSpeedChange,
     });
-    setPickedDateTime(parseInt(localStorage.getItem(renderDateTimeKey), 10) || Date.now());
-    onResetRenderDateTime();
+    setPickedDateTime(renderDateTime);
+    setRenderDateTime(renderDateTime);
+
+    function onPickerValueChange() {
+        const timestamp = getPickedDateTime().getTime();
+        localStorage.setItem(renderDateTimeKey, timestamp);
+    }
 
     async function renderLoop() {
         const now = Date.now();
@@ -152,7 +158,6 @@ async function main() {
 
         const dny = await loader.getDnyAfter(renderDateTime);
         if (dny && lastDny !== dny) {
-            const startRender = Date.now();
             renderer.render(dny);
             lastDny = dny;
         }
@@ -164,6 +169,8 @@ async function main() {
             renderIntervalId = null;
             target.innerText = 'Play';
             lastLoop = null;
+
+            renderer.garbageCollect();
         } else {
             renderIntervalId = setInterval(renderLoop, 100);
             target.innerText = 'Pause';

@@ -4,6 +4,7 @@ class DnyLoader {
 
         this.isSimpleGetting = false;
         this.lastMeta = null;
+        this.lastMetaFetchTimestamp = null;
         this.lastDny = null;
     }
 
@@ -14,12 +15,14 @@ class DnyLoader {
         try {
             this.isSimpleGetting = true;
 
-            if (!(this.lastMeta && utcToUnix(this.lastMeta.timestamp) > timestamp)) {
+            if (!this.lastMeta || !utcToUnix(this.lastMeta.timestamp) < timestamp ||
+                !this.lastMetaFetchTimestamp || this.lastMetaFetchTimestamp > timestamp) {
                 const metas = await this.api.getDnyMetas({
                     rangeStart: new Date(timestamp),
                     limit: 1,
                 });
                 this.lastMeta = metas[0];
+                this.lastMetaFetchTimestamp = timestamp;
             }
 
             if (!this.lastMeta) {

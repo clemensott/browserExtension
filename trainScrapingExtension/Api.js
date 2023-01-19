@@ -36,8 +36,8 @@ class Api {
     async getDnyMetas({ rangeStart, rangeEnd, limit }) {
         const response = await this.fetch('/trains/dnyMetas', {
             query: {
-                rangeStart: rangeStart.toUtcIsoString(),
-                rangeEnd: rangeEnd && rangeEnd.toUtcIsoString(),
+                rangeStart: rangeStart.toJSON(),
+                rangeEnd: rangeEnd && rangeEnd.toJSON(),
                 limit,
             },
         });

@@ -1,57 +1,86 @@
 class DnyRenderer {
-    constructor(map) {
+    constructor(map, iconSize) {
         this.map = map;
-        this.markers = [];
-        this.usedMarkers = 0;
+        this.markers = new Map();
         this.icons = Object.entries(trainScrapingIconURLs).reduce((sum, [key, url]) => {
             sum[key] = L.icon({
                 iconUrl: url,
-                iconSize: [20, 20],
+                iconSize: [iconSize, iconSize],
             });
             return sum;
         }, {});
+
+        this.newMarkers = 0;
     }
 
     getIcon(productClass) {
         return this.icons[productClass] || this.icons.default;
     }
 
-    setLatLng(trains, index) {
-        const train = trains[index];
-        this.markers[index].setLatLng([parseCoordinate(train.y), parseCoordinate(train.x)]);
-        this.markers[index].setIcon(this.getIcon(train.c));
-        if (index >= this.usedMarkers) {
-            this.markers[index].setOpacity(1);
-        }
-    }
-
     renderMarker(train) {
-        return L.marker([
-            parseCoordinate(train.y),
-            parseCoordinate(train.x)
-        ], {
-            icon: this.getIcon(train.c),
-        }).addTo(map);
+        const container = this.markers.get(train.i);
+        if (container) {
+            if (container.x !== train.x || container.y !== train.y) {
+                container.marker.setLatLng([parseCoordinate(train.y), parseCoordinate(train.x)]);
+                container.x = train.x;
+                container.y = train.y;
+            }
+            if (container.c !== train.c) {
+                container.marker.setIcon(this.getIcon(train.c));
+                container.c = train.c;
+            }
+            if (!container.visable) {
+                container.marker.setOpacity(1);
+                container.visable = true;
+            }
+        } else {
+            this.newMarkers++;
+            this.markers.set(train.i, {
+                y: train.y,
+                x: train.x,
+                c: train.c,
+                visable: true,
+                marker: L.marker(
+                    [parseCoordinate(train.y), parseCoordinate(train.x)],
+                    { icon: this.getIcon(train.c), }
+                ).addTo(map),
+            });
+        }
     }
 
     render(dny) {
+        this.newMarkers = 0;
         const start = Date.now();
         if (dny && dny.t) {
-            const minCount = Math.min(dny.t.length, this.markers.length);
-            for (let i = 0; i < minCount; i++) {
-                this.setLatLng(dny.t, i);
-            }
+            const remainingHashIds = new Set(this.markers.keys());
+            dny.t.forEach(train => {
+                this.renderMarker(train);
+                remainingHashIds.delete(train.i);
+            });
 
-            for (let i = minCount; i < dny.t.length; i++) {
-                this.markers.push(this.renderMarker(dny.t[i]));
-            }
-
-            for (let i = minCount; i < this.usedMarkers; i++) {
-                this.markers[i].setOpacity(0);
-            }
-
-            this.usedMarkers = dny.t.length;
+            remainingHashIds.forEach(id => {
+                const container = this.markers.get(id);
+                if (container.visable) {
+                    container.marker.setOpacity(0);
+                    container.visable = false;
+                }
+            });
+            // console.log('render infos:', {
+            //     markers: this.markers.size,
+            //     old: remainingHashIds.size,
+            //     new: this.newMarkers,
+            //     duration: Date.now() - start,
+            // });
         }
-        // console.log('render millis:', Date.now() - start);
+    }
+
+    garbageCollect() {
+        [...this.markers.entries()].forEach(([key, { visable, marker }]) => {
+            if (!visable) {
+                removeCount++;
+                marker._icon.remove();
+                this.markers.delete(key);
+            }
+        });
     }
 }

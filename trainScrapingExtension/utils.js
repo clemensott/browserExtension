@@ -13,13 +13,13 @@ function utils() {
     function toStringWithLeftPad(no, amount = 2, char = '0') {
         return no.toString().leftPad(amount, char);
     }
-    Date.prototype.toUtcIsoString = function () {
-        const year = this.getUTCFullYear().toString();
-        const month = toStringWithLeftPad(this.getUTCMonth() + 1);
-        const day = toStringWithLeftPad(this.getUTCDate());
-        const hour = toStringWithLeftPad(this.getUTCHours());
-        const minute = toStringWithLeftPad(this.getUTCMinutes());
-        const second = toStringWithLeftPad(this.getUTCSeconds());
+    Date.prototype.toLocalISOString = function () {
+        const year = this.getFullYear().toString();
+        const month = toStringWithLeftPad(this.getMonth() + 1);
+        const day = toStringWithLeftPad(this.getDate());
+        const hour = toStringWithLeftPad(this.getHours());
+        const minute = toStringWithLeftPad(this.getMinutes());
+        const second = toStringWithLeftPad(this.getSeconds());
         return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
     };
 
