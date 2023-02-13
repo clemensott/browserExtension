@@ -150,7 +150,7 @@ export default class SpeedMeasurer {
     }
 
     static getCurrentVideoTime() {
-        return document.querySelector('video').currentTime;
+        return document.querySelector('#movie_player > div > video').currentTime;
     }
 
     start() {
