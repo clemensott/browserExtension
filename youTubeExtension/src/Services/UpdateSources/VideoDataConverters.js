@@ -39,14 +39,15 @@ export function fromVideoRenderer({ videoRenderer: raw }, additionalData) {
     };
 }
 
-export function fromReelItemRenderer({ reelItemRenderer: raw }) {
+export function fromReelItemRenderer({ reelItemRenderer: raw }, additionalData) {
+    const { channelTitle, channelId } = additionalData || {};
     return raw && raw.videoId && {
         id: raw.videoId,
         title: raw.headline?.simpleText,
-        channelTitle: raw?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
+        channelTitle: channelTitle || raw?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
             ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.channelTitleText?.runs
             ?.map(r => r?.text).filter(Boolean).join(''),
-        channelId: raw?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
+        channelId: channelId || raw?.navigationEndpoint?.reelWatchEndpoint?.overlay?.reelPlayerOverlayRenderer
             ?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer
             ?.channelNavigationEndpoint?.browseEndpoint?.browseId,
     };
