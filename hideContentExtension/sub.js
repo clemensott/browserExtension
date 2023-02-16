@@ -80,7 +80,6 @@ function sendElementInfos(current, newElements, win) {
         },
         localElements: localElementsMap,
     };
-    console.log('send:',chrome.runtime, chrome)
     chrome.runtime.sendMessage({
         type: lastEvent.type,
         data: lastEvent.data,
@@ -89,7 +88,9 @@ function sendElementInfos(current, newElements, win) {
 
 function addContextMenuListener(win) {
     win.oncontextmenu = (e) => {
-        sendElementInfos([], [...e.path], win);
+        if (e.path) {
+            sendElementInfos([], [...e.path], win);
+        }
     };
 }
 
