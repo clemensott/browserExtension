@@ -18,16 +18,9 @@ chrome.runtime.onMessage.addListener((msg) => {
             if (msg.data.elements.every(e => e.src !== window.location.href)) {
                 const lastSrc = msg.data.elements.length && msg.data.elements[msg.data.elements.length - 1].src;
                 const frames = document.querySelectorAll('iframe');
-                let element = [...frames].find(f => f.src === lastSrc);
-                const path = [];
-
-                while (element) {
-                    path.push(element);
-                    element = element.parentElement;
-                }
-
-                if (path.length) {
-                    sendElementInfos(msg.data.elements, path, window);
+                const element = [...frames].find(f => f.src === lastSrc);
+                if (element) {
+                    sendElementInfos(msg.data.elements, element, window);
                 }
             }
             break;
@@ -59,7 +52,15 @@ function getRandomId() {
     return `${Date.now()}_${Math.random()}`;
 }
 
-function sendElementInfos(current, newElements, win) {
+function sendElementInfos(current, element, win) {
+    const newElements = [];
+    while (element) {
+        newElements.push(element);
+        element = element.parentElement;
+    }
+
+    console.log('new elements:', newElements);
+
     const localElementsMap = new Map();
     lastEvent = {
         type: 'element_infos',
@@ -87,11 +88,12 @@ function sendElementInfos(current, newElements, win) {
 }
 
 function addContextMenuListener(win) {
-    win.oncontextmenu = (e) => {
-        if (e.path) {
-            sendElementInfos([], [...e.path], win);
+    win.addEventListener('contextmenu', e => {
+        console.log('e:', e)
+        if (e.target) {
+            sendElementInfos([], e.target, win);
         }
-    };
+    });
 }
 
 addContextMenuListener(window);
