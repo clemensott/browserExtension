@@ -31,6 +31,8 @@ function getVideoIdFromVideoContainer(container) {
 function getVideoContainers() {
     const watchVideos = [{
         container: document.querySelector(
+            '#title > h1'
+        ) || document.querySelector(
             '#bottom-row'
         ) || document.querySelector(
             '#owner-and-teaser'
@@ -40,6 +42,7 @@ function getVideoContainers() {
         getVideoId: () => getCurrentVideoId(),
         additionalClassName: 'yt-video-user-state-watch',
         insertReferenceNodeSelector: '#comment-teaser, #flex',
+        addRootContainerClass: 'yt-video-user-state-watch-root',
     }];
 
     const shortVideos = [

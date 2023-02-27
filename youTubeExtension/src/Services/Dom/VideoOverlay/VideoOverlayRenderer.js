@@ -18,7 +18,7 @@ export default class VideoOverlayRenderer {
         this.videoOpenContainerClassName = videoOpenContainerClassName;
     }
 
-    getBaseElement(container, className, additionalClassName, insertReferenceNodeSelector) {
+    getBaseElement(container, className, additionalClassName, insertReferenceNodeSelector, addRootContainerClass) {
         let element = container.querySelector(`.${className}`);
         if (!element) {
             element = document.createElement('span');
@@ -26,11 +26,20 @@ export default class VideoOverlayRenderer {
             const refNode = insertReferenceNodeSelector && container.querySelector(insertReferenceNodeSelector);
             container.insertBefore(element, refNode);
         }
+        if (addRootContainerClass) {
+            container.classList.add(addRootContainerClass);
+        }
         return element;
     }
 
-    renderVideoState({ container, videoId, additionalClassName, insertReferenceNodeSelector }) {
-        const element = this.getBaseElement(container, this.videoStateContainerClassName, additionalClassName, insertReferenceNodeSelector);
+    renderVideoState({ container, videoId, additionalClassName, insertReferenceNodeSelector = null, addRootContainerClass = null }) {
+        const element = this.getBaseElement(
+            container,
+            this.videoStateContainerClassName,
+            additionalClassName,
+            insertReferenceNodeSelector,
+            addRootContainerClass,
+        );
         if (element.dataset.id === videoId) {
             return;
         }
@@ -52,8 +61,14 @@ export default class VideoOverlayRenderer {
         );
     }
 
-    renderVideoOpen({ container, videoId, additionalClassName, insertReferenceNodeSelector }) {
-        const element = this.getBaseElement(container, this.videoOpenContainerClassName, additionalClassName, insertReferenceNodeSelector);
+    renderVideoOpen({ container, videoId, additionalClassName, insertReferenceNodeSelector = null, addRootContainerClass = null }) {
+        const element = this.getBaseElement(
+            container,
+            this.videoOpenContainerClassName,
+            additionalClassName,
+            insertReferenceNodeSelector,
+            addRootContainerClass,
+        );
 
         const videoOpen = this.videoOpenStorageService.isVideoOpenFromCache(videoId);
         const wasVideoOpen = element.dataset.videoOpen === 'true';
@@ -68,12 +83,13 @@ export default class VideoOverlayRenderer {
         );
     }
 
-    render({ container, videoId, additionalClassName, insertReferenceNodeSelector = null }) {
+    render(params) {
+        const { container, videoId } = params;
         if (!container || !document.contains(container) || !videoId) {
             return;
         }
 
-        this.renderVideoOpen({ container, videoId, additionalClassName, insertReferenceNodeSelector });
-        this.renderVideoState({ container, videoId, additionalClassName, insertReferenceNodeSelector });
+        this.renderVideoOpen(params);
+        this.renderVideoState(params);
     }
 }
