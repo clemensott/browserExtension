@@ -1,5 +1,5 @@
 .yt-video-user-state-container {
-    z-index: 5;
+    z-index: 500;
 }
 
 .yt-video-user-state-container > div {
@@ -140,6 +140,9 @@ ytd-playlist-video-renderer > .yt-video-user-state-container.yt-video-user-state
     cursor: pointer;
     height: 17px;
     padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .yt-video-user-state-action-button:not(.video-state-dropdown-action-button) {
@@ -222,7 +225,7 @@ div#info-text.style-scope.ytd-video-primary-info-renderer {
 }
 
 .yt-video-user-state-inactive.yt-video-user-state-updating {
-    background: rgb(158,50,158);
+    background: rgb(158, 50, 158);
 }
 
 .yt-video-user-state-inactive-depricated {
@@ -239,4 +242,16 @@ div#info-text.style-scope.ytd-video-primary-info-renderer {
 
 .yt-video-user-state-count.yt-video-user-state-updating {
     background: rgb(180, 180, 180);
+}
+
+h1.ytd-watch-metadata.yt-video-user-state-watch-root {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow: visible;
+    max-height: 8.4rem;
+}
+
+.yt-video-user-state-watch-root>yt-formatted-string {
+    flex-grow: 1;
 }

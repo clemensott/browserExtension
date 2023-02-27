@@ -1,6 +1,8 @@
 span.yt-video-open-container.yt-video-user-state-watch {
     display: flex;
     align-items: center;
+    font-size: 10px;
+    height: 25px;
 }
 
 #bottom-row > span.yt-video-open-container.yt-video-user-state-watch,
@@ -9,7 +11,8 @@ span.yt-video-open-container.yt-video-user-state-watch {
 }
 
 span.yt-video-open-container.yt-video-user-state-watch > .yt-video-open-indicator-container {
-    padding: 6.5px 9px;
+    height: 100%;
+    padding: 0px 9px;
     background-color: black;
     color: white;
     cursor: default;
