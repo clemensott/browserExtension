@@ -8,6 +8,7 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
             elementsGetter: ChannelPlayerDomEventHandler.getChannelHeader,
             timeout: 5000,
             notFoundTimeout: 100,
+            triggerEventOnRunChange: true,
         });
 
         this.onSomething = this.onSomething.bind(this);
@@ -22,7 +23,6 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
             this.unsubscribe(lastElements);
         }
         if (currentElements instanceof Node) {
-            console.log('channel video element:', currentElements.paused);
             if (currentElements.readyState >= 3 || !currentElements.paused) {
                 currentElements.pause();
             } else {
@@ -43,7 +43,7 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
         element.removeEventListener('timeupdate ', this.onSomething);
     }
 
-    onSomething({ target, type }) {
+    onSomething({ target }) {
         if (!target.paused) {
             target.pause();
             this.unsubscribe(target);
