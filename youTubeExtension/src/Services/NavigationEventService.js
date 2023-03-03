@@ -46,10 +46,18 @@ export default class NavigationEventService {
         return NavigationEventService.isChannelSite('videos');
     }
 
+    static isChannelShortsSite() {
+        return NavigationEventService.isChannelSite('shorts');
+    }
+
+    static isChannelLiveSite() {
+        return NavigationEventService.isChannelSite('live') || NavigationEventService.isChannelSite('streams');
+    }
+
     static isChannelSite(tab = null) {
         const channelMatchList = ['c', 'channel', 'user'];
         const mismatchList = ['watch', 'shorts', 'playlist', 'feed', 'premium ', 'results', ''];
-        const channelTabs = ['featured', 'videos', 'playlists', 'community', 'store', 'channels', 'about'];
+        const channelTabs = ['featured', 'videos', 'shorts', 'live', 'streams', 'playlists', 'community', 'store', 'channels', 'about'];
 
         const isFeaturedTab = tab === 'featured';
         const pathParts = window.location.pathname.split('/');
@@ -97,8 +105,10 @@ export default class NavigationEventService {
             isChannelSite: NavigationEventService.isChannelSite(),
             isChannelFeaturedSite: NavigationEventService.isChannelFeaturedSite(),
             isChannelVideosSite: NavigationEventService.isChannelVideosSite(),
+            isChannelShortsSite: NavigationEventService.isChannelShortsSite(),
+            isChannelLiveSite: NavigationEventService.isChannelLiveSite(),
             isSubscriptionBoxSite: NavigationEventService.isSubscriptionBoxSite(),
-        }
+        };
     }
 
     onUrlChange() {

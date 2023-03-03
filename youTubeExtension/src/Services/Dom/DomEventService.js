@@ -48,9 +48,14 @@ export default class DomEventService {
             this.channelPlayer.stop();
         }
 
-        if (detail.isChannelVideosSite === navigationChange.ENTERED) {
+        const channelVideoSites = [
+            detail.isChannelVideosSite,
+            detail.isChannelShortsSite,
+            detail.isChannelLiveSite,
+        ];
+        if (channelVideoSites.includes(navigationChange.ENTERED)) {
             this.channelVideosCount.start();
-        } else if (detail.isChannelVideosSite === navigationChange.LEFT) {
+        } else if (channelVideoSites.includes(navigationChange.LEFT)) {
             this.channelVideosCount.stop();
         }
 

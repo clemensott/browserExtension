@@ -6,6 +6,7 @@ function tabFilter(tab) {
         'videos',
         'shorts',
         'live',
+        'streams',
     ].includes(tab.title.toLowerCase());
 }
 

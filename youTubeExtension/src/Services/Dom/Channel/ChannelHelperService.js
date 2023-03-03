@@ -52,19 +52,33 @@ export default class ChannelHelperService {
     }
 
     static revertTabText(element) {
-        if (element instanceof Node && element.dataset.title) {
-            ReactDOM.unmountComponentAtNode(element);
-            element.innerText = element.dataset.title;
+        if (element instanceof Node && element.dataset.fakeId) {
+            const fakeElement = element.parentElement.querySelector(`#${element.dataset.fakeId}`);
+            if (fakeElement) {
+                ReactDOM.unmountComponentAtNode(fakeElement);
+                fakeElement.remove();
+                delete element.dataset.fakeId;
+            }
         }
     }
 
     static renderTabVideosCount({ tabElement, ...props }) {
-        if (!tabElement.dataset.title) {
-            tabElement.dataset.title = tabElement.innerText;
+        let fakeElement;
+        if (tabElement.dataset.fakeId) {
+            fakeElement = tabElement.parentElement.querySelector(`#${tabElement.dataset.fakeId}`);
+        }
+        if (!fakeElement) {
+            const fakeId = `fake-tab-element-${Math.random()}`.replace('.', '');
+            const div = document.createElement('div');
+            div.innerHTML = tabElement.outerHTML;
+            fakeElement = div.firstChild;
+            fakeElement.id = fakeId;
+            tabElement.parentElement.appendChild(fakeElement);
+            tabElement.dataset.fakeId = fakeId;
         }
         ReactDOM.render(
-            <TabVideosCount title={tabElement.dataset.title} {...props} />,
-            tabElement,
+            <TabVideosCount title={tabElement.innerText} {...props} />,
+            fakeElement,
         );
     }
 }

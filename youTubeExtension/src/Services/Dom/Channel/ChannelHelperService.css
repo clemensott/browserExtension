@@ -1,5 +1,5 @@
-#inner-header-container.yt-channel-helper-service-inner-header-container > #meta.ytd-c4-tabbed-header-renderer {
-    flex: initial!important;
+#inner-header-container.yt-channel-helper-service-inner-header-container>#meta.ytd-c4-tabbed-header-renderer {
+    flex: initial !important;
 }
 
 div.yt-channel-helper-service-own-container {
@@ -11,4 +11,8 @@ div.yt-channel-helper-service-own-container {
     flex-direction: row;
     align-items: center;
     margin: 10px;
+}
+
+div[data-fake-id^="fake-tab-element"] {
+    display: none!important;
 }

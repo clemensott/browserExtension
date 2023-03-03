@@ -2,12 +2,15 @@ import DomEventHandler from '../DomEventHandler';
 
 
 function getCountFactor(container) {
-    switch (container.firstElementChild.tagName.toLowerCase()) {
+    const firstRow = container.firstElementChild;
+    switch (firstRow.tagName.toLowerCase()) {
         case 'ytd-grid-playlist-renderer':
             return 0;
         case 'ytd-rich-grid-row':
-            const firstVideo = container.querySelector('ytd-rich-grid-row > div > ytd-rich-item-renderer');
-            return firstVideo && parseInt(firstVideo.getAttribute('items-per-row'), 10) || 1;
+            const itemsPerRowPropName = firstRow.hasAttribute('is-shorts-grid') ?
+                '--ytd-rich-grid-slim-items-per-row' : '--ytd-rich-grid-items-per-row';
+            const itemsPerRow = container.parentElement.style.getPropertyValue(itemsPerRowPropName);
+            return itemsPerRow && parseInt(itemsPerRow, 10) || 1;
     }
     return 1;
 }
@@ -60,11 +63,25 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         });
     }
 
-    static getCurrentTab() {
-        return document.querySelector('#tabsContent > tp-yt-paper-tab.style-scope.iron-selected > div.tab-content.style-scope.tp-yt-paper-tab');
+    static isCurrentTab(tab) {
+        return tab instanceof Node &&
+            document.contains(tab) &&
+            tab.parentElement instanceof Node &&
+            tab.parentElement.classList.contains('iron-selected');
     }
 
-    static getVideoListContainer() {
+    static getCurrentTab() {
+        return document.querySelector(
+            '#tabsContent > tp-yt-paper-tab.style-scope.iron-selected > div.tab-content.style-scope.tp-yt-paper-tab'
+        );
+    }
+
+    static isCurrentVideoListContainer(container) {
+        return container instanceof Node &&
+            document.contains(container);
+    }
+
+    static getCurrentVideoListContainer() {
         return document.querySelector('ytd-browse:not([hidden]) #contents.style-scope.ytd-rich-grid-renderer') ||
             document.querySelector('#items.style-scope.ytd-grid-renderer');
     }
@@ -105,10 +122,10 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
 
     static getChannelVideosCount(obj) {
         let { tabElement, videoListContainer } = obj || {};
-        tabElement = tabElement instanceof Node && document.contains(tabElement) ?
+        tabElement = ChannelVideosDomEventHandler.isCurrentTab(tabElement) ?
             tabElement : ChannelVideosDomEventHandler.getCurrentTab();
-        videoListContainer = videoListContainer instanceof Node && document.contains(videoListContainer) ?
-            videoListContainer : ChannelVideosDomEventHandler.getVideoListContainer();
+        videoListContainer = ChannelVideosDomEventHandler.isCurrentVideoListContainer(videoListContainer) ?
+            videoListContainer : ChannelVideosDomEventHandler.getCurrentVideoListContainer();
 
         let videosCount = null;
         let hasVideosFetchingContinuation = null;
