@@ -21,6 +21,6 @@ This creates a simple extension with loads the actual files from the webpack ser
 
 - record watch time
 - disable video state buttons while applying
-- show Thumbnail of current video above recommanded list
+- show Thumbnail of current video above recommended list
 - show if video is open in other tab
 - enable/disable certain dom manipulations
