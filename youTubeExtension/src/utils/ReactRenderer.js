@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 
 
@@ -57,7 +56,7 @@ export default class ReactRenderer {
 
     unmount() {
         if (this.lastContainer) {
-            ReactDOM.render(<></>, this.lastContainer);
+            ReactDOM.unmountComponentAtNode(this.lastContainer);
         }
     }
 }

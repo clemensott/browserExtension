@@ -28,80 +28,13 @@ function getVideoIdFromVideoContainer(container) {
     return a && a.href && getVideoIdFromUrl(a.href);
 }
 
-function getVideoContainers() {
-    const watchVideos = [{
-        container: document.querySelector(
-            '#title > h1'
-        ) || document.querySelector(
-            '#bottom-row'
-        ) || document.querySelector(
-            '#owner-and-teaser'
-        ) || document.querySelector(
-            'ytd-video-primary-info-renderer #info'
-        ),
-        getVideoId: () => getCurrentVideoId(),
-        additionalClassName: 'yt-video-user-state-watch',
-        insertReferenceNodeSelector: '#comment-teaser, #flex',
-        addRootContainerClass: 'yt-video-user-state-watch-root',
-    }];
-
-    const shortVideos = [
-        'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
-    ]
-        .map(selector => Array.from(document.querySelectorAll(selector))).flat()
-        .map(container => ({
-            container,
-            getVideoId: () => getVideoIdOfShortVideoContainer(container),
-            additionalClassName: 'yt-video-user-state-watch',
-        }));
-
-    const listVideos = [
-        '#items > ytd-compact-video-renderer',
-        '#contents > ytd-compact-video-renderer',
-        '#items > ytd-grid-video-renderer',
-        '#contents > ytd-rich-item-renderer',
-        '#contents > ytd-video-renderer',
-        '#items > ytd-video-renderer',
-        '#items > ytd-playlist-panel-video-renderer',
-        '#contents > ytd-playlist-video-renderer',
-    ]
-        .map(selector => Array.from(document.querySelectorAll(selector))).flat()
-        .map(container => ({
-            container,
-            getVideoId: () => getVideoIdFromVideoContainer(container),
-            additionalClassName: 'yt-video-user-state-list-item',
-        }));
-
-    return [
-        ...watchVideos,
-        ...shortVideos,
-        ...listVideos,
-    ];
-}
-
-export default class DisplayVideoStateService {
-    constructor(api, videoOpenStorageService) {
+export default class VideoOverlayService {
+    constructor({ api, videoOpenStorageService }) {
         this.api = api;
         this.videoOpenStorageService = videoOpenStorageService;
-        this.videoContainers = null;
-        this.loop = new AtOnceService(async (fast = false, forceUserStateUpdate = false) => {
-            try {
-                if (!fast || !this.videoContainers) {
-                    this.videoContainers = getVideoContainers();
-                }
-                this.videoContainers.forEach(container => container.videoId = container.getVideoId());
-                this.updateUI();
 
-                const videoIds = this.videoContainers.map(c => c.videoId).filter(Boolean);
-                const updatedVideoIds = await this.api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
-                if (updatedVideoIds) {
-                    await this.loadSourcesOfVideos(updatedVideoIds);
-                }
-                this.updateUI(updatedVideoIds);
-            } catch (e) {
-                console.error('loop error', e)
-            }
-        });
+        this.videoContainers = null;
+        this.loop = new AtOnceService(this.loopHandle.bind(this));
         this.runLoopNonAsync = this.runLoopNonAsync.bind(this);
         this.overlayRender = new VideoOverlayRenderer({
             api,
@@ -111,6 +44,83 @@ export default class DisplayVideoStateService {
         });
         this.updateBroadcast = new BroadcastChannel('updateSources');
         this.videoStateBroadcast = new BroadcastChannel('videoState');
+    }
+
+    async loopHandle(fast = false, forceUserStateUpdate = false) {
+        try {
+            if (!fast || !this.videoContainers) {
+                this.videoContainers = this.getVideoContainers();
+            }
+            this.videoContainers.forEach(container => container.videoId = container.getVideoId());
+            this.updateUI();
+
+            const videoIds = this.videoContainers.map(c => c.videoId).filter(Boolean);
+            const updatedVideoIds = await this.api.updateUserStateOfVideos(videoIds, forceUserStateUpdate);
+            if (updatedVideoIds) {
+                await this.loadSourcesOfVideos(updatedVideoIds);
+            }
+            this.updateUI(updatedVideoIds);
+        } catch (e) {
+            console.error('loop error', e)
+        }
+    }
+
+    getVideoContainers() {
+        const watchVideos = [{
+            container: document.querySelector(
+                '#title > h1'
+            ) || document.querySelector(
+                '#bottom-row'
+            ) || document.querySelector(
+                '#owner-and-teaser'
+            ) || document.querySelector(
+                'ytd-video-primary-info-renderer #info'
+            ),
+            getVideoId: () => getCurrentVideoId(),
+            additionalClassName: 'yt-video-user-state-watch',
+            insertReferenceNodeSelector: '#comment-teaser, #flex',
+            addRootContainerClass: 'yt-video-user-state-watch-root',
+        }];
+
+        const shortVideos = [
+            'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
+        ]
+            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+            .map(container => ({
+                container,
+                getVideoId: () => getVideoIdOfShortVideoContainer(container),
+                additionalClassName: 'yt-video-user-state-watch',
+            }));
+
+        const recommendedVideos = Array.from(document.querySelectorAll('#items > ytd-compact-video-renderer'))
+            .map(container => ({
+                container,
+                getVideoId: () => getVideoIdFromVideoContainer(container),
+                additionalClassName: 'yt-video-user-state-list-item',
+            }));
+
+        const listVideos = [
+            '#contents > ytd-compact-video-renderer',
+            '#items > ytd-grid-video-renderer',
+            '#contents > ytd-rich-item-renderer',
+            '#contents > ytd-video-renderer',
+            '#items > ytd-video-renderer',
+            '#items > ytd-playlist-panel-video-renderer',
+            '#contents > ytd-playlist-video-renderer',
+        ]
+            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+            .map(container => ({
+                container,
+                getVideoId: () => getVideoIdFromVideoContainer(container),
+                additionalClassName: 'yt-video-user-state-list-item',
+            }));
+
+        return [
+            ...watchVideos,
+            ...shortVideos,
+            ...recommendedVideos,
+            ...listVideos,
+        ];
     }
 
     loadSourcesOfVideos(videoIds) {
@@ -147,7 +157,7 @@ export default class DisplayVideoStateService {
         };
 
         setIntervalUntil(() => {
-            if (!getVideoContainers().length) return true;
+            if (!this.getVideoContainers().length) return true;
 
             this.loop.run();
             return false;

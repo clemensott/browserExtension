@@ -7,7 +7,7 @@ import HideWatchVideoElementsService from './HideWatchVideoElementsService';
 import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
 
 export default class DomEventService {
-    constructor({ optionsService, navigationService, updateSourcesTrackerService }) {
+    constructor({ optionsService, navigationService, updateSourcesTrackerService, filterRecommendedVideosService }) {
         this.channel = new ChannelDomEventHandler();
         this.channelVideosCount = new ChannelVideosDomEventHandler({
             updateTrackerService: updateSourcesTrackerService,
@@ -21,6 +21,7 @@ export default class DomEventService {
         });
         this.reloadSubscriptionBoxDomEventHandler = new ReloadSubscriptionBoxDomEventHandler(optionsService);
         this.hideWatchVideosElementsHandler = new HideWatchVideoElementsService({ optionsService });
+        this.filterRecommendedVideosService = filterRecommendedVideosService;
 
         this.navigationService = navigationService;
         this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange.bind(this));
@@ -69,6 +70,12 @@ export default class DomEventService {
             this.hideWatchVideosElementsHandler.start();
         } else if (detail.isVideoWatchSite === navigationChange.LEFT) {
             this.hideWatchVideosElementsHandler.stop();
+        }
+
+        if (detail.isVideoWatchSite === navigationChange.ENTERED) {
+            this.filterRecommendedVideosService.start();
+        } else if (detail.isVideoWatchSite === navigationChange.LEFT) {
+            this.filterRecommendedVideosService.stop();
         }
     }
 }

@@ -1,6 +1,7 @@
 import { navigationChange } from '../constants';
 import getCurrentVideoId from '../utils/getCurrentVideoId';
 import sleep from '../utils/sleep';
+import randomString from '../utils/randomString';
 
 const constants = {
     STORAGE_KEY_PREFIX: 'yt-extension-video-open-open-entry-',
@@ -14,7 +15,7 @@ export default class VideoOpenStorageService {
         this.navigatoreEventService = navigatoreEventService;
         this.validSeconds = parseInt(localStorage.getItem(constants.VALID_SECONDS_KEY), 10) || 1000;
         this.garbageCollectStorageInvalid = true;
-        this.videoOpenTabStorageKey = `${constants.STORAGE_KEY_PREFIX}${Date.now()}-${Math.random()}`;
+        this.videoOpenTabStorageKey = `${constants.STORAGE_KEY_PREFIX}${randomString()}`;
         this.videoOpenCache = new Map();
         this.lastVideoId = null;
         this.updateVideoOpenCacheIntervalId = null;
