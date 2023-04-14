@@ -33,7 +33,7 @@ export default class FilterRecommendedVideosService {
 
         this.filterRenderer = new ReactRenderer({
             id: 'yt-extension-filter-recommended-videos-container',
-            beforeSelector: '#related',
+            beforeSelector: 'ytd-item-section-renderer,#related',
         });
         this.filterRenderDomEventHandler = new DomEventHandler({
             elementsGetter: FilterRecommendedVideosService.getFilterBaseElement,
@@ -108,7 +108,10 @@ export default class FilterRecommendedVideosService {
     }
 
     static getFilterBaseElement() {
-        return document.querySelector('ytd-watch-flexy > #columns > #secondary > #secondary-inner');
+        const sibling = document.querySelector(
+            'ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related > ytd-watch-next-secondary-results-renderer > #items > ytd-item-section-renderer'
+        ) || document.querySelector('ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related');
+        return sibling && sibling.parentElement;
     }
 
     onFilterBaseElementChange({ currentElements: baseElement }) {
@@ -134,7 +137,7 @@ export default class FilterRecommendedVideosService {
         // if (!this.domContainer) {
         //     return [];
         // }
-        const videoContainers = Array.from(document.querySelectorAll('#items > ytd-compact-video-renderer'))
+        const videoContainers = Array.from(document.querySelectorAll('#items > ytd-compact-video-renderer,#contents > ytd-compact-video-renderer'))
             .map(container => ({
                 videoId: getVideoIdFromVideoContainer(container),
                 container,
@@ -198,9 +201,12 @@ export default class FilterRecommendedVideosService {
                 });
         }
 
-        videoContainers.filter((_, i) => i === 0).forEach(({ container, videoId }) => {
-            container.dataset.ytExtensionHidden = this.isFiltered(container, videoId).toString();
-        });
+        videoContainers
+            // .filter((_, i) => i === 0)
+            .forEach(({ container, videoId }) => {
+                const filter = !!this.isFiltered(container, videoId);
+                container.dataset.ytExtensionHidden = filter.toString();
+            });
     }
 
     /**
@@ -210,6 +216,13 @@ export default class FilterRecommendedVideosService {
      */
     isFiltered(container, videoId) {
         const videoUserState = this.api.getVideoUserStateWithSourcesData(videoId);
+        // console.log('is filtered:', [
+        //     this.isWatchedFiltered(videoUserState),
+        //     this.isActiveFiltered(videoUserState),
+        //     this.isOpenFiltered(videoId),
+        //     this.isChannelNameFiltered(container),
+        //     this.isMusicFiltered(container)
+        // ])
         return (
             this.isWatchedFiltered(videoUserState) ||
             this.isActiveFiltered(videoUserState) ||
@@ -233,7 +246,7 @@ export default class FilterRecommendedVideosService {
     }
 
     isOpenFiltered(videoId) {
-        return this.filter.isOpen !== null && videoId && this.videoOpenStorageService.isVideoOpenFromCache(videoId);
+        return this.filter.isOpen !== null && videoId && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId);
     }
 
     isChannelNameFiltered(container) {
@@ -241,18 +254,19 @@ export default class FilterRecommendedVideosService {
             return false;
         }
         const channelName = getChannelName(container);
-        return channelName && this.filter.channelName === channelName;
+        // console.log('isChannelNameFiltered:', this.filter.channelName, channelName);
+        return channelName && this.filter.channelName !== channelName;
     }
 
     isMusicFiltered(container) {
         if (this.filter.isMusic === null) {
             return false;
         }
-        return !!this.filter.isMusic ^ !getIsMusic(container);
+        // console.log('isMusicFiltered:', this.filter.isMusic, getIsMusic(container));
+        return !!this.filter.isMusic !== getIsMusic(container);
     }
 
     updateChannels(videoContainers) {
-        console.log('updateChannels1', videoContainers.length)
         const channels = videoContainers.map(({ container }) => ({
             channelName: getChannelName(container),
             isMusic: getIsMusic(container),
@@ -268,7 +282,6 @@ export default class FilterRecommendedVideosService {
             return map;
         }, new Map());
 
-        console.log('channels:', channels instanceof Map, channels.size, Array.from(channels.values()), channels)
         triggerEvent(this.channelsChangedEventName, { channels: Array.from(channels.values()) });
     }
 

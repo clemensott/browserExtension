@@ -46,7 +46,8 @@ export default class ReactRenderer {
 
         if (!document.contains(containerElement)) {
             if (typeof this.beforeSelector === 'string') {
-                const beforeNode = base.querySelector(this.beforeSelector);
+                const beforeNode = Array.from(base.querySelectorAll(this.beforeSelector))
+                    .find(node => node.parentElement === base);
                 base.insertBefore(containerElement, beforeNode);
             } else {
                 base.appendChild(containerElement);
