@@ -57,7 +57,7 @@ export default class NavigationEventService {
     static isChannelSite(tab = null) {
         const channelMatchList = ['c', 'channel', 'user'];
         const mismatchList = ['watch', 'shorts', 'playlist', 'feed', 'premium ', 'results', ''];
-        const channelTabs = ['featured', 'videos', 'shorts', 'live', 'streams', 'playlists', 'community', 'store', 'channels', 'about'];
+        const channelTabs = ['featured', 'videos', 'shorts', 'live', 'streams', 'podcasts', 'playlists', 'community', 'store', 'channels', 'about'];
 
         const isFeaturedTab = tab === 'featured';
         const pathParts = window.location.pathname.split('/');
