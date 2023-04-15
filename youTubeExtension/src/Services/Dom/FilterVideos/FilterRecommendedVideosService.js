@@ -42,19 +42,15 @@ export default class FilterRecommendedVideosService {
             notFoundTimeout: 200,
         });
         this.videoContainersDomEventHandler = new DomEventHandler({
-            elementsExists: () => false,
+            elementsExists: FilterRecommendedVideosService.getVideoContainersSame,
             elementsGetter: FilterRecommendedVideosService.getVideoContainers,
             changeDetector: FilterRecommendedVideosService.videoContainersDiffer,
             onChange: this.onVideoContainersChange.bind(this),
             triggerEventOnRunChange: true,
-            timeout: 5000,
-            notFoundTimeout: 200,
+            timeout: 200,
         });
 
         this.isRunning = false;
-        // this.domContainer = null;
-        // this.videoContainers = [];
-        this.preVideoContainers = [];
         this.filter = {
             isWatchted: null,
             isActive: null,
@@ -128,35 +124,70 @@ export default class FilterRecommendedVideosService {
         }
     }
 
+    static isVideoIdUpToDate({ container, videoId }) {
+        const currentVideoId = getVideoIdFromVideoContainer(container);
+        return currentVideoId === videoId;
+    }
+
+    static getVideoContainersSame(last) {
+        if (!last) {
+            return false;
+        }
+        const { domContainer, childrenCount, timestamp, videoContainers } = last;
+        return (
+            Date.now() > timestamp + 5000 &&
+            domContainer instanceof Node &&
+            domContainer.childElementCount === childrenCount &&
+            !document.contains(domContainer) &&
+            videoContainers.length !== 0 &&
+            FilterRecommendedVideosService.isVideoIdUpToDate(videoContainers[0]) &&
+            FilterRecommendedVideosService.isVideoIdUpToDate(videoContainers[videoContainers.length - 1])
+        );
+    }
+
+    static getVideoContainersContainer() {
+        return document.querySelector('#items > ytd-item-section-renderer > #contents') ||
+            document.querySelector('ytd-watch-next-secondary-results-renderer > #items');
+    }
+
     static getVideoContainers() {
-        // if (!this.domContainer || !document.contains(this.domContainer)) {
-        //     this.domContainer = document.querySelector(
-        //         'ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related > ytd-watch-next-secondary-results-renderer > #items'
-        //     );
-        // }
-        // if (!this.domContainer) {
-        //     return [];
-        // }
-        const videoContainers = Array.from(document.querySelectorAll('#items > ytd-compact-video-renderer,#contents > ytd-compact-video-renderer'))
+        const domContainer = FilterRecommendedVideosService.getVideoContainersContainer();
+        const videoContainers = domContainer && Array.from(domContainer.querySelectorAll('ytd-compact-video-renderer'))
             .map(container => ({
                 videoId: getVideoIdFromVideoContainer(container),
+                channelName: getChannelName(container),
+                isMusicChannel: getIsMusic(container),
                 container,
-            }));
+            })) || [];
         return {
+            domContainer,
+            childrenCount: domContainer ? domContainer.childElementCount : -1,
+            timestamp: Date.now(),
             videoContainers,
         };
     }
 
     static videoContainersDiffer(current, last) {
+        if (current === last) {
+            return false;
+        }
         if (!current || !last) {
             return current !== last;
         }
         const { videoContainers: newContainers } = current;
         const { videoContainers: oldContainers } = last;
-        return newContainers.length !== oldContainers.length || newContainers.some(({ videoId, container }, i) => {
-            const oldContainer = oldContainers[i];
-            return videoId !== oldContainer.videoId || container !== oldContainer.container;
-        });
+        return (
+            newContainers.length !== oldContainers.length ||
+            newContainers.some(({ videoId, channelName, isMusicChannel, container }, i) => {
+                const oldContainer = oldContainers[i];
+                return (
+                    videoId !== oldContainer.videoId ||
+                    channelName !== oldContainer.channelName ||
+                    isMusicChannel !== oldContainer.isMusicChannel ||
+                    container !== oldContainer.container
+                );
+            })
+        );
     }
 
     onUserStateOfVideoChanged({ detail: { videoIds } }) {
@@ -203,9 +234,9 @@ export default class FilterRecommendedVideosService {
 
         videoContainers
             // .filter((_, i) => i === 0)
-            .forEach(({ container, videoId }) => {
-                const filter = !!this.isFiltered(container, videoId);
-                container.dataset.ytExtensionHidden = filter.toString();
+            .forEach(videoContainer => {
+                const filter = !!this.isFiltered(videoContainer);
+                videoContainer.container.dataset.ytExtensionHidden = filter.toString();
             });
     }
 
@@ -214,21 +245,14 @@ export default class FilterRecommendedVideosService {
      * @param {Node} container DOM element which contains all elements of a video
      * @returns {boolean} returns true if container should not be visable
      */
-    isFiltered(container, videoId) {
-        const videoUserState = this.api.getVideoUserStateWithSourcesData(videoId);
-        // console.log('is filtered:', [
-        //     this.isWatchedFiltered(videoUserState),
-        //     this.isActiveFiltered(videoUserState),
-        //     this.isOpenFiltered(videoId),
-        //     this.isChannelNameFiltered(container),
-        //     this.isMusicFiltered(container)
-        // ])
+    isFiltered(videoContainer) {
+        const videoUserState = this.api.getVideoUserStateWithSourcesData(videoContainer.videoId);
         return (
             this.isWatchedFiltered(videoUserState) ||
             this.isActiveFiltered(videoUserState) ||
-            this.isOpenFiltered(videoId) ||
-            this.isChannelNameFiltered(container) ||
-            this.isMusicFiltered(container)
+            this.isOpenFiltered(videoContainer) ||
+            this.isChannelNameFiltered(videoContainer) ||
+            this.isMusicFiltered(videoContainer)
         );
     }
 
@@ -245,36 +269,30 @@ export default class FilterRecommendedVideosService {
             videoUserState.sources.every(vus => !vus.isActive);
     }
 
-    isOpenFiltered(videoId) {
+    isOpenFiltered({ videoId }) {
         return this.filter.isOpen !== null && videoId && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId);
     }
 
-    isChannelNameFiltered(container) {
+    isChannelNameFiltered({ channelName }) {
         if (typeof this.filter.channelName !== 'string') {
             return false;
         }
-        const channelName = getChannelName(container);
-        // console.log('isChannelNameFiltered:', this.filter.channelName, channelName);
         return channelName && this.filter.channelName !== channelName;
     }
 
-    isMusicFiltered(container) {
+    isMusicFiltered({ isMusicChannel }) {
         if (this.filter.isMusic === null) {
             return false;
         }
-        // console.log('isMusicFiltered:', this.filter.isMusic, getIsMusic(container));
-        return !!this.filter.isMusic !== getIsMusic(container);
+        return !!this.filter.isMusic !== isMusicChannel;
     }
 
     updateChannels(videoContainers) {
-        const channels = videoContainers.map(({ container }) => ({
-            channelName: getChannelName(container),
-            isMusic: getIsMusic(container),
-        })).reduce((map, channel) => {
-            const key = `${channel.channelName}|${channel.isMusic}`;
+        const channels = videoContainers.reduce((map, container) => {
+            const key = `${container.channelName}|${container.isMusic}`;
             if (!map.has(key)) {
                 map.set(key, {
-                    ...channel,
+                    ...container,
                     count: 0,
                 });
             }
