@@ -2,6 +2,7 @@ import { navigationChange } from '../constants';
 import getCurrentVideoId from '../utils/getCurrentVideoId';
 import sleep from '../utils/sleep';
 import randomString from '../utils/randomString';
+import triggerEvent from '../utils/triggerEvent';
 
 const constants = {
     STORAGE_KEY_PREFIX: 'yt-extension-video-open-open-entry-',
@@ -55,13 +56,21 @@ export default class VideoOpenStorageService {
         if (key.startsWith(constants.STORAGE_KEY_PREFIX)) {
             this.garbageCollectStorageInvalid = true;
 
+            let oldVideoId = null;
+            let newVideoId = null;
             if (oldValue) {
-                const { videoId } = JSON.parse(oldValue);
-                this.decreaseVideoOpenCount(videoId);
+                oldVideoId = JSON.parse(oldValue).videoId;
+                this.decreaseVideoOpenCount(oldVideoId);
             }
             if (newValue) {
-                const { videoId } = JSON.parse(newValue);
-                this.increaseVideoOpenCount(videoId);
+                newVideoId = JSON.parse(newValue).videoId;
+                this.increaseVideoOpenCount(newVideoId);
+            }
+            if (oldVideoId !== newVideoId) {
+                this.triggerOpenChangedEvent(
+                    [oldVideoId].filter(Boolean),
+                    [newVideoId].filter(Boolean),
+                );
             }
         }
     }
@@ -122,6 +131,7 @@ export default class VideoOpenStorageService {
     }
 
     loadOpenVideosCache() {
+        const oldOpenVideoIds = new Set(this.videoOpenCache.keys());
         this.videoOpenCache.clear();
 
         Object.keys(localStorage)
@@ -131,6 +141,10 @@ export default class VideoOpenStorageService {
             .filter(entry => Date.now() < entry.timestamp + this.validSeconds * 1000)
             .map(entry => entry.videoId)
             .forEach(videoId => this.increaseVideoOpenCount(videoId));
+
+        const closedVideoIds = Array.from(oldOpenVideoIds).filter(videoId => !this.videoOpenCache.has(videoId));
+        const openedVideoIds = Array.from(this.videoOpenCache.keys()).filter(videoId => !oldOpenVideoIds.has(videoId));
+        this.triggerOpenChangedEvent(closedVideoIds, openedVideoIds);
     }
 
     increaseVideoOpenCount(videoId) {
@@ -182,5 +196,20 @@ export default class VideoOpenStorageService {
             }
         }
         localStorage.setItem(constants.LAST_GARBAGE_COLLECT_STORAGE_KEY, Date.now().toString());
+    }
+
+    triggerOpenChangedEvent(closedVideoIds, openedVideoIds) {
+        triggerEvent(constants.VIDEO_OPEN_CHANGE_EVENTNAME, {
+            closedVideoIds,
+            openedVideoIds,
+        });
+    }
+
+    addOpenChangedEventListener(callback) {
+        document.addEventListener(constants.VIDEO_OPEN_CHANGE_EVENTNAME, callback);
+    }
+
+    removeOpenChangedEventListener(callback) {
+        document.removeEventListener(constants.VIDEO_OPEN_CHANGE_EVENTNAME, callback);
     }
 }

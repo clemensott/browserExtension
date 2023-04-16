@@ -97,13 +97,13 @@ export default class FilterRecommendedVideosService {
     subscribe() {
         if (this.api) {
             this.api.addUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
-            // subscribe to video open changed
+            this.videoOpenStorageService.addOpenChangedEventListener(this.onVideoOpenStateChanged);
         }
     }
 
     unsubscribe() {
         this.api?.removeUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
-        // unsubscribe to video open changed
+        this.videoOpenStorageService.removeOpenChangedEventListener(this.onVideoOpenStateChanged);
     }
 
     static getFilterBaseElement() {
@@ -197,8 +197,11 @@ export default class FilterRecommendedVideosService {
         this.filterLastContainers(videoIds);
     }
 
-    onVideoOpenStateChanged() {
-        this.filterLastContainers();
+    onVideoOpenStateChanged({ detail: { closedVideoIds, openedVideoIds } }) {
+        this.filterLastContainers(new Set([
+            ...closedVideoIds,
+            ...openedVideoIds,
+        ]));
     }
 
     onFilterChange(filter) {
