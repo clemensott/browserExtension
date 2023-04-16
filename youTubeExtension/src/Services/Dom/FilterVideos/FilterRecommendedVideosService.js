@@ -78,12 +78,10 @@ export default class FilterRecommendedVideosService {
     }
 
     stop() {
-        this.api?.removeUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
-        // unsubscribe to video open changed
+        this.unsubscribe();
+        this.filterRenderDomEventHandler.start();
+        this.videoContainersDomEventHandler.start();
 
-        // this.videoContainers.forEach(({ container }) => {
-        //     delete container.dataset.ytExtensionHidden;
-        // });
         this.isRunning = false;
     }
 
@@ -101,6 +99,11 @@ export default class FilterRecommendedVideosService {
             this.api.addUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
             // subscribe to video open changed
         }
+    }
+
+    unsubscribe() {
+        this.api?.removeUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
+        // unsubscribe to video open changed
     }
 
     static getFilterBaseElement() {
@@ -191,7 +194,7 @@ export default class FilterRecommendedVideosService {
     }
 
     onUserStateOfVideoChanged({ detail: { videoIds } }) {
-        this.filterLastContainers();
+        this.filterLastContainers(videoIds);
     }
 
     onVideoOpenStateChanged() {
@@ -206,8 +209,8 @@ export default class FilterRecommendedVideosService {
         this.filterLastContainers();
     }
 
-    filterLastContainers() {
-        this.filterContainers(this.videoContainersDomEventHandler.lastElements, null);
+    filterLastContainers(videoIds = null) {
+        this.filterContainers(this.videoContainersDomEventHandler.lastElements, null, videoIds);
     }
 
     onVideoContainersChange({ currentElements, lastElements }) {
@@ -215,7 +218,7 @@ export default class FilterRecommendedVideosService {
         this.updateChannels(currentElements?.videoContainers || []);
     }
 
-    filterContainers(currentElements, lastElements) {
+    filterContainers(currentElements, lastElements, videoIds) {
         if (!this.api || !currentElements) {
             return;
         }
@@ -232,8 +235,9 @@ export default class FilterRecommendedVideosService {
                 });
         }
 
-        videoContainers
-            // .filter((_, i) => i === 0)
+        const videoContainersToUpdate = videoIds ?
+            videoContainers.filter(({ videoId }) => videoIds.has(videoId)) : videoContainers;
+        videoContainersToUpdate
             .forEach(videoContainer => {
                 const filter = !!this.isFiltered(videoContainer);
                 videoContainer.container.dataset.ytExtensionHidden = filter.toString();
@@ -257,7 +261,9 @@ export default class FilterRecommendedVideosService {
     }
 
     isWatchedFiltered(videoUserState) {
-        return this.filter.isWatchted !== null && videoUserState && this.filter.isWatchted !== videoUserState.isWatched;
+        const videoIsWatched = videoUserState && typeof videoUserState.isWatched === 'boolean' ?
+            videoUserState.isWatched : false;
+        return this.filter.isWatchted !== null && this.filter.isWatchted !== videoIsWatched;
     }
 
     isActiveFiltered(videoUserState) {
