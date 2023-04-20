@@ -21,6 +21,19 @@ function getIsMusic(container) {
     );
 }
 
+function getVideoContainerType(container) {
+    switch (container.tagName.toLowerCase()) {
+        case 'ytd-compact-video-renderer':
+            return 'video';
+        case 'ytd-compact-playlist-renderer':
+            return 'playlist';
+        case 'ytd-compact-movie-renderer':
+            return 'movie';
+        default:
+            throw new Error('TagName not supported: ' + container.tagName);
+    }
+}
+
 function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
     return a && a.href && getVideoIdFromUrl(a.href);
@@ -57,6 +70,7 @@ export default class FilterRecommendedVideosService {
             isOpen: null,
             channelName: null,
             isMusic: null,
+            type: null,
         };
         this.channelsChangedEventName = `FilterRecommendedVideosService.${randomString()}.channels_changed`;
 
@@ -155,13 +169,15 @@ export default class FilterRecommendedVideosService {
 
     static getVideoContainers() {
         const domContainer = FilterRecommendedVideosService.getVideoContainersContainer();
-        const videoContainers = domContainer && Array.from(domContainer.querySelectorAll('ytd-compact-video-renderer'))
-            .map(container => ({
-                videoId: getVideoIdFromVideoContainer(container),
-                channelName: getChannelName(container),
-                isMusicChannel: getIsMusic(container),
-                container,
-            })) || [];
+        const videoContainers = domContainer && Array.from(domContainer.querySelectorAll(
+            'ytd-compact-video-renderer,ytd-compact-playlist-renderer,ytd-compact-movie-renderer',
+        )).map(container => ({
+            videoId: getVideoIdFromVideoContainer(container),
+            channelName: getChannelName(container),
+            isMusicChannel: getIsMusic(container),
+            type: getVideoContainerType(container),
+            container,
+        })) || [];
         return {
             domContainer,
             childrenCount: domContainer ? domContainer.childElementCount : -1,
@@ -259,7 +275,8 @@ export default class FilterRecommendedVideosService {
             this.isActiveFiltered(videoUserState) ||
             this.isOpenFiltered(videoContainer) ||
             this.isChannelNameFiltered(videoContainer) ||
-            this.isMusicFiltered(videoContainer)
+            this.isMusicFiltered(videoContainer) ||
+            this.isTypeFiltered(videoContainer)
         );
     }
 
@@ -294,6 +311,13 @@ export default class FilterRecommendedVideosService {
             return false;
         }
         return !!this.filter.isMusic !== isMusicChannel;
+    }
+
+    isTypeFiltered({ type }) {
+        if (this.filter.type === null) {
+            return false;
+        }
+        return this.filter.type !== type;
     }
 
     updateChannels(videoContainers) {

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './FilterRecommendedVideos.css';
 
+const allChangesValue = JSON.stringify({ channelName: null, isMusic: null });
+
 function renderFilterChannelOption({ channelName, isMusic, count }) {
     return (
         <option key={channelName} value={JSON.stringify({ channelName, isMusic })}>
@@ -24,9 +26,9 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
         };
     }, [eventProvider]);
 
-    const getOnChangeHandler = (optionName) => {
+    const getOnChangeHandler = (optionName, parse = true) => {
         return ({ target }) => onFilterChange({
-            [optionName]: JSON.parse(target.value),
+            [optionName]: parse ? JSON.parse(target.value) : target.value,
         });
     };
 
@@ -64,13 +66,26 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
             <div className="yt-extension-filter-videos-row-contianer">
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Channels</label>
-                    <select onChange={({ target }) => onFilterChange(
-                        JSON.parse(target.value),
-                    )}>
-                        <option value={JSON.stringify({ channelName: null, isMusic: null })}>
+                    <select
+                        style={{ width: '100%' }}
+                        onChange={({ target }) => onFilterChange(
+                            JSON.parse(target.value),
+                        )}
+                    >
+                        <option value={allChangesValue}>
                             All
                         </option>
                         {channels.map(renderFilterChannelOption)}
+                    </select>
+                </div>
+
+                <div className="yt-extension-filter-videos-select-contianer">
+                    <label>Type</label>
+                    <select onChange={getOnChangeHandler('type', false)}>
+                        <option value="null">All</option>
+                        <option value="video">Video</option>
+                        <option value="playlist">Playlists</option>
+                        <option value="movie">Movie</option>
                     </select>
                 </div>
             </div>
