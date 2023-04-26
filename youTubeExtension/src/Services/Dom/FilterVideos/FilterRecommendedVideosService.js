@@ -46,7 +46,7 @@ export default class FilterRecommendedVideosService {
 
         this.filterRenderer = new ReactRenderer({
             id: 'yt-extension-filter-recommended-videos-container',
-            beforeSelector: 'ytd-item-section-renderer,#related',
+            beforeSelector: '#related,#items',
         });
         this.filterRenderDomEventHandler = new DomEventHandler({
             elementsGetter: FilterRecommendedVideosService.getFilterBaseElement,
@@ -122,7 +122,7 @@ export default class FilterRecommendedVideosService {
 
     static getFilterBaseElement() {
         const sibling = document.querySelector(
-            'ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related > ytd-watch-next-secondary-results-renderer > #items > ytd-item-section-renderer'
+            'ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related > ytd-watch-next-secondary-results-renderer > #items'
         ) || document.querySelector('ytd-watch-flexy > #columns > #secondary > #secondary-inner > #related');
         return sibling && sibling.parentElement;
     }
@@ -131,6 +131,7 @@ export default class FilterRecommendedVideosService {
         if (baseElement) {
             this.filterRenderer.render(
                 <FilterRecommendedVideos
+                    defaultFilter={this.filter}
                     eventProvider={this}
                     onFilterChange={this.onFilterChange}
                 />,

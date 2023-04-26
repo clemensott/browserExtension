@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import './FilterRecommendedVideos.css';
 
-const allChangesValue = JSON.stringify({ channelName: null, isMusic: null });
+const jsonValues = {
+    null: JSON.stringify(null),
+    true: JSON.stringify(true),
+    false: JSON.stringify(false),
+    channelsAll: JSON.stringify({ channelName: null, isMusic: null }),
+    typeVideo: JSON.stringify('video'),
+    typePlaylist: JSON.stringify('playlist'),
+    typeMovie: JSON.stringify('movie'),
+};
 
 function renderFilterChannelOption({ channelName, isMusic, count }) {
     return (
@@ -11,7 +19,7 @@ function renderFilterChannelOption({ channelName, isMusic, count }) {
     );
 }
 
-export default function FilterRecommendedVideos({ eventProvider, onFilterChange }) {
+export default function FilterRecommendedVideos({ defaultFilter, eventProvider, onFilterChange }) {
     const [channels, setChannels] = useState([]);
 
     useEffect(() => {
@@ -26,9 +34,9 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
         };
     }, [eventProvider]);
 
-    const getOnChangeHandler = (optionName, parse = true) => {
+    const getOnChangeHandler = (optionName) => {
         return ({ target }) => onFilterChange({
-            [optionName]: parse ? JSON.parse(target.value) : target.value,
+            [optionName]: JSON.parse(target.value),
         });
     };
 
@@ -37,28 +45,37 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
             <div className="yt-extension-filter-videos-row-contianer">
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Watch Status</label>
-                    <select onChange={getOnChangeHandler('isWatchted')}>
-                        <option value="null">All</option>
-                        <option value="true">Watched</option>
-                        <option value="false">Not Watched</option>
+                    <select
+                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
+                        onChange={getOnChangeHandler('isWatchted')}
+                    >
+                        <option value={jsonValues.null}>All</option>
+                        <option value={jsonValues.true}>Watched</option>
+                        <option value={jsonValues.false}>Not Watched</option>
                     </select>
                 </div>
 
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Active Status</label>
-                    <select onChange={getOnChangeHandler('isActive')}>
-                        <option value="null">All</option>
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
+                    <select
+                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
+                        onChange={getOnChangeHandler('isActive')}
+                    >
+                        <option value={jsonValues.null}>All</option>
+                        <option value={jsonValues.true}>Active</option>
+                        <option value={jsonValues.false}>Inactive</option>
                     </select>
                 </div>
 
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Open Status</label>
-                    <select onChange={getOnChangeHandler('isOpen')}>
-                        <option value="null">All</option>
-                        <option value="true">Open</option>
-                        <option value="false">Closed</option>
+                    <select
+                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
+                        onChange={getOnChangeHandler('isOpen')}
+                    >
+                        <option value={jsonValues.null}>All</option>
+                        <option value={jsonValues.true}>Open</option>
+                        <option value={jsonValues.false}>Closed</option>
                     </select>
                 </div>
             </div>
@@ -67,12 +84,16 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Channels</label>
                     <select
+                        defaultValue={JSON.stringify({
+                            channelName: defaultFilter.channelName,
+                            isMusic: defaultFilter.isMusic,
+                        })}
                         style={{ width: '100%' }}
                         onChange={({ target }) => onFilterChange(
                             JSON.parse(target.value),
                         )}
                     >
-                        <option value={allChangesValue}>
+                        <option value={jsonValues.channelsAll}>
                             All
                         </option>
                         {channels.map(renderFilterChannelOption)}
@@ -81,11 +102,14 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
 
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Type</label>
-                    <select onChange={getOnChangeHandler('type', false)}>
-                        <option value="null">All</option>
-                        <option value="video">Video</option>
-                        <option value="playlist">Playlists</option>
-                        <option value="movie">Movie</option>
+                    <select
+                        defaultValue={defaultFilter.type}
+                        onChange={getOnChangeHandler('type')}
+                    >
+                        <option value={jsonValues.null}>All</option>
+                        <option value={jsonValues.typeVideo}>Video</option>
+                        <option value={jsonValues.typePlaylist}>Playlists</option>
+                        <option value={jsonValues.typeMovie}>Movie</option>
                     </select>
                 </div>
             </div>
