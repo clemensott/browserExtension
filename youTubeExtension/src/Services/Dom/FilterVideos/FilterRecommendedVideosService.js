@@ -34,6 +34,11 @@ function getVideoContainerType(container) {
     }
 }
 
+function getVideoContainerTitle(container) {
+    const titleElement = container.querySelector('span#video-title');
+    return titleElement ? titleElement.innerText : '';
+}
+
 function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
     return a && a.href && getVideoIdFromUrl(a.href);
@@ -71,6 +76,7 @@ export default class FilterRecommendedVideosService {
             channelName: null,
             isMusic: null,
             type: null,
+            title: null,
         };
         this.channelsChangedEventName = `FilterRecommendedVideosService.${randomString()}.channels_changed`;
 
@@ -177,6 +183,7 @@ export default class FilterRecommendedVideosService {
             channelName: getChannelName(container),
             isMusicChannel: getIsMusic(container),
             type: getVideoContainerType(container),
+            title: getVideoContainerTitle(container),
             container,
         })) || [];
         return {
@@ -222,10 +229,7 @@ export default class FilterRecommendedVideosService {
     }
 
     onFilterChange(filter) {
-        this.filter = {
-            ...this.filter,
-            ...filter,
-        };
+        Object.assign(this.filter, filter);
         this.filterLastContainers();
     }
 
@@ -277,7 +281,8 @@ export default class FilterRecommendedVideosService {
             this.isOpenFiltered(videoContainer) ||
             this.isChannelNameFiltered(videoContainer) ||
             this.isMusicFiltered(videoContainer) ||
-            this.isTypeFiltered(videoContainer)
+            this.isTypeFiltered(videoContainer) ||
+            this.isTitleFiltered(videoContainer)
         );
     }
 
@@ -319,6 +324,13 @@ export default class FilterRecommendedVideosService {
             return false;
         }
         return this.filter.type !== type;
+    }
+
+    isTitleFiltered({ title }) {
+        if (this.filter.title === null) {
+            return false;
+        }
+        return !title.toLowerCase().includes(this.filter.title.toLowerCase());
     }
 
     updateChannels(videoContainers) {

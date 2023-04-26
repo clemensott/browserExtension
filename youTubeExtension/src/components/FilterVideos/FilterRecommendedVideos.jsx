@@ -113,7 +113,19 @@ export default function FilterRecommendedVideos({ defaultFilter, eventProvider, 
                     </select>
                 </div>
             </div>
-            Hello Filter: {channels.length}
+
+            <div className="yt-extension-filter-videos-row-contianer">
+                <div className="yt-extension-filter-videos-select-contianer">
+                    <label>Title</label>
+                    <input
+                        type="text"
+                        defaultValue={defaultFilter.title}
+                        onChange={({ target }) => onFilterChange({
+                            title: target.value || null,
+                        })}
+                    />
+                </div>
+            </div>
         </div>
     );
 }
