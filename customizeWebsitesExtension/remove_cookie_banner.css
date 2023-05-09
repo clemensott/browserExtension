@@ -25,6 +25,8 @@ div.amgdprcookie-bar-template,
 div.CookieBanner.output,
 #usercentrics-button,
 #cookiebanner-next,
+div.ccm-root.ccm--tcf-enabled,
+#ez-cookie-dialog-wrapper,
 img[width="1"][height="1"] + div.needsclick,
 html > body div[is_cookie_banner_hide],
 html > body > div[is_cookie_banner_hide],
@@ -34,6 +36,8 @@ html > body > *[is_cookie_banner_hide],
     display: none!important;
 }
 
+html.ccm-blocked[xmlns="https://www.w3.org/1999/xhtml"],
+html > body.ccm-blocked,
 html[is_cookie_banner_initial_overflow],
 body[is_cookie_banner_initial_overflow],
 *[is_cookie_banner_initial_overflow] {
