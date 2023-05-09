@@ -1,0 +1,12 @@
+.yt-extension-filter-videos-row-contianer {
+    margin: 1px;
+    display: flex;
+    flex-direction: row;
+}
+
+.yt-extension-filter-videos-select-contianer {
+    margin: 3px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}

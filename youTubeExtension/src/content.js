@@ -14,6 +14,7 @@ import checkExclusivity from './utils/checkExclusivity';
 import StorageService from './Services/StorageService';
 import OptionsService from './Services/OptionsService';
 import VideoOpenStorageService from './Services/VideoOpenStorageService';
+import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
 
 async function main() {
     const optionsService = new OptionsService(new StorageService());
@@ -23,7 +24,14 @@ async function main() {
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
-    const domService = new DomEventService({ optionsService, navigationService, updateSourcesTrackerService });
+    const videoOpenStorageService = new VideoOpenStorageService(navigationService);
+    const filterRecommendedVideosService = new FilterRecommendedVideosService({ videoOpenStorageService });
+    const domService = new DomEventService({
+        optionsService,
+        navigationService,
+        updateSourcesTrackerService,
+        filterRecommendedVideosService,
+    });
     const channelVideoHidingService = new ChannelVideoHidingService({ domService, updateSourcesTrackerService });
     const channelHelperService = new ChannelHelperService({
         channelVideoHidingService,
@@ -33,7 +41,6 @@ async function main() {
         domService,
         trackerService: updateSourcesTrackerService,
     });
-    const videoOpenStorageService = new VideoOpenStorageService(navigationService);
 
     const initDataService = new InitDataService();
     const apiHandler = await createApiHandler(optionsService);
@@ -50,6 +57,9 @@ async function main() {
 
     if (apiHandler) {
         console.log('API baseURL:', apiHandler.api.baseUrl);
+
+        filterRecommendedVideosService.setApiHandler(apiHandler);
+
         try {
             isUpdatingSourcesService.start();
             const updateSourcesService = new UpdateSourcesService(apiHandler);
@@ -64,8 +74,11 @@ async function main() {
         }
 
         try {
-            const displayVideoStateService = new VideoOverlayService(apiHandler, videoOpenStorageService);
-            displayVideoStateService.start();
+            const videoOverlayService = new VideoOverlayService({
+                api: apiHandler,
+                videoOpenStorageService,
+            });
+            videoOverlayService.start();
         } catch (err) {
             console.error('init display video state service:', err);
         }
