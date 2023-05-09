@@ -50,7 +50,7 @@ export default class FilterRecommendedVideosService {
         this.videoOpenStorageService = videoOpenStorageService;
 
         this.filterRenderer = new ReactRenderer({
-            id: 'yt-extension-filter-recommended-videos-container',
+            id: 'yt-extension-filter-recommended-videos-root',
             beforeSelector: '#related,#items',
         });
         this.filterRenderDomEventHandler = new DomEventHandler({

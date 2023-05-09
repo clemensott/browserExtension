@@ -41,7 +41,7 @@ export default function FilterRecommendedVideos({ defaultFilter, eventProvider, 
     };
 
     return (
-        <div>
+        <div className="yt-extension-filter-recommended-videos-container">
             <div className="yt-extension-filter-videos-row-contianer">
                 <div className="yt-extension-filter-videos-select-contianer">
                     <label>Watch Status</label>
