@@ -1,9 +1,10 @@
 import triggerEvent from '../../utils/triggerEvent';
+import randomString from '../../utils/randomString';
 
 
 export default class DomEventHandler {
-    constructor({ eventName, elementsExists, elementsGetter, changeDetector, timeout, notFoundTimeout, triggerEventOnRunChange }) {
-        this.eventName = eventName;
+    constructor({ eventName, elementsExists, elementsGetter, changeDetector, onChange, timeout, notFoundTimeout, triggerEventOnRunChange }) {
+        this.eventName = eventName || `DomEventHandler.${randomString()}.change`;
         this.notFoundTimeout = notFoundTimeout;
         this.timeout = timeout;
         this.lastTimeout = null;
@@ -17,9 +18,11 @@ export default class DomEventHandler {
         if (elementsGetter) {
             this.getElements = elementsGetter;
         }
-        this.elementsGetter = elementsGetter;
         if (changeDetector) {
             this.detectChange = changeDetector;
+        }
+        if (onChange) {
+            this.onChange = onChange;
         }
 
         this.onTick = this.onTick.bind(this);
