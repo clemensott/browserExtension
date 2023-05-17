@@ -13,7 +13,10 @@ module.exports = {
     filename: '[name].bundle.js'
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    alias: {
+      '@mui/styled-engine': '@mui/styled-engine-sc'
+    },
   },
   module: {
     rules: [{

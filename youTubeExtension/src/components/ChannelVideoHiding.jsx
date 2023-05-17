@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+
+const hidingValue = 'hiding';
 
 export default function ChannelVideoHiding({ service }) {
-    const onChange = e => {
-        if (e.target.checked) {
+    const [value, setValue] = useState(service.isHiding() ? hidingValue : '');
+    const onChange = (e, newValue) => {
+        if (newValue && newValue.length) {
             service.start();
         } else {
             service.stop();
         }
+        setValue(newValue);
     };
 
     return (
         <span className="yt-channel-helper-service-hide-videos-contianer">
-            <input id="channel_video_hiding" type="checkbox" defaultChecked={service.isHiding()} onChange={onChange} />
-            <label htmlFor="channel_video_hiding">Video hiding</label>
+            <ToggleButtonGroup
+                value={value}
+                onChange={onChange}
+            >
+                <ToggleButton value={hidingValue}>Video hiding</ToggleButton>
+            </ToggleButtonGroup>
         </span>
     );
 }

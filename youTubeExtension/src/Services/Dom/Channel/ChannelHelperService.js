@@ -14,7 +14,7 @@ export default class ChannelHelperService {
 
         this.channelHidingRenderer = new ReactRenderer({
             className: 'yt-channel-helper-service-own-container',
-            beforeSelector: '#buttons',
+            beforeSelector: '#purchase-button',
         });
     }
 
@@ -29,7 +29,7 @@ export default class ChannelHelperService {
             innerHeaderContainer.classList.remove('yt-channel-helper-service-inner-header-container');
         }
         if (newContainer) {
-            const innerHeaderContainer = newContainer.querySelector('#inner-header-container');
+            const innerHeaderContainer = newContainer.querySelector('#inner-header-container > #buttons');
 
             this.channelHidingRenderer.render(
                 <ChannelVideoHiding service={this.channelVideoHidingService} />,
