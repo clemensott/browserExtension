@@ -1,131 +1,186 @@
 import React, { useEffect, useState } from 'react';
-import './FilterRecommendedVideos.css';
+import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const jsonValues = {
     null: JSON.stringify(null),
     true: JSON.stringify(true),
     false: JSON.stringify(false),
-    channelsAll: JSON.stringify({ channelName: null, isMusic: null }),
+    channelsAll: JSON.stringify({ channelName: null, isMusicChannel: null }),
     typeVideo: JSON.stringify('video'),
     typePlaylist: JSON.stringify('playlist'),
     typeMovie: JSON.stringify('movie'),
 };
 
-function renderFilterChannelOption({ channelName, isMusic, count }) {
+function encodeValue(filter, propName) {
+    const value = filter[propName];
+    if (value === null || value === undefined) {
+        return '';
+    }
+    return JSON.stringify(value);
+}
+
+function decodeValue(rawValue) {
+    if (rawValue === '') {
+        return null;
+    }
+    return JSON.parse(rawValue);
+}
+
+function encodeChannel({ channelName, isMusicChannel }) {
+    return channelName || isMusicChannel ? JSON.stringify({ channelName, isMusicChannel }) : '';
+}
+
+function decodeChannel(rawValue) {
+    if (!rawValue) {
+        return {
+            channelName: null,
+            isMusicChannel: null,
+        };
+    }
+    return JSON.parse(rawValue);
+}
+
+function renderFilterChannelOption({ channelName, isMusicChannel, count }) {
     return (
-        <option key={channelName} value={JSON.stringify({ channelName, isMusic })}>
-            {channelName} {isMusic ? '♪ ' : ''}({count}x)
-        </option>
+        <MenuItem key={channelName} value={encodeChannel({ channelName, isMusicChannel })}>
+            {channelName} {isMusicChannel ? '♪ ' : ''}({count}x)
+        </MenuItem>
     );
 }
 
-export default function FilterRecommendedVideos({ defaultFilter, eventProvider, onFilterChange }) {
-    const [channels, setChannels] = useState([]);
+function useForceRerender() {
+    const [value, setValue] = useState(true);
+    return () => setValue(!value);
+}
+
+export default function FilterRecommendedVideos({ eventProvider, onFilterChange }) {
+    const forceRerender = useForceRerender();
 
     useEffect(() => {
-        const onChannelsChanged = ({ detail: { channels } }) => {
-            setChannels(channels.sort((a, b) => {
-                return b.count - a.count || a.channelName.localeCompare(b.channelName);
-            }));
-        }
-        eventProvider.addChannelsChangedEventListener(onChannelsChanged);
+        eventProvider.addChannelsChangedEventListener(forceRerender);
         return () => {
-            eventProvider.removeChannelsChangedEventListener(onChannelsChanged);
+            eventProvider.removeChannelsChangedEventListener(forceRerender);
         };
     }, [eventProvider]);
 
+    const filter = eventProvider.getFilter();
+    const channels = eventProvider.getChannels().sort((a, b) => {
+        return b.count - a.count || a.channelName.localeCompare(b.channelName);
+    });
+
     const getOnChangeHandler = (optionName) => {
-        return ({ target }) => onFilterChange({
-            [optionName]: JSON.parse(target.value),
-        });
+        return ({ target }) => {
+            console.log('on change handler:', optionName, target.value, decodeValue(target.value))
+            onFilterChange({
+                [optionName]: decodeValue(target.value),
+            });
+            forceRerender();
+        };
     };
 
     return (
-        <div className="yt-extension-filter-recommended-videos-container">
-            <div className="yt-extension-filter-videos-row-contianer">
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Watch Status</label>
-                    <select
-                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
-                        onChange={getOnChangeHandler('isWatchted')}
+        <Grid container spacing={1} mb={1}>
+            <Grid item xs={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-watched-label">Watch Status</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-watched"
+                        labelId="yt-extension-filter-videos-watched-label"
+                        value={encodeValue(filter, 'isWatched')}
+                        onChange={getOnChangeHandler('isWatched')}
+                        label="Watch Status"
                     >
-                        <option value={jsonValues.null}>All</option>
-                        <option value={jsonValues.true}>Watched</option>
-                        <option value={jsonValues.false}>Not Watched</option>
-                    </select>
-                </div>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value={jsonValues.true}>Watched</MenuItem>
+                        <MenuItem value={jsonValues.false}>Not Watched</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
 
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Active Status</label>
-                    <select
-                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
+            <Grid item xs={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-active-label">Active Status</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-active"
+                        labelId="yt-extension-filter-videos-active-label"
+                        value={encodeValue(filter, 'isActive')}
                         onChange={getOnChangeHandler('isActive')}
+                        label="Active Status"
                     >
-                        <option value={jsonValues.null}>All</option>
-                        <option value={jsonValues.true}>Active</option>
-                        <option value={jsonValues.false}>Inactive</option>
-                    </select>
-                </div>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value={jsonValues.true}>Active</MenuItem>
+                        <MenuItem value={jsonValues.false}>Inactive</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
 
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Open Status</label>
-                    <select
-                        defaultValue={JSON.stringify(defaultFilter.isWatchted)}
+            <Grid item xs={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-open-label">Open Status</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-open"
+                        labelId="yt-extension-filter-videos-open-label"
+                        value={encodeValue(filter, 'isOpen')}
                         onChange={getOnChangeHandler('isOpen')}
+                        label="Open Status"
                     >
-                        <option value={jsonValues.null}>All</option>
-                        <option value={jsonValues.true}>Open</option>
-                        <option value={jsonValues.false}>Closed</option>
-                    </select>
-                </div>
-            </div>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value={jsonValues.true}>Open</MenuItem>
+                        <MenuItem value={jsonValues.false}>Closed</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
 
-            <div className="yt-extension-filter-videos-row-contianer">
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Channels</label>
-                    <select
-                        defaultValue={JSON.stringify({
-                            channelName: defaultFilter.channelName,
-                            isMusic: defaultFilter.isMusic,
-                        })}
-                        style={{ width: '100%' }}
-                        onChange={({ target }) => onFilterChange(
-                            JSON.parse(target.value),
-                        )}
+            <Grid item xs={8}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-channels-label">Channels</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-channels"
+                        labelId="yt-extension-filter-videos-channels-label"
+                        value={encodeChannel(filter)}
+                        onChange={({ target }) => {
+                            onFilterChange(decodeChannel(target.value));
+                            forceRerender();
+                        }}
+                        label="Channels"
                     >
-                        <option value={jsonValues.channelsAll}>
-                            All
-                        </option>
+                        <MenuItem value="">All</MenuItem>
                         {channels.map(renderFilterChannelOption)}
-                    </select>
-                </div>
+                    </Select>
+                </FormControl>
+            </Grid>
 
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Type</label>
-                    <select
-                        defaultValue={defaultFilter.type}
+            <Grid item xs={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-type-label">Type</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-type"
+                        labelId="yt-extension-filter-videos-type-label"
+                        value={encodeValue(filter, 'type')}
                         onChange={getOnChangeHandler('type')}
+                        label="Open Status"
                     >
-                        <option value={jsonValues.null}>All</option>
-                        <option value={jsonValues.typeVideo}>Video</option>
-                        <option value={jsonValues.typePlaylist}>Playlists</option>
-                        <option value={jsonValues.typeMovie}>Movie</option>
-                    </select>
-                </div>
-            </div>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value={jsonValues.typeVideo}>Video</MenuItem>
+                        <MenuItem value={jsonValues.typePlaylist}>Playlists</MenuItem>
+                        <MenuItem value={jsonValues.typeMovie}>Movie</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
 
-            <div className="yt-extension-filter-videos-row-contianer">
-                <div className="yt-extension-filter-videos-select-contianer">
-                    <label>Title</label>
-                    <input
-                        type="text"
-                        defaultValue={defaultFilter.title}
-                        onChange={({ target }) => onFilterChange({
+            <Grid item xs={12}>
+                <TextField
+                    label="Title"
+                    value={filter.title}
+                    onChange={({ target }) => {
+                        onFilterChange({
                             title: target.value || null,
-                        })}
-                    />
-                </div>
-            </div>
-        </div>
+                        });
+                        forceRerender();
+                    }}
+                    fullWidth
+                />
+            </Grid>
+        </Grid>
     );
 }

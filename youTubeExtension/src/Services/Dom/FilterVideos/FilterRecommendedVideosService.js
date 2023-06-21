@@ -70,14 +70,16 @@ export default class FilterRecommendedVideosService {
 
         this.isRunning = false;
         this.filter = {
-            isWatchted: null,
+            isWatched: null,
             isActive: null,
             isOpen: null,
             channelName: null,
-            isMusic: null,
+            isMusicChannel: null,
             type: null,
             title: null,
         };
+
+        this.channels = [];
         this.channelsChangedEventName = `FilterRecommendedVideosService.${randomString()}.channels_changed`;
 
         this.onUserStateOfVideoChanged = this.onUserStateOfVideoChanged.bind(this);
@@ -280,7 +282,7 @@ export default class FilterRecommendedVideosService {
             this.isActiveFiltered(videoUserState) ||
             this.isOpenFiltered(videoContainer) ||
             this.isChannelNameFiltered(videoContainer) ||
-            this.isMusicFiltered(videoContainer) ||
+            this.isMusicChannelFiltered(videoContainer) ||
             this.isTypeFiltered(videoContainer) ||
             this.isTitleFiltered(videoContainer)
         );
@@ -289,11 +291,11 @@ export default class FilterRecommendedVideosService {
     isWatchedFiltered(videoUserState) {
         const videoIsWatched = videoUserState && typeof videoUserState.isWatched === 'boolean' ?
             videoUserState.isWatched : false;
-        return this.filter.isWatchted !== null && this.filter.isWatchted !== videoIsWatched;
+        return this.filter.isWatched !== null && this.filter.isWatched !== videoIsWatched;
     }
 
     isActiveFiltered(videoUserState) {
-        if (this.filter.isActive === null || !videoUserState) {
+        if (this.filter.isActive === null || !videoUserState || !videoUserState.sources) {
             return false;
         }
         return this.filter.isActive ?
@@ -312,11 +314,11 @@ export default class FilterRecommendedVideosService {
         return channelName && this.filter.channelName !== channelName;
     }
 
-    isMusicFiltered({ isMusicChannel }) {
-        if (this.filter.isMusic === null) {
+    isMusicChannelFiltered({ isMusicChannel }) {
+        if (this.filter.isMusicChannel === null) {
             return false;
         }
-        return !!this.filter.isMusic !== isMusicChannel;
+        return !!this.filter.isMusicChannel !== isMusicChannel;
     }
 
     isTypeFiltered({ type }) {
@@ -335,7 +337,7 @@ export default class FilterRecommendedVideosService {
 
     updateChannels(videoContainers) {
         const channels = videoContainers.reduce((map, container) => {
-            const key = `${container.channelName}|${container.isMusic}`;
+            const key = `${container.channelName}|${container.isMusicChannel}`;
             if (!map.has(key)) {
                 map.set(key, {
                     ...container,
@@ -346,7 +348,18 @@ export default class FilterRecommendedVideosService {
             return map;
         }, new Map());
 
-        triggerEvent(this.channelsChangedEventName, { channels: Array.from(channels.values()) });
+        this.channels = Array.from(channels.values());
+        triggerEvent(this.channelsChangedEventName, { channels: this.channels });
+    }
+
+    getFilter() {
+        return {
+            ...this.filter,
+        };
+    }
+
+    getChannels() {
+        return [...this.channels];
     }
 
     addChannelsChangedEventListener(callback) {
