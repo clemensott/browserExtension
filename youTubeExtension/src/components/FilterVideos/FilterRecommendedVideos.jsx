@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const jsonValues = {
     null: JSON.stringify(null),
@@ -26,28 +26,6 @@ function decodeValue(rawValue) {
     return JSON.parse(rawValue);
 }
 
-function encodeChannel({ channelName, isMusicChannel }) {
-    return channelName || isMusicChannel ? JSON.stringify({ channelName, isMusicChannel }) : '';
-}
-
-function decodeChannel(rawValue) {
-    if (!rawValue) {
-        return {
-            channelName: null,
-            isMusicChannel: null,
-        };
-    }
-    return JSON.parse(rawValue);
-}
-
-function renderFilterChannelOption({ channelName, isMusicChannel, count }) {
-    return (
-        <MenuItem key={channelName} value={encodeChannel({ channelName, isMusicChannel })}>
-            {channelName} {isMusicChannel ? '♪ ' : ''}({count}x)
-        </MenuItem>
-    );
-}
-
 function useForceRerender() {
     const [value, setValue] = useState(true);
     return () => setValue(!value);
@@ -70,7 +48,6 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
 
     const getOnChangeHandler = (optionName) => {
         return ({ target }) => {
-            console.log('on change handler:', optionName, target.value, decodeValue(target.value))
             onFilterChange({
                 [optionName]: decodeValue(target.value),
             });
@@ -132,22 +109,20 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
             </Grid>
 
             <Grid item xs={8}>
-                <FormControl fullWidth>
-                    <InputLabel id="yt-extension-filter-videos-channels-label">Channels</InputLabel>
-                    <Select
-                        id="yt-extension-filter-videos-channels"
-                        labelId="yt-extension-filter-videos-channels-label"
-                        value={encodeChannel(filter)}
-                        onChange={({ target }) => {
-                            onFilterChange(decodeChannel(target.value));
-                            forceRerender();
-                        }}
-                        label="Channels"
-                    >
-                        <MenuItem value="">All</MenuItem>
-                        {channels.map(renderFilterChannelOption)}
-                    </Select>
-                </FormControl>
+                <Autocomplete
+                    id="yt-extension-filter-videos-channels"
+                    options={channels.map(c => ({
+                        ...c,
+                        label: `${c.channelName} ${c.isMusicChannel ? '♪ ' : ''}(${c.count}x)`,
+                    }))}
+                    renderInput={(params) => <TextField {...params} label="Channels" />}
+                    onChange={(_, option) => {
+                        const { channelName = null, isMusicChannel = null } = option || {};
+                        onFilterChange({ channelName, isMusicChannel });
+                        forceRerender();
+                    }}
+                    disablePortal
+                />
             </Grid>
 
             <Grid item xs={4}>
