@@ -39,6 +39,29 @@ function getVideoContainerTitle(container) {
     return titleElement ? titleElement.innerText : '';
 }
 
+function normalizeDuration(text) {
+    const parts = text.split(':');
+    let hours, minutes, seconds;
+    if (parts.length === 2) {
+        hours = '';
+        minutes = parts[0];
+        seconds = parts[1];
+    } else if (parts.length === 3) {
+        hours = parts[0];
+        minutes = parts[1];
+        seconds = parts[2];
+    } else {
+        return '';
+    }
+
+    return `${hours.padStart(5, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+}
+
+function getVideoContainerDuration(container) {
+    const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer > #text');
+    return durationElement ? normalizeDuration(durationElement.innerText) : '';
+}
+
 function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
     return a && a.href && getVideoIdFromUrl(a.href);
@@ -76,6 +99,7 @@ export default class FilterRecommendedVideosService {
             channels: [],
             type: null,
             title: null,
+            sorting: [],
         };
 
         this.channels = [];
@@ -185,6 +209,7 @@ export default class FilterRecommendedVideosService {
             isMusicChannel: getIsMusic(container),
             type: getVideoContainerType(container),
             title: getVideoContainerTitle(container),
+            duration: getVideoContainerDuration(container),
             container,
         })) || [];
         return {
@@ -232,6 +257,9 @@ export default class FilterRecommendedVideosService {
     onFilterChange(filter) {
         Object.assign(this.filter, filter);
         this.filterLastContainers();
+        if ('sorting' in filter) {
+            this.sortLastContainers();
+        }
     }
 
     filterLastContainers(videoIds = null) {
@@ -240,10 +268,11 @@ export default class FilterRecommendedVideosService {
 
     onVideoContainersChange({ currentElements, lastElements }) {
         this.filterContainers(currentElements, lastElements);
+        this.sortContainers(currentElements, lastElements);
         this.updateChannels(currentElements?.videoContainers || []);
     }
 
-    filterContainers(currentElements, lastElements, videoIds) {
+    filterContainers(currentElements, lastElements, videoIds = null) {
         if (!this.api || !currentElements) {
             return;
         }
@@ -328,6 +357,64 @@ export default class FilterRecommendedVideosService {
             return false;
         }
         return !title.toLowerCase().includes(this.filter.title.toLowerCase());
+    }
+
+    sortLastContainers() {
+        this.sortContainers(this.videoContainersDomEventHandler.lastElements, null);
+    }
+
+    sortContainers(currentElements, lastElements) {
+        if (lastElements) {
+            lastElements.videoContainers.forEach(({ container }) => {
+                container.style.removeProperty('order');
+            });
+        }
+
+        if (currentElements) {
+            const videoContainers = Array.from(currentElements.videoContainers);
+            videoContainers.sort((a, b) => this.compareContainers(a, b));
+            videoContainers.forEach(({ container }, index) => container.style.order = index.toString());
+        }
+    }
+
+    compareContainers(a, b) {
+        for (const sortValue of this.filter.sorting) {
+            const [sortType, sortDirection] = sortValue.split('_');
+
+            let compareValue;
+            switch (sortType) {
+                case 'title':
+                    compareValue = this.compareTitle(a, b);
+                    break;
+                case 'channel':
+                    compareValue = this.compareChannelName(a, b);
+                    break;
+                case 'duration':
+                    compareValue = this.compareDuration(a, b);
+                    break;
+            }
+
+            if (compareValue === 0) {
+                continue;
+            }
+
+            if (sortDirection === 'desc') {
+                compareValue = compareValue * -1;
+            }
+            return compareValue;
+        }
+    }
+
+    compareTitle({ title: a }, { title: b }) {
+        return a.localeCompare(b);
+    }
+
+    compareChannelName({ channelName: a }, { channelName: b }) {
+        return a.localeCompare(b);
+    }
+
+    compareDuration({ duration: a }, { duration: b }) {
+        return a.localeCompare(b);
     }
 
     updateChannels(videoContainers) {

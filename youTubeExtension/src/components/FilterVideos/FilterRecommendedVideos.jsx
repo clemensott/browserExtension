@@ -128,7 +128,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                         labelId="yt-extension-filter-videos-type-label"
                         value={encodeValue(filter, 'type')}
                         onChange={getOnChangeHandler('type')}
-                        label="Open Status"
+                        label="Type"
                     >
                         <MenuItem value="">All</MenuItem>
                         <MenuItem value={jsonValues.typeVideo}>Video</MenuItem>
@@ -156,7 +156,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={8}>
                 <TextField
                     label="Title"
                     value={filter.title}
@@ -168,6 +168,39 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                     }}
                     fullWidth
                 />
+            </Grid>
+
+            <Grid item xs={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="yt-extension-filter-videos-sorting-label">Order By</InputLabel>
+                    <Select
+                        id="yt-extension-filter-videos-sorting"
+                        labelId="yt-extension-filter-videos-sorting-label"
+                        value={filter.sorting}
+                        onChange={({ target: { value } }) => {
+                            const newValues = value.filter(v => !filter.sorting.includes(v));
+                            onFilterChange({
+                                sorting: value.filter(v => {
+                                    if (newValues.includes(v)) {
+                                        return true;
+                                    }
+                                    const [sortingType] = v.split('_');
+                                    return !newValues.some(nv => nv.startsWith(sortingType));
+                                }),
+                            });
+                            forceRerender();
+                        }}
+                        label="Order By"
+                        multiple
+                    >
+                        <MenuItem value="title_asc">Title ASC</MenuItem>
+                        <MenuItem value="title_desc">Title DESC</MenuItem>
+                        <MenuItem value="channel_asc">Channel ASC</MenuItem>
+                        <MenuItem value="channel_desc">Channel DESC</MenuItem>
+                        <MenuItem value="duration_asc">Duration ASC</MenuItem>
+                        <MenuItem value="duration_desc">Duration DESC</MenuItem>
+                    </Select>
+                </FormControl>
             </Grid>
         </Grid>
     );

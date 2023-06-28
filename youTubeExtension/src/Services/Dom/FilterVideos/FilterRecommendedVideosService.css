@@ -1,3 +1,13 @@
 *[data-yt-extension-hidden="true"] {
     display: none;
 }
+
+ytd-compact-video-renderer,
+ytd-compact-playlist-renderer,
+ytd-compact-movie-renderer {
+    order: 10000;
+}
+
+ytd-continuation-item-renderer {
+    order: 10001;
+}
