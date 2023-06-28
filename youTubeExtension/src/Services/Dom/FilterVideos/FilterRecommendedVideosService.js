@@ -73,8 +73,7 @@ export default class FilterRecommendedVideosService {
             isWatched: null,
             isActive: null,
             isOpen: null,
-            channelName: null,
-            isMusicChannel: null,
+            channels: [],
             type: null,
             title: null,
         };
@@ -281,8 +280,7 @@ export default class FilterRecommendedVideosService {
             this.isWatchedFiltered(videoUserState) ||
             this.isActiveFiltered(videoUserState) ||
             this.isOpenFiltered(videoContainer) ||
-            this.isChannelNameFiltered(videoContainer) ||
-            this.isMusicChannelFiltered(videoContainer) ||
+            this.isChannelFiltered(videoContainer) ||
             this.isTypeFiltered(videoContainer) ||
             this.isTitleFiltered(videoContainer)
         );
@@ -304,21 +302,18 @@ export default class FilterRecommendedVideosService {
     }
 
     isOpenFiltered({ videoId }) {
-        return this.filter.isOpen !== null && videoId && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId);
+        return (
+            this.filter.isOpen !== null
+            && videoId
+            && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId)
+        );
     }
 
-    isChannelNameFiltered({ channelName }) {
-        if (typeof this.filter.channelName !== 'string') {
+    isChannelFiltered({ channelName, isMusicChannel }) {
+        if (!this.filter.channels || !this.filter.channels.length) {
             return false;
         }
-        return channelName && this.filter.channelName !== channelName;
-    }
-
-    isMusicChannelFiltered({ isMusicChannel }) {
-        if (this.filter.isMusicChannel === null) {
-            return false;
-        }
-        return !!this.filter.isMusicChannel !== isMusicChannel;
+        return !this.filter.channels.some(c => c.channelName === channelName && c.isMusicChannel === isMusicChannel);
     }
 
     isTypeFiltered({ type }) {

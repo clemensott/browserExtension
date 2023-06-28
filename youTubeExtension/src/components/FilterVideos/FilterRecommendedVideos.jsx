@@ -26,6 +26,12 @@ function decodeValue(rawValue) {
     return JSON.parse(rawValue);
 }
 
+function getSelectedChannels(channels, { channels: filteredChannels }) {
+    return channels.filter(c => filteredChannels.some(
+        fc => fc.channelName === c.channelName && fc.isMusicChannel === c.isMusicChannel
+    ));
+}
+
 function useForceRerender() {
     const [value, setValue] = useState(true);
     return () => setValue(!value);
@@ -46,6 +52,12 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
         return b.count - a.count || a.channelName.localeCompare(b.channelName);
     });
 
+    const channelOptions = channels.map(c => ({
+        ...c,
+        label: `${c.channelName} ${c.isMusicChannel ? '♪ ' : ''}(${c.count}x)`,
+    }));
+    const selectedChannelOptions = getSelectedChannels(channelOptions, filter);
+
     const getOnChangeHandler = (optionName) => {
         return ({ target }) => {
             onFilterChange({
@@ -57,7 +69,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
 
     return (
         <Grid container spacing={1} mb={1}>
-            <Grid item xs={4}>
+            <Grid item xs={3}>
                 <FormControl fullWidth>
                     <InputLabel id="yt-extension-filter-videos-watched-label">Watch Status</InputLabel>
                     <Select
@@ -74,7 +86,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 </FormControl>
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={3}>
                 <FormControl fullWidth>
                     <InputLabel id="yt-extension-filter-videos-active-label">Active Status</InputLabel>
                     <Select
@@ -91,7 +103,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 </FormControl>
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={3}>
                 <FormControl fullWidth>
                     <InputLabel id="yt-extension-filter-videos-open-label">Open Status</InputLabel>
                     <Select
@@ -108,24 +120,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 </FormControl>
             </Grid>
 
-            <Grid item xs={8}>
-                <Autocomplete
-                    id="yt-extension-filter-videos-channels"
-                    options={channels.map(c => ({
-                        ...c,
-                        label: `${c.channelName} ${c.isMusicChannel ? '♪ ' : ''}(${c.count}x)`,
-                    }))}
-                    renderInput={(params) => <TextField {...params} label="Channels" />}
-                    onChange={(_, option) => {
-                        const { channelName = null, isMusicChannel = null } = option || {};
-                        onFilterChange({ channelName, isMusicChannel });
-                        forceRerender();
-                    }}
-                    disablePortal
-                />
-            </Grid>
-
-            <Grid item xs={4}>
+            <Grid item xs={3}>
                 <FormControl fullWidth>
                     <InputLabel id="yt-extension-filter-videos-type-label">Type</InputLabel>
                     <Select
@@ -141,6 +136,24 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                         <MenuItem value={jsonValues.typeMovie}>Movie</MenuItem>
                     </Select>
                 </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+                <Autocomplete
+                    id="yt-extension-filter-videos-channels"
+                    options={channelOptions}
+                    value={selectedChannelOptions}
+                    renderInput={(params) => <TextField {...params} label="Channels" />}
+                    limitTags={1}
+                    onChange={(_, options) => {
+                        onFilterChange({
+                            channels: options.map(({ channelName, isMusicChannel }) => ({ channelName, isMusicChannel })),
+                        });
+                        forceRerender();
+                    }}
+                    multiple
+                    disablePortal
+                />
             </Grid>
 
             <Grid item xs={12}>
