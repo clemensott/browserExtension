@@ -33,7 +33,7 @@ const defaultTrains = {
     Flirt_3: 57, // different lengths // GoAhead BW
     Flirt_3XL: 68,
     Flirt_4: 75, // different lengths // GoAhead BW
-    Flirt_5: 91, // GoAhead BW
+    Flirt_5_BW: 91, // GoAhead BW
     Flirt_5XL: 106,
     Flirt_6: 106, // GoAhead BW
     Flirt_5: 107,

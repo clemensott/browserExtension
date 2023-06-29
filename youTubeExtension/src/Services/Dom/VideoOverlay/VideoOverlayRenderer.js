@@ -1,7 +1,7 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import VideoOpenIndicator from '../../../components/VideoOpenIndicator';
 import VideoState from '../../../components/VideoStates/VideoState';
+import RootElement from '../../../components/RootElement';
 
 const videoUserStateNotCollapse = 'yt-video-user-state-container-not-collapse';
 
@@ -46,17 +46,17 @@ export default class VideoOverlayRenderer {
         element.dataset.id = videoId;
 
         ReactDOM.render(
-            <VideoState
-                videoId={videoId}
-                api={this.api}
-                onDropdownOpenChange={open => {
+            RootElement(VideoState, {
+                videoId,
+                api: this.api,
+                onDropdownOpenChange: open => {
                     if (open) {
                         element.classList.add(videoUserStateNotCollapse);
                     } else {
                         element.classList.remove(videoUserStateNotCollapse);
                     }
-                }}
-            />,
+                },
+            }),
             element,
         );
     }
@@ -78,7 +78,7 @@ export default class VideoOverlayRenderer {
         element.dataset.videoOpen = videoOpen;
 
         ReactDOM.render(
-            <VideoOpenIndicator videoOpen={videoOpen} />,
+            VideoOpenIndicator({ videoOpen }),
             element,
         );
     }

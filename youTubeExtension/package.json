@@ -4,28 +4,16 @@
   "description": "A lot of usefull stuff for youtube",
   "main": "content.js",
   "scripts": {
-    "build": "webpack",
+    "build": "node esbuild.config.js",
     "dev:windows": "xcopy static devDist /y /i & node ./convertManifest.js & webpack serve --mode development",
     "dev:linux": "cp -R static/. dist/ & node ./convertManifest.js devDist & webpack serve --mode development",
-    "package:windows": "xcopy static dist /y /i & webpack",
-    "package:linux": "cp -R static/. dist/ & webpack"
+    "package:windows": "xcopy static dist /y /i & npm run build",
+    "package:linux": "cp -R static/. dist/ & npm run build"
   },
   "author": "Clemens Ott",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.16.5",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/preset-react": "^7.0.0",
-    "babel-loader": "^8.2.3",
-    "css-loader": "^6.5.1",
-    "mini-css-extract-plugin": "^2.4.5",
-    "style-loader": "^3.3.1",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.4"
+    "esbuild": "^0.18.10"
   },
   "dependencies": {
     "@mui/material": "^5.13.1",

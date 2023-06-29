@@ -15,10 +15,10 @@
                 "https://www.youtube.com/*"
             ],
             "js": [
-                "content.bundle.js"
+                "content.js"
             ],
             "css": [
-                "content.bundle.css"
+                "content.css"
             ]
         }
     ],
@@ -28,7 +28,7 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "insite.bundle.js"
+                "insite.js"
             ],
             "matches": [
                 "https://www.youtube.com/*"

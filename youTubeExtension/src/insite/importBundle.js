@@ -1,5 +1,5 @@
 export default function importBundle() {
-    const websiteBundleUrl = chrome.runtime.getURL('insite.bundle.js');
+    const websiteBundleUrl = chrome.runtime.getURL('insite.js');
 
     const script = document.createElement('script');
     script.src = websiteBundleUrl;

@@ -1,6 +1,7 @@
-import React from 'react';
 import IsUpdatingIndicator from '../../components/IsUpdatingIndicator';
 import ReactRenderer from '../../utils/ReactRenderer';
+import Div from '../../components/Div';
+import RootElement from '../../components/RootElement';
 
 
 export default class IsUpdatingSourcesService {
@@ -22,8 +23,11 @@ export default class IsUpdatingSourcesService {
 
     onHeaderContainer({ detail: { currentElements: container } }) {
         if (container) {
-            this.beforeSearchRenderer.render(<div />, container);
-            this.indicatorRenderer.render(<IsUpdatingIndicator trackerService={this.trackerService} />, container);
+            this.beforeSearchRenderer.render(RootElement(Div), container);
+            this.indicatorRenderer.render(
+                RootElement(IsUpdatingIndicator, { trackerService: this.trackerService }),
+                container,
+            );
         } else {
             this.indicatorRenderer.unmount();
         }

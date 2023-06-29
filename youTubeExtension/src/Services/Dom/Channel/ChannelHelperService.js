@@ -1,9 +1,9 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRenderer from '../../../utils/ReactRenderer';
 import ChannelVideoHiding from '../../../components/ChannelVideoHiding';
 import TabVideosCount from '../../../components/TabVideosCount';
 import './ChannelHelperService.css';
+import RootElement from '../../../components/RootElement';
 
 
 export default class ChannelHelperService {
@@ -32,7 +32,7 @@ export default class ChannelHelperService {
             const innerHeaderContainer = newContainer.querySelector('#inner-header-container > #buttons');
 
             this.channelHidingRenderer.render(
-                <ChannelVideoHiding service={this.channelVideoHidingService} />,
+                RootElement(ChannelVideoHiding, { service: this.channelVideoHidingService }),
                 innerHeaderContainer,
             );
             innerHeaderContainer.classList.add('yt-channel-helper-service-inner-header-container');
@@ -77,7 +77,7 @@ export default class ChannelHelperService {
             tabElement.dataset.fakeId = fakeId;
         }
         ReactDOM.render(
-            <TabVideosCount title={tabElement.innerText} {...props} />,
+            TabVideosCount({ title: tabElement.innerText, ...props }),
             fakeElement,
         );
     }

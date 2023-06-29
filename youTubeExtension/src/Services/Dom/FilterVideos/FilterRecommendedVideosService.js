@@ -6,6 +6,7 @@ import ReactRenderer from '../../../utils/ReactRenderer';
 import triggerEvent from '../../../utils/triggerEvent';
 import randomString from '../../../utils/randomString';
 import './FilterRecommendedVideosService.css';
+import RootElement from '../../../components/RootElement';
 
 
 function getChannelName(container) {
@@ -161,11 +162,11 @@ export default class FilterRecommendedVideosService {
     onFilterBaseElementChange({ currentElements: baseElement }) {
         if (baseElement) {
             this.filterRenderer.render(
-                <FilterRecommendedVideos
-                    defaultFilter={this.filter}
-                    eventProvider={this}
-                    onFilterChange={this.onFilterChange}
-                />,
+                RootElement(FilterRecommendedVideos, {
+                    defaultFilter: this.filter,
+                    eventProvider: this,
+                    onFilterChange: this.onFilterChange,
+                }),
                 baseElement,
             );
         } else {

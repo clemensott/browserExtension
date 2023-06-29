@@ -1,5 +1,5 @@
-import React from 'react';
 import ReloadCheckbox from '../../components/ReloadCheckbox';
+import RootElement from '../../components/RootElement';
 import ReactRenderer from '../../utils/ReactRenderer';
 import tryReloadSubscriptions from '../../utils/tryReloadSubscriptions';
 import DomEventHandler from './DomEventHandler';
@@ -63,11 +63,11 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
     onChange({ currentElements: container }) {
         if (container) {
             this.reloadIndicatorRenderer.render(
-                <ReloadCheckbox
-                    runDownSeconds={this.getReloadingSeconds()}
-                    defaultChecked={this.getReloadingEnabled()}
-                    onChange={this.onChangeReloadEnabled.bind(this)}
-                />, container);
+                RootElement(ReloadCheckbox, {
+                    runDownSeconds: this.getReloadingSeconds(),
+                    defaultChecked: this.getReloadingEnabled(),
+                    onChange: this.onChangeReloadEnabled.bind(this)(),
+                }), container);
             clearTimeout(this.reloadTimeoutId);
         } else {
             this.reloadIndicatorRenderer.unmount();
