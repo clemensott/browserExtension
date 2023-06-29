@@ -33,9 +33,15 @@ export default function App() {
     const [apiPassword, setApiPassword] = useState('');
     const enableEndVideoButton = useRef();
     const subscriptionboxReloadSeconds = useRef();
+    const pingApiId = useRef(0);
 
     const checkBaseUrlValid = async url => {
-        setApiBaseUrlValid(await pingApi(url));
+        const pingId = ++pingApiId.current;
+        const baseUrlValid = await pingApi(url);
+
+        if (pingId === pingApiId.current) {
+            setApiBaseUrlValid(baseUrlValid);
+        }
     }
 
     useEffect(() => {
@@ -63,7 +69,7 @@ export default function App() {
 
     useEffect(() => {
         checkBaseUrlValid(apiBaseUrl);
-    }, [apiBaseUrl, apiUsername, apiPassword]);
+    }, [apiBaseUrl]);
 
     const saveOptions = () => {
         options.isDomManipulationEnabled = !!enableDomManipulation;
@@ -83,6 +89,8 @@ export default function App() {
         options.apiBaseUrl = apiBaseUrl;
         options.apiUsername = apiUsername;
         options.apiPassword = apiPassword;
+
+        alert('Options saved!');
     };
 
     return (
@@ -243,9 +251,9 @@ export default function App() {
                     <input
                         id="api-base-url"
                         type="text"
-                        className={clsx('form-control', apiBaseUrlValid && 'form-error')}
-                        defaultValue={apiBaseUrl}
-                        onChange={async e => setApiBaseUrl(e.target.value)}
+                        className={clsx('form-control', apiBaseUrl && !apiBaseUrlValid && 'form-error')}
+                        value={apiBaseUrl}
+                        onChange={e => setApiBaseUrl(e.target.value)}
                     />
                 </div>
 
@@ -254,9 +262,9 @@ export default function App() {
                     <input
                         id="api-username"
                         type="text"
-                        className={clsx('form-control', !apiBaseUrlValid || apiUsername && 'form-error')}
-                        defaultValue={apiUsername}
-                        onChange={async e => setApiUsername(e.target.value)}
+                        className={clsx('form-control', apiBaseUrlValid && !apiUsername && 'form-error')}
+                        value={apiUsername}
+                        onChange={e => setApiUsername(e.target.value)}
                     />
                 </div>
 
@@ -265,9 +273,9 @@ export default function App() {
                     <input
                         id="api-username"
                         type="password"
-                        className={clsx('form-control', !apiBaseUrlValid || apiPassword && 'form-error')}
-                        defaultValue={apiPassword}
-                        onChange={async e => setApiPassword(e.target.value)}
+                        className={clsx('form-control', apiBaseUrlValid && !apiPassword && 'form-error')}
+                        value={apiPassword}
+                        onChange={e => setApiPassword(e.target.value)}
                     />
                 </div>
             </div>
@@ -277,7 +285,7 @@ export default function App() {
                 <button
                     className="btn"
                     onClick={saveOptions}
-                    disabled={apiBaseUrl ? !(apiBaseUrlValid && apiUsername && apiPassword) : false}
+                    disabled={apiBaseUrl && !(apiBaseUrlValid && apiUsername && apiPassword)}
                 >
                     Save
                 </button>
