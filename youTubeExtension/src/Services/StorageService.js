@@ -2,12 +2,12 @@ import triggerEvent from '../utils/triggerEvent';
 
 const constants = {
     STORAGE_KEY: 'youtube-extension-fake-storage',
-    EVENTNAME: 'yotube-extension-storage-service-set',
+    EVENTNAME: 'youtube-extension-storage-service-set',
 };
 
 /**
  * A wrapper for the storage interface to enable it for dev enviroment.
- * chrome.storage.sync interface is only available in prd enviroment of options page.
+ * chrome.storage.local interface is only available in prd enviroment of options page.
  * This service provides a interface which saves the data in the localStorage
  */
 export default class StorageService {
@@ -16,8 +16,8 @@ export default class StorageService {
     }
 
     onSetData({ detail }) {
-        if (chrome && chrome.storage && chrome.storage.sync) {
-            chrome.storage.sync.set(detail);
+        if (chrome && chrome.storage && chrome.storage.local) {
+            chrome.storage.local.set(detail);
         } else {
             const storedData = JSON.parse(localStorage.getItem(constants.STORAGE_KEY) || '{}');
             localStorage.setItem(constants.STORAGE_KEY, JSON.stringify({
@@ -32,9 +32,9 @@ export default class StorageService {
     }
 
     get(keys) {
-        if (chrome && chrome.storage && chrome.storage.sync) {
+        if (chrome && chrome.storage && chrome.storage.local) {
             return new Promise(resolve => {
-                chrome.storage.sync.get(keys, resolve);
+                chrome.storage.local.get(keys, resolve);
             });
         }
 
