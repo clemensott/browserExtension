@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const jsonValues = {
@@ -33,8 +33,9 @@ function getSelectedChannels(channels, { channels: filteredChannels }) {
 }
 
 function useForceRerender() {
-    const [value, setValue] = useState(true);
-    return () => setValue(!value);
+    const value = useRef(false);
+    const [, setValue] = useState(true);
+    return () => setValue(value.current = !value.current);
 }
 
 export default function FilterRecommendedVideos({ eventProvider, onFilterChange }) {

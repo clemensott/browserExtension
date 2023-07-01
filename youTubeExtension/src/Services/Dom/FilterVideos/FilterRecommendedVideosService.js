@@ -1,12 +1,11 @@
-import React from 'react';
 import FilterRecommendedVideos from '../../../components/FilterVideos/FilterRecommendedVideos';
 import DomEventHandler from '../DomEventHandler';
 import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
 import ReactRenderer from '../../../utils/ReactRenderer';
 import triggerEvent from '../../../utils/triggerEvent';
 import randomString from '../../../utils/randomString';
-import './FilterRecommendedVideosService.css';
 import RootElement from '../../../components/RootElement';
+import './FilterRecommendedVideosService.css';
 
 
 function getChannelName(container) {
@@ -41,7 +40,7 @@ function getVideoContainerTitle(container) {
 }
 
 function normalizeDuration(text) {
-    const parts = text.split(':');
+    const parts = text.trim().split(':');
     let hours, minutes, seconds;
     if (parts.length === 2) {
         hours = '';
@@ -371,11 +370,20 @@ export default class FilterRecommendedVideosService {
             });
         }
 
-        if (currentElements) {
-            const videoContainers = Array.from(currentElements.videoContainers);
-            videoContainers.sort((a, b) => this.compareContainers(a, b));
-            videoContainers.forEach(({ container }, index) => container.style.order = index.toString());
+        if (!currentElements) {
+            return;
         }
+
+        if (!this.filter.sorting.length) {
+            currentElements.videoContainers.forEach(({ container }) => {
+                container.style.removeProperty('order');
+            });
+            return;
+        }
+
+        const videoContainers = Array.from(currentElements.videoContainers);
+        videoContainers.sort((a, b) => this.compareContainers(a, b));
+        videoContainers.forEach(({ container }, index) => container.style.order = index.toString());
     }
 
     compareContainers(a, b) {
@@ -415,10 +423,16 @@ export default class FilterRecommendedVideosService {
     }
 
     compareDuration({ duration: a }, { duration: b }) {
+        if (!a && !b) return 0;
+        if (!a) return 1;
+        if (!b) return -1;
         return a.localeCompare(b);
     }
 
     updateChannels(videoContainers) {
+        if (!videoContainers) {
+            videoContainers = [];
+        }
         const channels = videoContainers.reduce((map, container) => {
             const key = `${container.channelName}|${container.isMusicChannel}`;
             if (!map.has(key)) {
