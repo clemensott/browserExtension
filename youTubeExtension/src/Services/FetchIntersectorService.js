@@ -1,66 +1,62 @@
 import triggerEvent from '../utils/triggerEvent';
 
-const originalFetch = window.fetch;
 const eventName = 'fetchIntersect.onfetchtext';
-
-async function getText(response) {
-    const text = await response.text();
-    try {
-        triggerEvent(eventName, {
-            url: response.url,
-            text,
-        });
-    } catch (e) {
-        console.error('fetch wrapper text error', e);
-    }
-    return text;
-}
-
-async function getJSON(response) {
-    const json = await response.json();
-    try {
-        triggerEvent(eventName, {
-            url: response.url,
-            json,
-        });
-    } catch (e) {
-        console.error('fetch wrapper json error', e);
-    }
-    return json;
-}
-
-function proxyHandler(target, prop) {
-    let res;
-    switch (prop) {
-        case 'text':
-            res = () => getText(target);
-            break;
-        case 'json':
-            res = () => getJSON(target);
-            break;
-        default:
-            res = target[prop];
-            break;
-    }
-    return res;
-}
-
-async function fetchWrapper(...params) {
-    const response = await originalFetch(...params);
-    return new Proxy(response, { get: proxyHandler });
-}
 
 class FetchIntersectorService {
     constructor() {
+        this.isSendingEnabled = false;
+        this.queue = [];
+    }
+
+    sendData(data) {
+        try {
+            triggerEvent(eventName, data);
+        } catch (e) {
+            console.error('fetch wrapper send data error', e);
+        }
+    }
+
+    handleData(data) {
+        if (this.isSendingEnabled) {
+            this.sendData(data);
+        } else {
+            this.queue.push(data);
+        }
+    }
+
+    isResponseRelevant(url) {
+        return [
+            'https://www.youtube.com/youtubei/v1/next',
+            'https://www.youtube.com/youtubei/v1/browse',
+            'https://www.youtube.com/youtubei/v1/player',
+            'https://www.youtube.com/youtubei/v1/search',
+            'https://www.youtube.com/youtubei/v1/reel/reel_item_watch',
+        ].some(u => url.startsWith(u))
     }
 
     enable() {
-        window.fetch = fetchWrapper;
-        console.log('enable fetch intersector');
+        const that = this;
+        Response.prototype.oldText = Response.prototype.text;
+        Response.prototype.text = async function () {
+            const text = await Response.prototype.oldText.call(this);
+            if (that.isResponseRelevant(this.url)) {
+                that.handleData({
+                    url: this.url,
+                    text,
+                });
+            }
+            return text;
+        };
     }
 
     disable() {
-        window.fetch = originalFetch;
+        Response.prototype.text = Response.prototype.text;
+    }
+
+    enableSending() {
+        this.isSendingEnabled = true;
+        this.queue.forEach(data => this.sendData(data));
+        this.queue.splice(0);
     }
 
     addOnTextListener(callback) {

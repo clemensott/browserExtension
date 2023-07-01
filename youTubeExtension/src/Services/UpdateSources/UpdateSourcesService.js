@@ -2,6 +2,7 @@ import getTabId from '../../utils/getTabId';
 import groupBy from '../../utils/groupBy';
 import fetchIntersectorService from '../FetchIntersectorService';
 import watchVideoDataHandler from './WatchVideoDataHandler';
+import watchVideoDetailsDataHandler from './WatchVideoDetailsDataHandler';
 import shortsWatchDataHandler from './ShortsWatchDataHandler';
 import recommendationVideosDataHandler from './RecommendationVideosDataHandler';
 import watchPlaylistVideosDataHandler from './WatchPlaylistVideosDataHandler';
@@ -15,6 +16,7 @@ import homeDataHandler from './HomeDataHandler';
 
 const handlers = [
     watchVideoDataHandler,
+    watchVideoDetailsDataHandler,
     shortsWatchDataHandler,
     recommendationVideosDataHandler,
     watchPlaylistVideosDataHandler,

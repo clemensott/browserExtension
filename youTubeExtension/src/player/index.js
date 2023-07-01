@@ -164,7 +164,7 @@ export default function setup(options) {
     if (options.isVideoPlayerManipulationEnabled) {
         enableEndVideoButton = options.isEndVideoButtonEnabled;
 
-        console.log('start player ad handler. enableEndVideoButton:', enableEndVideoButton);
+        console.log('start player ad handler:', { enableEndVideoButton });
 
         setInterval(loop, 1000);
         setIntervalUntil(() => !getVideoElement(), 20);

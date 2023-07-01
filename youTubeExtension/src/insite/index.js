@@ -1,20 +1,18 @@
 import InitDataService from '../Services/InitDataService';
-import fetchIntersectorService from '../Services/FetchIntersectorService';
 import createApiHandler from '../utils/createApiHandler';
 import StorageService from '../Services/StorageService';
 import OptionsService from '../Services/OptionsService';
 import SpeedMeasurer from './speedMeasure';
 
 
-(function () {
-    console.log('youtube extension insite js');
-
+(async function () {
     const initDataService = new InitDataService();
-    initDataService.send('ytInitialData', ytInitialData);
-    fetchIntersectorService.enable();
+    // initDataService.send('ytInitialPlayerResponse', window.ytInitialPlayerResponse);
+    initDataService.send('ytInitialData', window.ytInitialData);
+    window.fetchIntersectorService.enableSending();
 
     const optionsService = new OptionsService(new StorageService());
-    optionsService.load();
+    await optionsService.load();
 
     Object.assign(window, {
         createApiHandler,

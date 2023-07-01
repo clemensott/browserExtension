@@ -2,6 +2,8 @@ const start = Date.now();
 require('esbuild').build({
     entryPoints: [
         'src/content.js',
+        'src/fast.js',
+        'src/fastInsite.js',
         'src/insite.js',
         'src/options.js',
     ],

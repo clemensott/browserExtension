@@ -15,6 +15,15 @@
                 "https://www.youtube.com/*"
             ],
             "js": [
+                "fast.js"
+            ],
+            "run_at": "document_start"
+        },
+        {
+            "matches": [
+                "https://www.youtube.com/*"
+            ],
+            "js": [
                 "content.js"
             ],
             "css": [
@@ -28,6 +37,7 @@
     "web_accessible_resources": [
         {
             "resources": [
+                "fastInsite.js",
                 "insite.js"
             ],
             "matches": [

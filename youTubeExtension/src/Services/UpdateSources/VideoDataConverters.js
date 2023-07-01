@@ -27,6 +27,19 @@ export function fromWatchVideo(raw, videoId) {
     };
 }
 
+export function fromWatchVideoDetails(raw) {
+    if (!raw) {
+        return null;
+    }
+    return {
+        id: raw.videoId,
+        title: raw.title,
+        channelTitle: raw.author,
+        channelId: raw.channelId,
+        views: raw.viewCount,
+    };
+}
+
 export function fromVideoRenderer({ videoRenderer: raw }, additionalData) {
     const { channelTitle, channelId } = additionalData || {};
     return raw && raw.videoId && {
@@ -120,8 +133,8 @@ export function fromPlaylistVideoRenderer({ playlistVideoRenderer: raw }) {
     return raw && raw.videoId && {
         id: raw.videoId,
         title: raw.title?.runs?.map(r => r?.text).filter(Boolean).join(''),
-        channelTitle: raw.shortBylineText?.runs?.map(r=>r.text).find(Boolean),
-        channelId: raw.shortBylineText?.runs?.map(r=>r.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
+        channelTitle: raw.shortBylineText?.runs?.map(r => r.text).find(Boolean),
+        channelId: raw.shortBylineText?.runs?.map(r => r.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
         duration: parseInt(raw.lengthSeconds),
     };
 }

@@ -65,7 +65,7 @@ async function main() {
             const updateSourcesService = new UpdateSourcesService(apiHandler);
             updateSourcesService.start();
             initDataService.addOnDataListener(({ detail }) => {
-                if (detail.name === 'ytInitialData') {
+                if (['ytInitialData', 'ytInitialPlayerResponse'].includes(detail.name)) {
                     updateSourcesService.handleData(detail.data);
                 }
             });
@@ -83,7 +83,7 @@ async function main() {
             console.error('init display video state service:', err);
         }
 
-        importBundle();
+        importBundle('insite.js');
     }
 }
 
