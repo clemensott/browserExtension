@@ -24,7 +24,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
     }
 
     static getContainer() {
-        return document.querySelector('#title-container');
+        return document.querySelector('#title-container:not([hidden])');
     }
 
     start() {
