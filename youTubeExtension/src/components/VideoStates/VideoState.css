@@ -120,15 +120,15 @@ ytd-playlist-video-renderer {
 
 ytd-playlist-video-renderer > .yt-video-user-state-container {
     position: absolute;
-    left: 35px;
-    top: 72px;
-    width: 120px;
+    left: 36px;
+    top: 94px;
+    width: 160px;
     height: 4px;
 }
 
 ytd-playlist-video-renderer:hover > .yt-video-user-state-container,
 ytd-playlist-video-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
-    top: 51px;
+    top: 73px;
     height: initial;
 }
 
