@@ -7,6 +7,7 @@ const jsonValues = {
     false: JSON.stringify(false),
     channelsAll: JSON.stringify({ channelName: null, isMusicChannel: null }),
     typeVideo: JSON.stringify('video'),
+    typeShort: JSON.stringify('short'),
     typePlaylist: JSON.stringify('playlist'),
     typeMovie: JSON.stringify('movie'),
 };
@@ -133,6 +134,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                     >
                         <MenuItem value="">All</MenuItem>
                         <MenuItem value={jsonValues.typeVideo}>Video</MenuItem>
+                        <MenuItem value={jsonValues.typeShort}>Short</MenuItem>
                         <MenuItem value={jsonValues.typePlaylist}>Playlists</MenuItem>
                         <MenuItem value={jsonValues.typeMovie}>Movie</MenuItem>
                     </Select>

@@ -1,6 +1,7 @@
 import FilterRecommendedVideos from '../../../components/FilterVideos/FilterRecommendedVideos';
 import DomEventHandler from '../DomEventHandler';
-import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
+import getVideoIdAndTypeFromContainer from '../../../utils/getVideoIdAndTypeFromContainer';
+import getVideoIdFromVideoContainer from '../../../utils/getVideoIdFromVideoContainer';
 import ReactRenderer from '../../../utils/ReactRenderer';
 import triggerEvent from '../../../utils/triggerEvent';
 import randomString from '../../../utils/randomString';
@@ -60,11 +61,6 @@ function normalizeDuration(text) {
 function getVideoContainerDuration(container) {
     const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer > #text');
     return durationElement ? normalizeDuration(durationElement.innerText) : '';
-}
-
-function getVideoIdFromVideoContainer(container) {
-    const a = container.querySelector('a#thumbnail');
-    return a && a.href && getVideoIdFromUrl(a.href);
 }
 
 export default class FilterRecommendedVideosService {
@@ -203,15 +199,18 @@ export default class FilterRecommendedVideosService {
         const domContainer = FilterRecommendedVideosService.getVideoContainersContainer();
         const videoContainers = domContainer && Array.from(domContainer.querySelectorAll(
             'ytd-compact-video-renderer,ytd-compact-playlist-renderer,ytd-compact-movie-renderer',
-        )).map(container => ({
-            videoId: getVideoIdFromVideoContainer(container),
-            channelName: getChannelName(container),
-            isMusicChannel: getIsMusic(container),
-            type: getVideoContainerType(container),
-            title: getVideoContainerTitle(container),
-            duration: getVideoContainerDuration(container),
-            container,
-        })) || [];
+        )).map(container => {
+            const { videoId, type } = getVideoIdAndTypeFromContainer(container)
+            return {
+                videoId,
+                channelName: getChannelName(container),
+                isMusicChannel: getIsMusic(container),
+                type,
+                title: getVideoContainerTitle(container),
+                duration: getVideoContainerDuration(container),
+                container,
+            };
+        }) || [];
         return {
             domContainer,
             childrenCount: domContainer ? domContainer.childElementCount : -1,

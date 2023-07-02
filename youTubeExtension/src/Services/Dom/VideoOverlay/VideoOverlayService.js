@@ -1,4 +1,4 @@
-import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
+import getVideoIdFromVideoContainer from '../../../utils/getVideoIdFromVideoContainer';
 import getCurrentVideoId from '../../../utils/getCurrentVideoId';
 import setIntervalUntil from '../../../utils/setIntervalUntil';
 import AtOnceService from '../../AtOnceService';
@@ -21,11 +21,6 @@ function getVideoIdOfShortVideoContainer(container) {
     return match && match[1] || (
         parent && parent.id === '0' ? getCurrentVideoId() : null
     );
-}
-
-function getVideoIdFromVideoContainer(container) {
-    const a = container.querySelector('a#thumbnail');
-    return a && a.href && getVideoIdFromUrl(a.href);
 }
 
 export default class VideoOverlayService {
