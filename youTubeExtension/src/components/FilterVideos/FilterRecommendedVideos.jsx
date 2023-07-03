@@ -202,6 +202,8 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                         <MenuItem value="channel_desc">Channel DESC</MenuItem>
                         <MenuItem value="duration_asc">Duration ASC</MenuItem>
                         <MenuItem value="duration_desc">Duration DESC</MenuItem>
+                        <MenuItem value="type_asc">Type ASC</MenuItem>
+                        <MenuItem value="type_desc">Type DESC</MenuItem>
                     </Select>
                 </FormControl>
             </Grid>

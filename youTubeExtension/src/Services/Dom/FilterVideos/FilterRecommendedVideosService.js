@@ -392,13 +392,16 @@ export default class FilterRecommendedVideosService {
             let compareValue;
             switch (sortType) {
                 case 'title':
-                    compareValue = this.compareTitle(a, b);
+                    compareValue = FilterRecommendedVideosService.compareTitle(a, b);
                     break;
                 case 'channel':
-                    compareValue = this.compareChannelName(a, b);
+                    compareValue = FilterRecommendedVideosService.compareChannelName(a, b);
                     break;
                 case 'duration':
-                    compareValue = this.compareDuration(a, b);
+                    compareValue = FilterRecommendedVideosService.compareDuration(a, b);
+                    break;
+                case 'type':
+                    compareValue = FilterRecommendedVideosService.compareType(a, b);
                     break;
             }
 
@@ -413,19 +416,40 @@ export default class FilterRecommendedVideosService {
         }
     }
 
-    compareTitle({ title: a }, { title: b }) {
+    static compareTitle({ title: a }, { title: b }) {
         return a.localeCompare(b);
     }
 
-    compareChannelName({ channelName: a }, { channelName: b }) {
+    static compareChannelName({ channelName: a }, { channelName: b }) {
         return a.localeCompare(b);
     }
 
-    compareDuration({ duration: a }, { duration: b }) {
+    static compareDuration({ duration: a }, { duration: b }) {
         if (!a && !b) return 0;
         if (!a) return 1;
         if (!b) return -1;
         return a.localeCompare(b);
+    }
+
+    static compareType({ type: a }, { type: b }) {
+        const valueA = FilterRecommendedVideosService.getTypeOrderValue(a);
+        const valueB = FilterRecommendedVideosService.getTypeOrderValue(b);
+        return valueA - valueB;
+    }
+
+    static getTypeOrderValue(type) {
+        switch (type) {
+            case 'short':
+                return 1;
+            case 'video':
+                return 2;
+            case 'playlist':
+                return 3;
+            case 'movie':
+                return 4;
+            default:
+                return 5;
+        }
     }
 
     updateChannels(videoContainers) {
