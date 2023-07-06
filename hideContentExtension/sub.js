@@ -59,7 +59,7 @@ function sendElementInfos(current, element, win) {
         element = element.parentElement;
     }
 
-    console.log('new elements:', newElements);
+    console.debug('new elements:', newElements);
 
     const localElementsMap = new Map();
     lastEvent = {
@@ -89,7 +89,7 @@ function sendElementInfos(current, element, win) {
 
 function addContextMenuListener(win) {
     win.addEventListener('contextmenu', e => {
-        console.log('e:', e)
+        console.debug('contextmenu e:', e)
         if (e.target) {
             sendElementInfos([], e.target, win);
         }

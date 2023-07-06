@@ -91,9 +91,12 @@ function showModal(elements) {
         return;
     }
 
+    const rootElements = [...document.querySelectorAll('html,body')];
+    const hasOverflowHidden = rootElements.some(e => getComputedStyle(e).overflow === 'hidden');
+
     const allElements = [...document.body.getElementsByTagName("*")];
     const maxZIndex = Math.max(...allElements.map(e => getComputedStyle(e)['z-index']).map(Number).filter(Boolean));
-    console.log('z index:', maxZIndex);
+    console.debug('z index:', maxZIndex);
     const modalContainer = buildDomElement({
         tagName: 'div',
         id: 'hide_elments_modal_container',
@@ -108,6 +111,8 @@ function showModal(elements) {
             'flex-direction': 'column',
             'justify-content': 'center',
             'align-items': 'center',
+            'max-height': '90vh',
+            margin: 'auto',
         },
         onclick: e => {
             if (e.target === modalContainer) {
@@ -121,9 +126,20 @@ function showModal(elements) {
                 padding: '20px',
                 'min-width': '500px',
                 border: '2px solid black',
-                opacity: '0.9'
+                opacity: '0.9',
+                'max-height': '100%',
+                'overflow-y': 'scroll',
             },
-            children: [{
+            children: [hasOverflowHidden && {
+                tagName: 'button',
+                innerText: 'clear overflow',
+                style: {
+                    float: 'left',
+                    top: 0,
+                    left: 0,
+                },
+                onclick: () => rootElements.forEach(e => e.style.setProperty('overflow', 'initial', 'important')),
+            }, {
                 tagName: 'button',
                 innerText: 'close',
                 style: {
