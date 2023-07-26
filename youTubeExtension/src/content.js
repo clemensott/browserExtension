@@ -15,6 +15,7 @@ import StorageService from './Services/StorageService';
 import OptionsService from './Services/OptionsService';
 import VideoOpenStorageService from './Services/VideoOpenStorageService';
 import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
+import FetchIntersectorService from './Services/FetchIntersectorService';
 
 async function main() {
     const optionsService = new OptionsService(new StorageService());
@@ -84,6 +85,8 @@ async function main() {
         }
 
         importBundle('insite.js');
+    } else {
+        FetchIntersectorService.disable();
     }
 }
 

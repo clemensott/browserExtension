@@ -1,18 +1,23 @@
 import triggerEvent from '../utils/triggerEvent';
 
-const eventName = 'fetchIntersect.onfetchtext';
+const constants = {
+    FETCH_TEXT_EVENT_NAME: 'FetchIntersectorService.onfetchtext',
+    DISABLE_EVENT_NAME: 'FetchIntersectorService.ondisable',
+};
 
 class FetchIntersectorService {
     constructor() {
         this.isSendingEnabled = false;
         this.queue = [];
+
+        this.onDisabled = this.onDisabled.bind(this);
     }
 
     sendData(data) {
         try {
-            triggerEvent(eventName, data);
+            triggerEvent(constants.FETCH_TEXT_EVENT_NAME, data);
         } catch (e) {
-            console.error('fetch wrapper send data error', e);
+            console.error('fetch intersector send data error', e);
         }
     }
 
@@ -35,8 +40,14 @@ class FetchIntersectorService {
     }
 
     enable() {
+        if (typeof Response.prototype.oldText === 'function' &&
+            Response.prototype.text !== Response.prototype.oldText) {
+            return;
+        }
         const that = this;
-        Response.prototype.oldText = Response.prototype.text;
+        if (typeof Response.prototype.oldText !== 'function') {
+            Response.prototype.oldText = Response.prototype.text;
+        }
         Response.prototype.text = async function () {
             const text = await Response.prototype.oldText.call(this);
             if (that.isResponseRelevant(this.url)) {
@@ -47,10 +58,19 @@ class FetchIntersectorService {
             }
             return text;
         };
+        document.addEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
     }
 
     disable() {
-        Response.prototype.text = Response.prototype.text;
+        if (typeof Response.prototype.oldText === 'function') {
+            Response.prototype.text = Response.prototype.oldText;
+        }
+        document.removeEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
+        triggerEvent(constants.DISABLE_EVENT_NAME, null);
+    }
+
+    onDisabled() {
+        this.disable();
     }
 
     enableSending() {
@@ -60,11 +80,11 @@ class FetchIntersectorService {
     }
 
     addOnTextListener(callback) {
-        document.addEventListener(eventName, callback);
+        document.addEventListener(constants.FETCH_TEXT_EVENT_NAME, callback);
     }
 
     removeOnTextListener(callback) {
-        document.removeEventListener(eventName, callback);
+        document.removeEventListener(constants.FETCH_TEXT_EVENT_NAME, callback);
     }
 }
 
