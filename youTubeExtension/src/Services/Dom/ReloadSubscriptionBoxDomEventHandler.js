@@ -66,7 +66,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
                 RootElement(ReloadCheckbox, {
                     runDownSeconds: this.getReloadingSeconds(),
                     defaultChecked: this.getReloadingEnabled(),
-                    onChange: this.onChangeReloadEnabled.bind(this)(),
+                    onChange: this.onChangeReloadEnabled.bind(this),
                 }), container);
             clearTimeout(this.reloadTimeoutId);
         } else {
