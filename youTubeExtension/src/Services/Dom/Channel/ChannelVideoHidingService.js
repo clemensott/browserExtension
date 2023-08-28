@@ -5,6 +5,7 @@ import './ChannelVideoHidingService.css';
 const constants = {
     UPDATE_COUNT_UPPER_THRESHOLD: 300,
     UPDATE_COUNT_LOWER_THRESHOLD: 120,
+    HIDE_LOAD_VIDEOS_CLASSNAME: 'yt-channel-video-hiding-load',
     HIDE_ALL_VIDEOS_CLASSNAME: 'yt-channel-video-hiding-all',
     HIDE_NOT_ALL_VIDEOS_CLASSNAME: 'yt-channel-video-hiding-not-all',
     RUNNING_CHANGE_EVENTNAME: 'ChannelVideoHidingService.runningChange',
@@ -39,6 +40,7 @@ export default class ChannelVideoHidingService {
         if (container) {
             container.classList.remove(constants.HIDE_NOT_ALL_VIDEOS_CLASSNAME);
             container.classList.remove(constants.HIDE_ALL_VIDEOS_CLASSNAME);
+            container.classList.remove(constants.HIDE_LOAD_VIDEOS_CLASSNAME);
         }
     }
 
@@ -51,12 +53,13 @@ export default class ChannelVideoHidingService {
                 (this.isWatingToCoolDown && updateCount > constants.UPDATE_COUNT_LOWER_THRESHOLD)) {
                 container.classList.add(constants.HIDE_NOT_ALL_VIDEOS_CLASSNAME);
                 container.classList.remove(constants.HIDE_ALL_VIDEOS_CLASSNAME);
+                container.classList.remove(constants.HIDE_LOAD_VIDEOS_CLASSNAME);
 
                 this.isWatingToCoolDown = true;
             } else {
                 container.classList.remove(constants.HIDE_NOT_ALL_VIDEOS_CLASSNAME);
                 container.classList.add(constants.HIDE_ALL_VIDEOS_CLASSNAME);
-                window.scrollTo(0, Math.random() * 400); // scroll to trigger loading next videos
+                container.classList.add(constants.HIDE_LOAD_VIDEOS_CLASSNAME);
                 this.isWatingToCoolDown = false;
             }
         } else {
