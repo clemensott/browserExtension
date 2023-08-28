@@ -59,7 +59,7 @@ function normalizeDuration(text) {
 }
 
 function getVideoContainerDuration(container) {
-    const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer > #text');
+    const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer #text');
     return durationElement ? normalizeDuration(durationElement.innerText) : '';
 }
 
