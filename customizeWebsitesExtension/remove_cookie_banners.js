@@ -164,6 +164,10 @@ const actionConfigs = [
         getHide('privacy-layer'),
         clearOverflow('html'),
     ],
+    [
+        getHide('.cmp-root-container'),
+        getRemoveClasses('html', 'cmp-modal-open'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
