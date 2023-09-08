@@ -1,3 +1,8 @@
+#items.yt-channel-video-hiding-load > ytd-continuation-item-renderer,
+#contents.yt-channel-video-hiding-load > ytd-continuation-item-renderer {
+    position: fixed!important;
+}
+
 #items.yt-channel-video-hiding-all > ytd-grid-video-renderer,
 #contents.yt-channel-video-hiding-all > ytd-rich-grid-row {
     display: none!important;

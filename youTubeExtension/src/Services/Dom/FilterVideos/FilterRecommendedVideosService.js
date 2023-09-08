@@ -22,19 +22,6 @@ function getIsMusic(container) {
     );
 }
 
-function getVideoContainerType(container) {
-    switch (container.tagName.toLowerCase()) {
-        case 'ytd-compact-video-renderer':
-            return 'video';
-        case 'ytd-compact-playlist-renderer':
-            return 'playlist';
-        case 'ytd-compact-movie-renderer':
-            return 'movie';
-        default:
-            throw new Error('TagName not supported: ' + container.tagName);
-    }
-}
-
 function getVideoContainerTitle(container) {
     const titleElement = container.querySelector('span#video-title');
     return titleElement ? titleElement.innerText : '';
@@ -95,15 +82,20 @@ export default class FilterRecommendedVideosService {
             channels: [],
             type: null,
             title: null,
-            sorting: [],
         };
 
         this.channels = [];
         this.channelsChangedEventName = `FilterRecommendedVideosService.${randomString()}.channels_changed`;
 
+        this.actions = {
+            isLoadVideos: false,
+            sorting: [],
+        };
+
         this.onUserStateOfVideoChanged = this.onUserStateOfVideoChanged.bind(this);
         this.onVideoOpenStateChanged = this.onVideoOpenStateChanged.bind(this);
         this.onFilterChange = this.onFilterChange.bind(this);
+        this.onActionsChange = this.onActionsChange.bind(this);
     }
 
     start() {
@@ -158,9 +150,9 @@ export default class FilterRecommendedVideosService {
         if (baseElement) {
             this.filterRenderer.render(
                 RootElement(FilterRecommendedVideos, {
-                    defaultFilter: this.filter,
                     eventProvider: this,
                     onFilterChange: this.onFilterChange,
+                    onActionsChange: this.onActionsChange,
                 }),
                 baseElement,
             );
@@ -256,9 +248,6 @@ export default class FilterRecommendedVideosService {
     onFilterChange(filter) {
         Object.assign(this.filter, filter);
         this.filterLastContainers();
-        if ('sorting' in filter) {
-            this.sortLastContainers();
-        }
     }
 
     filterLastContainers(videoIds = null) {
@@ -358,6 +347,14 @@ export default class FilterRecommendedVideosService {
         return !title.toLowerCase().includes(this.filter.title.toLowerCase());
     }
 
+    onActionsChange(actions) {
+        Object.assign(this.actions, actions);
+        if ('sorting' in actions) {
+            this.sortLastContainers();
+        }
+        this.handleLoadVideos();
+    }
+
     sortLastContainers() {
         this.sortContainers(this.videoContainersDomEventHandler.lastElements, null);
     }
@@ -373,7 +370,7 @@ export default class FilterRecommendedVideosService {
             return;
         }
 
-        if (!this.filter.sorting.length) {
+        if (!this.actions.sorting.length) {
             currentElements.videoContainers.forEach(({ container }) => {
                 container.style.removeProperty('order');
             });
@@ -386,7 +383,7 @@ export default class FilterRecommendedVideosService {
     }
 
     compareContainers(a, b) {
-        for (const sortValue of this.filter.sorting) {
+        for (const sortValue of this.actions.sorting) {
             const [sortType, sortDirection] = sortValue.split('_');
 
             let compareValue;
@@ -452,6 +449,16 @@ export default class FilterRecommendedVideosService {
         }
     }
 
+    handleLoadVideos() {
+        const loadVideosClassName = 'yt-extension-load-recommanded-videos';
+        const container = FilterRecommendedVideosService.getVideoContainersContainer();
+        if (this.actions.isLoadVideos) {
+            container?.classList.add(loadVideosClassName);
+        } else {
+            container?.classList.remove(loadVideosClassName);
+        }
+    }
+
     updateChannels(videoContainers) {
         if (!videoContainers) {
             videoContainers = [];
@@ -480,6 +487,12 @@ export default class FilterRecommendedVideosService {
 
     getChannels() {
         return [...this.channels];
+    }
+
+    getActions() {
+        return {
+            ...this.actions,
+        };
     }
 
     addChannelsChangedEventListener(callback) {

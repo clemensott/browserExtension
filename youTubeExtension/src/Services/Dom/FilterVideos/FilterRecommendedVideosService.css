@@ -11,3 +11,9 @@ ytd-compact-movie-renderer {
 ytd-continuation-item-renderer {
     order: 10001;
 }
+
+.yt-extension-load-recommanded-videos ytd-continuation-item-renderer {
+    top: 0;
+    right: 0;
+    position: fixed;
+}
