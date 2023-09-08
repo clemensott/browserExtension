@@ -21,8 +21,13 @@ function setupInterval(intervalName, callback, timeout) {
 
 function setupIntervals() {
     function getLoginOverlay() {
-        const overlay = document.querySelector('#scrollview + div');
-        return overlay && overlay.querySelector('input[name="username"]') ? overlay : null;
+        for (let i = document.body.childElementCount - 1; i >= 0; i--) {
+            const child = document.body.children.item(i);
+            if (child.querySelector('input[name="username"]')) {
+                return child;
+            }
+        }
+        return null;
     }
 
     if (!window.location.href.startsWith('https://www.instagram.com/accounts/login')) {
@@ -30,8 +35,8 @@ function setupIntervals() {
         setupInterval('loginInterval', intervalName => {
             const overlayBaseElement = getLoginOverlay();
             if (overlayBaseElement) {
-                overlayBaseElement.remove();
-                removedLoginOverlay = true;
+                overlayBaseElement.style.setProperty('display', 'none');
+                // removedLoginOverlay = true;
             }
             if (removedLoginOverlay && document.body.style.overflow) {
                 document.body.style.overflow = null;
@@ -58,18 +63,17 @@ function setupIntervals() {
     }, 100);
 
     function getCookieBannerOverlay() {
-        let overlay = document.querySelector('#scrollview + div');
-        if (overlay) {
-            return overlay;
+        for (let i = document.body.childElementCount - 1; i >= 0; i--) {
+            const child = document.body.children.item(i);
+            if (child.tagName !== 'DIV') {
+                continue;
+            }
+            const cookieCount = child.innerText.toLowerCase().split('cookie').length;
+            if (cookieCount > 10) {
+                return child;
+            }
         }
-        const headers = Array.from(document.querySelectorAll('h2'));
-        const cookieHeader = headers.find(h => h.innerText.includes('Cookies'));
-
-        overlay = cookieHeader;
-        while (overlay && overlay.role !== 'presentation') {
-            overlay = overlay.parentElement;
-        }
-        return overlay;
+        return null;
     }
 
     setupInterval('removeCookieBanner', intervalName => {
