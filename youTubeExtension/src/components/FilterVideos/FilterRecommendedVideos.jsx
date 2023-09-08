@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import ReadMoreIcon from '@mui/icons-material/ReadMore';
 
 const jsonValues = {
     null: JSON.stringify(null),
@@ -27,10 +28,28 @@ function decodeValue(rawValue) {
     return JSON.parse(rawValue);
 }
 
-function getSelectedChannels(channels, { channels: filteredChannels }) {
-    return channels.filter(c => filteredChannels.some(
-        fc => fc.channelName === c.channelName && fc.isMusicChannel === c.isMusicChannel
-    ));
+function equalsChannel(a, b) {
+    return a.channelName === b.channelName && a.isMusicChannel === b.isMusicChannel;
+}
+
+function getChannelOptions(channels, { channels: filteredChannels }) {
+    return useMemo(() => {
+        const options = [
+            ...channels.map(c => ({
+                ...c,
+                label: `${c.channelName}${c.isMusicChannel ? ' ♪' : ''} (${c.count}x)`,
+            })),
+            ...filteredChannels.filter(fc => !channels.some(c => equalsChannel(c, fc))).map(c => ({
+                ...c,
+                label: `${c.channelName}${c.isMusicChannel ? ' ♪' : ''} (0x)`,
+            })),
+        ];
+        const selected = options.filter(c => filteredChannels.some(fc => equalsChannel(c, fc)));
+        return {
+            options,
+            selected,
+        };
+    }, [channels, filteredChannels]);
 }
 
 function useForceRerender() {
@@ -39,7 +58,7 @@ function useForceRerender() {
     return () => setValue(value.current = !value.current);
 }
 
-export default function FilterRecommendedVideos({ eventProvider, onFilterChange }) {
+export default function FilterRecommendedVideos({ eventProvider, onFilterChange, onActionsChange }) {
     const forceRerender = useForceRerender();
 
     useEffect(() => {
@@ -53,12 +72,9 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
     const channels = eventProvider.getChannels().sort((a, b) => {
         return b.count - a.count || a.channelName.localeCompare(b.channelName);
     });
+    const actions = eventProvider.getActions();
 
-    const channelOptions = channels.map(c => ({
-        ...c,
-        label: `${c.channelName} ${c.isMusicChannel ? '♪ ' : ''}(${c.count}x)`,
-    }));
-    const selectedChannelOptions = getSelectedChannels(channelOptions, filter);
+    const { options: channelOptions, selected: selectedChannelOptions } = getChannelOptions(channels, filter);
 
     const getOnChangeHandler = (optionName) => {
         return ({ target }) => {
@@ -159,7 +175,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                 />
             </Grid>
 
-            <Grid item xs={8}>
+            <Grid item xs={6}>
                 <TextField
                     label="Title"
                     value={filter.title}
@@ -179,10 +195,10 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                     <Select
                         id="yt-extension-filter-videos-sorting"
                         labelId="yt-extension-filter-videos-sorting-label"
-                        value={filter.sorting}
+                        value={actions.sorting}
                         onChange={({ target: { value } }) => {
-                            const newValues = value.filter(v => !filter.sorting.includes(v));
-                            onFilterChange({
+                            const newValues = value.filter(v => !actions.sorting.includes(v));
+                            onActionsChange({
                                 sorting: value.filter(v => {
                                     if (newValues.includes(v)) {
                                         return true;
@@ -205,6 +221,24 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange 
                         <MenuItem value="type_asc">Type ASC</MenuItem>
                         <MenuItem value="type_desc">Type DESC</MenuItem>
                     </Select>
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={2}>
+                <FormControl fullWidth>
+                    <ToggleButton
+                        sx={{ height: '46px' }}
+                        value="load_videos"
+                        selected={actions.isLoadVideos}
+                        onChange={() => {
+                            onActionsChange({
+                                isLoadVideos: !actions.isLoadVideos,
+                            });
+                            forceRerender();
+                        }}
+                    >
+                        <ReadMoreIcon />
+                    </ToggleButton>
                 </FormControl>
             </Grid>
         </Grid>
