@@ -314,8 +314,8 @@ export default class FilterRecommendedVideosService {
             return false;
         }
         return this.filter.isActive ?
-            videoUserState.sources.some(vus => vus.isActive) :
-            videoUserState.sources.every(vus => !vus.isActive);
+            videoUserState.sources.every(vus => !vus.isActive) :
+            videoUserState.sources.some(vus => vus.isActive);
     }
 
     isOpenFiltered({ videoId }) {
