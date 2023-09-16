@@ -70,15 +70,15 @@ export default class VideoOverlayRenderer {
             addRootContainerClass,
         );
 
-        const videoOpen = this.videoOpenStorageService.isVideoOpenFromCache(videoId);
-        const wasVideoOpen = element.dataset.videoOpen === 'true';
-        if (wasVideoOpen === videoOpen) {
+        const videoOpenTypes = this.videoOpenStorageService.isVideoOpenFromCache(videoId);
+        const videoOpen = videoOpenTypes.join(',');
+        if (element.dataset.videoOpen === videoOpen) {
             return;
         }
         element.dataset.videoOpen = videoOpen;
 
         ReactDOM.render(
-            VideoOpenIndicator({ videoOpen }),
+            VideoOpenIndicator({ videoOpenTypes }),
             element,
         );
     }

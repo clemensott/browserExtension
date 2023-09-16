@@ -322,7 +322,7 @@ export default class FilterRecommendedVideosService {
         return (
             this.filter.isOpen !== null
             && videoId
-            && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId)
+            && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId).length
         );
     }
 
