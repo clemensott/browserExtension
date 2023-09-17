@@ -1,4 +1,4 @@
-import { navigationChange } from '../constants';
+import { navigationChange, openVideoType } from '../constants';
 import getCurrentVideoId from '../utils/getCurrentVideoId';
 import sleep from '../utils/sleep';
 import randomString from '../utils/randomString';
@@ -11,21 +11,22 @@ const constants = {
     LAST_GARBAGE_COLLECT_STORAGE_KEY: 'yt-extension-video-open-last-garbage-collect',
     VALID_SECONDS_KEY: 'yt-extension-video-open-valid-seconds',
     VIDEO_OPEN_CHANGE_EVENTNAME: 'VideoOpenStorageService.videoOpenChange',
-    WATCH_TYPE: 'watch',
     PLAYLIST_TYPE: 'playlist',
+    DISCARDED_TYPE: 'bookmark',
+    BOOKMARK_TYPE: 'bookmark',
 };
 
 function getOpenVideoIds() {
     const videoIds = [
         {
             videoId: getCurrentVideoId(),
-            type: constants.WATCH_TYPE,
+            type: openVideoType.WATCH,
         },
         ...[
             ...document.querySelectorAll('#items > ytd-playlist-panel-video-renderer'),
         ].map(container => ({
             videoId: getVideoIdFromVideoContainer(container),
-            type: constants.PLAYLIST_TYPE,
+            type: openVideoType.PLAYLIST,
         })),
     ];
     return videoIds.filter(v => v.videoId);
@@ -39,11 +40,14 @@ function diffVideoIdArrays(a, b) {
 }
 
 export default class VideoOpenStorageService {
-    constructor(navigatoreEventService) {
+    constructor(navigatoreEventService, messagesService) {
         this.navigatoreEventService = navigatoreEventService;
+        this.messagesService = messagesService;
         this.validSeconds = parseInt(localStorage.getItem(constants.VALID_SECONDS_KEY), 10) || 1000;
         this.garbageCollectStorageInvalid = true;
         this.videoOpenTabStorageKey = `${constants.STORAGE_KEY_PREFIX}${randomString()}`;
+        this.bookmarkVideoIds = [];
+        this.discardedVideoIds = [];
         this.videoOpenCache = new Map();
         this.lastVideoIds = [];
         this.checkOpenVideoIdsIntervalId = null;
@@ -55,6 +59,8 @@ export default class VideoOpenStorageService {
         this.onUrlChange = this.onUrlChange.bind(this);
         this.setVideosOpen = this.setVideosOpen.bind(this);
         this.onBeforeUnload = this.onBeforeUnload.bind(this);
+        this.onDiscardedVideoIdsChanged = this.onDiscardedVideoIdsChanged.bind(this);
+        this.onBookmarkVideoIdsChanged = this.onBookmarkVideoIdsChanged.bind(this);
         this.checkOpenVideoIdsLoop = this.checkOpenVideoIdsLoop.bind(this);
         this.loadOpenVideosCache = this.loadOpenVideosCache.bind(this);
         this.onCheckGarbageCollect = this.onCheckGarbageCollect.bind(this);
@@ -63,12 +69,16 @@ export default class VideoOpenStorageService {
     start() {
         window.addEventListener('storage', this.onStorageChange);
         window.addEventListener('beforeunload', this.onBeforeUnload);
+        this.messagesService.onDiscardedOpenVideos(this.onDiscardedVideoIdsChanged);
+        this.messagesService.onBookmarkOpenVideos(this.onBookmarkVideoIdsChanged);
         this.navigatoreEventService.addOnUrlChangeEventHandler(this.onUrlChange);
         this.onUrlChange({
             detail: this.navigatoreEventService.getInitalArgs(),
         });
         this.updateVideoOpenCacheIntervalId = setInterval(this.loadOpenVideosCache, 60 * 1000);
         this.garbageCollectIntervalId = setInterval(this.onCheckGarbageCollect, 1000 * 1000);
+
+        this.requestOpenVideos();
         this.loadOpenVideosCache();
     }
 
@@ -108,6 +118,16 @@ export default class VideoOpenStorageService {
 
     onBeforeUnload() {
         this.onChangeWatchVideoIds(null);
+    }
+
+    onDiscardedVideoIdsChanged({ discardedVideoIds }) {
+        this.discardedVideoIds = discardedVideoIds;
+        this.loadOpenVideosCache();
+    }
+
+    onBookmarkVideoIdsChanged({ bookmarkVideoIds }) {
+        this.bookmarkVideoIds = bookmarkVideoIds;
+        this.loadOpenVideosCache();
     }
 
     onUrlChange({ detail }) {
@@ -161,20 +181,31 @@ export default class VideoOpenStorageService {
         localStorage.removeItem(this.videoOpenTabStorageKey);
     }
 
-    loadOpenVideosCache() {
-        const oldOpenVideoIds = new Set(
-            [...this.videoOpenCache.keys()].filter(key => this.isVideoOpenFromCache(key).length),
-        );
-        this.videoOpenCache.clear();
+    async requestOpenVideos() {
+        const { discardedVideoIds, bookmarkVideoIds } = await this.messagesService.sendRequestOpenVideos();
+        this.discardedVideoIds = discardedVideoIds;
+        this.bookmarkVideoIds = bookmarkVideoIds;
+        
+        this.loadOpenVideosCache();
+    }
 
-        Object.keys(localStorage)
+    async loadOpenVideosCache() {
+        const openVideoIds = Object.keys(localStorage)
             .filter(key => key.startsWith(constants.STORAGE_KEY_PREFIX))
             .filter(key => key !== this.videoOpenTabStorageKey)
             .map(key => JSON.parse(localStorage.getItem(key)))
             .filter(entry => Date.now() < entry.timestamp + this.validSeconds * 1000)
             .flatMap(entry => entry.videoIds)
-            .filter(Boolean)
-            .forEach(entry => this.increaseVideoOpenCount(entry));
+            .filter(Boolean);
+
+        const oldOpenVideoIds = new Set(
+            [...this.videoOpenCache.keys()].filter(key => this.isVideoOpenFromCache(key).length),
+        );
+
+        this.videoOpenCache.clear();
+        openVideoIds.forEach(entry => this.increaseVideoOpenCount(entry));
+        this.discardedVideoIds.forEach(videoId => this.increaseVideoOpenCount({ videoId, type: openVideoType.DISCARDED }));
+        this.bookmarkVideoIds.forEach(videoId => this.increaseVideoOpenCount({ videoId, type: openVideoType.BOOKMARK }));
 
         const closedVideoIds = Array.from(oldOpenVideoIds).filter(videoId => !this.isVideoOpenFromCache(videoId).length);
         const openedVideoIds = Array.from(this.videoOpenCache.keys()).filter(videoId => !oldOpenVideoIds.has(videoId));

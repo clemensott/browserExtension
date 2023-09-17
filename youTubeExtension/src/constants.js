@@ -4,3 +4,10 @@ export const navigationChange = {
     STAYED: 'stayed',
     NONE: 'none',
 };
+
+export const openVideoType = {
+    WATCH: 'watch',
+    PLAYLIST: 'playlist',
+    BOOKMARK: 'bookmark',
+    DISCARDED: 'discarded',
+};

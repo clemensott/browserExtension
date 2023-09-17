@@ -1,17 +1,28 @@
 import React from 'react';
+import { openVideoType } from '../constants';
 import './VideoOpenIndicator.css';
 
+const typesOrder = [
+    openVideoType.WATCH,
+    openVideoType.DISCARDED,
+    openVideoType.PLAYLIST,
+    openVideoType.BOOKMARK,
+];
+
 function compareType(a, b) {
-    const types = ['watch', 'playlist'];
-    return types.indexOf(a) - types.indexOf(b);
+    return typesOrder.indexOf(a) - typesOrder.indexOf(b);
 }
 
 function getIcon(type) {
     switch (type) {
-        case 'watch':
+        case openVideoType.WATCH:
             return '\u23F5';
-        case 'playlist':
+        case openVideoType.PLAYLIST:
             return '\u2630';
+        case openVideoType.DISCARDED:
+            return '\u2716';
+        case openVideoType.BOOKMARK:
+            return '🔖';
         default:
             return '';
     }

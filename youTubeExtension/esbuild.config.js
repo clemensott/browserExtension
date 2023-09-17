@@ -6,6 +6,7 @@ require('esbuild').build({
         'src/fastInsite.js',
         'src/insite.js',
         'src/options.js',
+        'src/background.js',
     ],
     outdir: 'dist',
     bundle: true,

@@ -16,6 +16,7 @@ import OptionsService from './Services/OptionsService';
 import VideoOpenStorageService from './Services/VideoOpenStorageService';
 import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
 import FetchIntersectorService from './Services/FetchIntersectorService';
+import MessagesService from './Services/MessagesService';
 
 async function main() {
     const optionsService = new OptionsService(new StorageService());
@@ -25,7 +26,8 @@ async function main() {
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
-    const videoOpenStorageService = new VideoOpenStorageService(navigationService);
+    const messagesService = new MessagesService();
+    const videoOpenStorageService = new VideoOpenStorageService(navigationService, messagesService);
     const filterRecommendedVideosService = new FilterRecommendedVideosService({ videoOpenStorageService });
     const domService = new DomEventService({
         optionsService,
