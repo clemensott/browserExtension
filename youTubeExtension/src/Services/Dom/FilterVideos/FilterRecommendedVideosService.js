@@ -51,9 +51,9 @@ function getVideoContainerDuration(container) {
 }
 
 export default class FilterRecommendedVideosService {
-    constructor({ videoOpenStorageService }) {
+    constructor({ videoOpenService }) {
         this.api = null;
-        this.videoOpenStorageService = videoOpenStorageService;
+        this.videoOpenService = videoOpenService;
 
         this.filterRenderer = new ReactRenderer({
             id: 'yt-extension-filter-recommended-videos-root',
@@ -130,13 +130,13 @@ export default class FilterRecommendedVideosService {
     subscribe() {
         if (this.api) {
             this.api.addUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
-            this.videoOpenStorageService.addOpenChangedEventListener(this.onVideoOpenStateChanged);
+            this.videoOpenService.addOpenChangedEventListener(this.onVideoOpenStateChanged);
         }
     }
 
     unsubscribe() {
         this.api?.removeUpdateUserStateOfVideosEventListener(this.onUserStateOfVideoChanged);
-        this.videoOpenStorageService.removeOpenChangedEventListener(this.onVideoOpenStateChanged);
+        this.videoOpenService.removeOpenChangedEventListener(this.onVideoOpenStateChanged);
     }
 
     static getFilterBaseElement() {
@@ -322,7 +322,7 @@ export default class FilterRecommendedVideosService {
         return (
             this.filter.isOpen !== null
             && videoId
-            && !!this.filter.isOpen !== !!this.videoOpenStorageService.isVideoOpenFromCache(videoId).length
+            && !!this.filter.isOpen !== !!this.videoOpenService.isVideoOpenFromCache(videoId).length
         );
     }
 

@@ -12,7 +12,12 @@ const constants = {
  */
 export default class StorageService {
     constructor() {
-        document.addEventListener(constants.EVENTNAME, this.onSetData.bind(this));
+        if (typeof document !== 'undefined') {
+            this.useEvent = true;
+            document.addEventListener(constants.EVENTNAME, this.onSetData.bind(this));
+        } else {
+            this.useEvent = false;
+        }
     }
 
     onSetData({ detail }) {
@@ -28,7 +33,11 @@ export default class StorageService {
     }
 
     set(obj) {
-        triggerEvent(constants.EVENTNAME, obj);
+        if (this.useEvent) {
+            triggerEvent(constants.EVENTNAME, obj);
+        } else {
+            this.onSetData({ detail: obj });
+        }
     }
 
     get(keys) {

@@ -1,6 +1,7 @@
 const constants = {
     REQUEST_OPEN_VIDEOS: 'request_open_videos',
-    DISCARDED_OPEN_VIDEO: 'discarded_open_videos',
+    LOCAL_OPEN_VIDEOS_CHANGE: 'local_open_videos_change',
+    TAB_OPEN_VIDEOS_CHANGE: 'tab_open_videos_change',
     BOOKMARK_OPEN_VIDEO: 'bookmark_open_videos',
 };
 
@@ -8,20 +9,24 @@ export default class MessagesService {
     constructor() {
         this.callbacks = {
             requestOpenVideos: null,
-            discardedOpenVideos: [],
+            localOpenVideosChange: [],
+            tabOpenVideosChange: [],
             bookmarkOpenVideos: [],
         };
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
     }
 
-    onMessage(message, _, sendResponse) {
+    onMessage(message, sender, sendResponse) {
         switch (message.type) {
             case constants.REQUEST_OPEN_VIDEOS:
-                (async () => sendResponse(await this.callbacks.requestOpenVideos()))();
+                (async () => sendResponse(await this.callbacks.requestOpenVideos(sender)))();
                 return true;
-            case constants.DISCARDED_OPEN_VIDEO:
-                this.callbacks.discardedOpenVideos.forEach(callback => callback(message.data));
+            case constants.LOCAL_OPEN_VIDEOS_CHANGE:
+                this.callbacks.localOpenVideosChange.forEach(callback => callback(sender, message.data));
+                return;
+            case constants.TAB_OPEN_VIDEOS_CHANGE:
+                this.callbacks.tabOpenVideosChange.forEach(callback => callback(message.data));
                 return;
             case constants.BOOKMARK_OPEN_VIDEO:
                 this.callbacks.bookmarkOpenVideos.forEach(callback => callback(message.data));
@@ -39,15 +44,26 @@ export default class MessagesService {
         this.callbacks.requestOpenVideos = callback;
     }
 
-    sendDiscardedOpenVideos(tabIds, data) {
+    sendLocalOpenVideosChange(data) {
+        chrome.runtime.sendMessage(null, {
+            type: constants.LOCAL_OPEN_VIDEOS_CHANGE,
+            data,
+        });
+    }
+
+    onLocalOpenVideosChange(callback) {
+        this.callbacks.localOpenVideosChange.push(callback);
+    }
+
+    sendTabOpenVideosChange(tabIds, data) {
         tabIds.forEach(tabId => chrome.tabs.sendMessage(tabId, {
-            type: constants.DISCARDED_OPEN_VIDEO,
+            type: constants.TAB_OPEN_VIDEOS_CHANGE,
             data,
         }));
     }
 
-    onDiscardedOpenVideos(callback) {
-        this.callbacks.discardedOpenVideos.push(callback);
+    onTabOpenVideosChange(callback) {
+        this.callbacks.tabOpenVideosChange.push(callback);
     }
 
     sendBookmarkOpenVideos(tabIds, data) {

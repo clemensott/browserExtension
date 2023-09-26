@@ -8,12 +8,12 @@ const videoUserStateNotCollapse = 'yt-video-user-state-container-not-collapse';
 export default class VideoOverlayRenderer {
     constructor({
         api,
-        videoOpenStorageService,
+        videoOpenService,
         videoStateContainerClassName,
         videoOpenContainerClassName,
     }) {
         this.api = api;
-        this.videoOpenStorageService = videoOpenStorageService;
+        this.videoOpenService = videoOpenService;
         this.videoStateContainerClassName = videoStateContainerClassName;
         this.videoOpenContainerClassName = videoOpenContainerClassName;
     }
@@ -70,7 +70,7 @@ export default class VideoOverlayRenderer {
             addRootContainerClass,
         );
 
-        const videoOpenTypes = this.videoOpenStorageService.isVideoOpenFromCache(videoId);
+        const videoOpenTypes = this.videoOpenService.isVideoOpenFromCache(videoId);
         const videoOpen = videoOpenTypes.join(',');
         if (element.dataset.videoOpen === videoOpen) {
             return;

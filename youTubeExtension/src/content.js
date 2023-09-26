@@ -13,7 +13,7 @@ import UpdateSourcesTrackerService from './Services/UpdateSourcesTrackerService'
 import checkExclusivity from './utils/checkExclusivity';
 import StorageService from './Services/StorageService';
 import OptionsService from './Services/OptionsService';
-import VideoOpenStorageService from './Services/VideoOpenStorageService';
+import ForegroundVideoOpenService from './Services/ForegroundVideoOpenService';
 import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
 import FetchIntersectorService from './Services/FetchIntersectorService';
 import MessagesService from './Services/MessagesService';
@@ -27,8 +27,8 @@ async function main() {
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();
     const messagesService = new MessagesService();
-    const videoOpenStorageService = new VideoOpenStorageService(navigationService, messagesService);
-    const filterRecommendedVideosService = new FilterRecommendedVideosService({ videoOpenStorageService });
+    const videoOpenService = new ForegroundVideoOpenService(navigationService, messagesService);
+    const filterRecommendedVideosService = new FilterRecommendedVideosService({ videoOpenService });
     const domService = new DomEventService({
         optionsService,
         navigationService,
@@ -54,8 +54,8 @@ async function main() {
         domService.start();
         navigationService.start();
         updateSourcesTrackerService.init();
-        videoOpenStorageService.start();
-        window.videoOpenStorage = videoOpenStorageService;
+        videoOpenService.start();
+        window.videoOpenService = videoOpenService;
     }
 
     if (apiHandler) {
@@ -79,7 +79,7 @@ async function main() {
         try {
             const videoOverlayService = new VideoOverlayService({
                 api: apiHandler,
-                videoOpenStorageService,
+                videoOpenService,
             });
             videoOverlayService.start();
         } catch (err) {

@@ -24,16 +24,16 @@ function getVideoIdOfShortVideoContainer(container) {
 }
 
 export default class VideoOverlayService {
-    constructor({ api, videoOpenStorageService }) {
+    constructor({ api, videoOpenService }) {
         this.api = api;
-        this.videoOpenStorageService = videoOpenStorageService;
+        this.videoOpenService = videoOpenService;
 
         this.videoContainers = null;
         this.loop = new AtOnceService(this.loopHandle.bind(this));
         this.runLoopNonAsync = this.runLoopNonAsync.bind(this);
         this.overlayRender = new VideoOverlayRenderer({
             api,
-            videoOpenStorageService,
+            videoOpenService,
             videoStateContainerClassName,
             videoOpenContainerClassName,
         });
