@@ -56,10 +56,14 @@ export default class BackgroundVideoOpenService {
         this.storageService = storageService;
         this.messagesService = messagesService;
 
+        this.lastTabStates = null;
+        this.loadLastTabStatesPromise = null;
+
         this.onRequestOpenVideos = this.onRequestOpenVideos.bind(this);
         this.onLocalOpenVideosChange = this.onLocalOpenVideosChange.bind(this);
         this.onTabUpdated = this.onTabUpdated.bind(this);
         this.onTabRemoved = this.onTabRemoved.bind(this);
+        this.onTabReplaced = this.onTabReplaced.bind(this);
         this.onBookmarkChanged = this.onBookmarkChanged.bind(this);
     }
 
@@ -68,17 +72,36 @@ export default class BackgroundVideoOpenService {
         this.messagesService.onLocalOpenVideosChange(this.onLocalOpenVideosChange);
         chrome.tabs.onUpdated.addListener(this.onTabUpdated);
         chrome.tabs.onRemoved.addListener(this.onTabRemoved);
+        chrome.tabs.onReplaced.addListener(this.onTabReplaced);
 
         chrome.bookmarks.onCreated.addListener(this.onBookmarkChanged);
         chrome.bookmarks.onChanged.addListener(this.onBookmarkChanged);
         chrome.bookmarks.onRemoved.addListener(this.onBookmarkChanged);
     }
 
-    async getLastTabStates() {
+    async loadLastTabStates() {
         const { [constants.LAST_TAB_STATES_KEY]: lastTabStatesJson } = await this.storageService.get({
             [constants.LAST_TAB_STATES_KEY]: null,
         });
         return lastTabStatesJson && JSON.parse(lastTabStatesJson) || {};
+    }
+
+    async getLastTabStates() {
+        if (!this.lastTabStates) {
+            if (!this.loadLastTabStatesPromise) {
+                this.loadLastTabStatesPromise = this.loadLastTabStates();
+                this.lastTabStates = await this.loadLastTabStatesPromise;
+            } else {
+                await this.loadLastTabStatesPromise;
+            }
+        }
+        return this.lastTabStates;
+    }
+
+    async setLastTabStates() {
+        this.storageService.set({
+            [constants.LAST_TAB_STATES_KEY]: JSON.stringify(this.lastTabStates),
+        });
     }
 
     async getSyncedTabStates() {
@@ -91,6 +114,7 @@ export default class BackgroundVideoOpenService {
             const tabId = parseInt(key, 10);
             const tab = openTabs.find(t => t.id === tabId);
             if (!tab) {
+                console.warn('getSyncedTabStates detete tab state:', tabId, tabStates[tabId]);
                 delete tabStates[tabId];
             }
         });
@@ -114,9 +138,7 @@ export default class BackgroundVideoOpenService {
             }
         });
 
-        this.storageService.set({
-            [constants.LAST_TAB_STATES_KEY]: JSON.stringify(tabStates),
-        });
+        await this.setLastTabStates();
 
         return tabStates;
     }
@@ -142,17 +164,13 @@ export default class BackgroundVideoOpenService {
     async setTabState(tabId, state) {
         const lastTabStates = await this.getLastTabStates();
         lastTabStates[tabId] = state;
-        this.storageService.set({
-            [constants.LAST_TAB_STATES_KEY]: JSON.stringify(lastTabStates),
-        });
+        await this.setLastTabStates();
     }
 
     async removeTabState(tabId) {
         const lastTabStates = await this.getLastTabStates();
         delete lastTabStates[tabId];
-        this.storageService.set({
-            [constants.LAST_TAB_STATES_KEY]: JSON.stringify(lastTabStates),
-        });
+        await this.setLastTabStates();
     }
 
     async sendTabOpenVideosChange(tabId, openVideos) {
@@ -197,6 +215,7 @@ export default class BackgroundVideoOpenService {
 
         if (videoId || playlistId) {
             await this.setTabState(tab.id, newTabState);
+            console.log('updated tab4:', tab.id)
         } else {
             await this.removeTabState(tab.id);
         }
@@ -211,9 +230,19 @@ export default class BackgroundVideoOpenService {
         await this.sendTabOpenVideosChange(tabId, []);
     }
 
+    async onTabReplaced(newTabId, oldTabId) {
+        const tabStates = await this.getLastTabStates();
+        tabStates[newTabId] = tabStates[oldTabId];
+        delete tabStates[oldTabId];
+        await this.setLastTabStates();
+
+        await this.sendTabOpenVideosChange(newTabId, getOpenVideos(tabStates[newTabId]));
+        await this.sendTabOpenVideosChange(oldTabId, []);
+    }
+
     async onBookmarkChanged() {
         const bookmarkVideoIds = await getBookmarkVideoIds();
         const openTabIds = await getOpenYoutubeTabIds();
-        messagesService.sendBookmarkOpenVideos(openTabIds, { bookmarkVideoIds });
+        this.messagesService.sendBookmarkOpenVideos(openTabIds, { bookmarkVideoIds });
     }
 }
