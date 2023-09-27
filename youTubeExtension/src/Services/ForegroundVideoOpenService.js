@@ -3,6 +3,7 @@ import triggerEvent from '../utils/triggerEvent';
 import getVideoIdFromVideoContainer from '../utils/getVideoIdFromVideoContainer';
 import setIntervalUntil from '../utils/setIntervalUntil';
 import getPlaylistIdFromUrl from '../utils/getPlaylistIdFromUrl';
+import setIntervalVisible from '../utils/setIntervalVisible';
 
 const constants = {
     VIDEO_OPEN_CHANGE_EVENTNAME: 'ForegroundVideoOpenService.videoOpenChange',
@@ -31,11 +32,13 @@ export default class ForegroundVideoOpenService {
         this.tabsOpenVideos = new Map();
         this.videoOpenCache = new Map();
         this.checkOpenVideoIdsIntervalId = null;
+        this.clearRequestOpenVideosInterval = null;
 
         this.onUrlChange = this.onUrlChange.bind(this);
         this.onTabOpenVideosChange = this.onTabOpenVideosChange.bind(this);
         this.onBookmarkVideoIdsChanged = this.onBookmarkVideoIdsChanged.bind(this);
         this.checkOpenVideoIdsLoop = this.checkOpenVideoIdsLoop.bind(this);
+        this.requestOpenVideos = this.requestOpenVideos.bind(this);
         this.loadOpenVideosCache = this.loadOpenVideosCache.bind(this);
     }
 
@@ -48,14 +51,22 @@ export default class ForegroundVideoOpenService {
         });
 
         this.checkOpenVideoIdsIntervalId = setInterval(this.checkOpenVideoIdsLoop, 10 * 1000);
+        this.clearRequestOpenVideosInterval = setIntervalVisible({
+            callback: this.requestOpenVideos,
+            timeout: 60 * 1000,
+            triggerOnVisable: true,
+        });
 
-        this.requestOpenVideos();
         this.loadOpenVideosCache();
     }
 
     stop() {
         this.navigatoreEventService.removeOnUrlChangeEventHandler(this.onUrlChange);
         this.onChangeWatchVideoIds({ playlistVideoIds: [] });
+        clearInterval(this.checkOpenVideoIdsIntervalId);
+        if (this.clearRequestOpenVideosInterval) {
+            this.clearRequestOpenVideosInterval();
+        }
     }
 
     onTabOpenVideosChange({ tabId, openVideos }) {
@@ -64,7 +75,6 @@ export default class ForegroundVideoOpenService {
             this.loadOpenVideosCache();
         } else if (!openVideos.length && this.tabsOpenVideos.has(tabId)) {
             this.tabsOpenVideos.delete(tabId);
-            
             this.loadOpenVideosCache();
         }
     }
@@ -109,6 +119,7 @@ export default class ForegroundVideoOpenService {
 
     async requestOpenVideos() {
         const { tabs, bookmarkVideoIds } = await this.messagesService.sendRequestOpenVideos();
+        this.tabsOpenVideos.clear();
         tabs.forEach(tab => this.tabsOpenVideos.set(tab.id, tab.openVideos));
         this.bookmarkVideoIds = bookmarkVideoIds;
 
