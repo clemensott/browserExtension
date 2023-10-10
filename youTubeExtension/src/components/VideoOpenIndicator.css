@@ -5,6 +5,11 @@ span.yt-video-open-container.yt-video-user-state-watch {
     height: 25px;
 }
 
+div.ytd-reel-player-overlay-renderer > span.yt-video-open-container.yt-video-user-state-watch {
+    width: 40px;
+    height: 40px;
+}
+
 #bottom-row > span.yt-video-open-container.yt-video-user-state-watch,
 #owner-and-teaser > span.yt-video-open-container.yt-video-user-state-watch {
     margin-top: 12px;
@@ -29,4 +34,11 @@ span.yt-video-open-container.yt-video-user-state-list-item > .yt-video-open-indi
     color: white;
     cursor: default;
     pointer-events: none;
+}
+
+div.ytd-reel-player-overlay-renderer > span.yt-video-open-container.yt-video-user-state-watch > .yt-video-open-indicator-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }

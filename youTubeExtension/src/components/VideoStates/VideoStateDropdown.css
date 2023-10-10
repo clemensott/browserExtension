@@ -21,6 +21,12 @@
     box-shadow: 2px 2px 4px 1px rgb(0 0 0 / 55%);
 }
 
+div.ytd-reel-player-overlay-renderer .video-state-dropdown-container > .video-state-dropdown-menu-container {
+    top: initial;
+    bottom: 0;
+    right: 40px;
+}
+
 .video-state-dropdown-menu-item {
     margin: 5px 5px;
     white-space: nowrap;

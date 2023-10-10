@@ -2,10 +2,14 @@
     z-index: 500;
 }
 
-.yt-video-user-state-container > div {
+.yt-video-user-state-container > div.yt-video-user-state-item {
     font-size: 13px;
     display: flex;
     height: 100%;
+}
+
+div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-user-state-watch > div.yt-video-user-state-item {
+    flex-direction: column;
 }
 
 ytd-grid-video-renderer > .yt-video-user-state-container {
@@ -145,6 +149,10 @@ ytd-playlist-video-renderer > .yt-video-user-state-container.yt-video-user-state
     justify-content: center;
 }
 
+div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item > .yt-video-user-state-action-button {
+    padding: 5px 0;
+}
+
 .yt-video-user-state-action-button:not(.video-state-dropdown-action-button) {
     flex-grow: 1;
 }
@@ -182,6 +190,11 @@ div#info-text.style-scope.ytd-video-primary-info-renderer {
 .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item {
     width: 200px;
     height: 25px;
+}
+
+div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-user-state-watch > .yt-video-user-state-item { 
+    width: 40px;
+    height: 150px;
 }
 
 .yt-video-user-state-unkown {
