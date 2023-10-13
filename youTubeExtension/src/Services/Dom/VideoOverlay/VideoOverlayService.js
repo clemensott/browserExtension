@@ -10,6 +10,15 @@ const videoStateContainerClassName = 'yt-video-user-state-container';
 const videoOpenContainerClassName = 'yt-video-open-container';
 
 function getVideoIdOfShortVideoContainer(container) {
+    const thumbnailContainer = container.querySelector('#thumbnail-container');
+    if (thumbnailContainer && thumbnailContainer.href) {
+        const { pathname } = new URL(thumbnailContainer.href);
+        const match = pathname.match(/^\/source\/([a-zA-Z0-9_\-]{11})\/shorts$/);
+
+        if (match) {
+            return match[1];
+        }
+    }
     let parent = container;
     while (parent && parent.tagName !== 'YTD-REEL-VIDEO-RENDERER') {
         parent = parent.parentElement;
@@ -18,9 +27,7 @@ function getVideoIdOfShortVideoContainer(container) {
     const match = videoContainer &&
         videoContainer.style['background-image'] &&
         videoContainer.style['background-image'].match(/\/vi\/([a-zA-Z0-9-_]*)\//);
-    return match && match[1] || (
-        parent && parent.id === '0' ? getCurrentVideoId() : null
-    );
+    return match && match[1];
 }
 
 export default class VideoOverlayService {
