@@ -5,13 +5,25 @@ export default class ChannelDomEventHandler extends DomEventHandler {
     constructor() {
         super({
             eventName: 'ChannelDomEventHandler.change',
-            elementsGetter: ChannelDomEventHandler.getChannelHeader,
             timeout: 1000,
             notFoundTimeout: 100,
         });
     }
 
-    static getChannelHeader() {
-        return document.querySelector('#channel-container');
+    getElements() {
+        const header = document.querySelector('#channel-container');
+        return {
+            header,
+            headerButtons: header && header.querySelector('#inner-header-container > #buttons'),
+        };
+    }
+
+    detectChange(newObj, lastObj) {
+        return DomEventHandler.detectObjectChange(
+            newObj,
+            lastObj,
+            'header',
+            'headerButtons',
+        );
     }
 }
