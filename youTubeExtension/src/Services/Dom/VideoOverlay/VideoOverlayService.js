@@ -5,23 +5,22 @@ import AtOnceService from '../../AtOnceService';
 import addToggleDisplayVideoState from '../../../components/addToggleDisplayVideoState';
 import VideoOverlayRenderer from './VideoOverlayRenderer';
 import './VideoOverlayService.css';
+import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
 
 const videoStateContainerClassName = 'yt-video-user-state-container';
 const videoOpenContainerClassName = 'yt-video-open-container';
 
 function getVideoIdOfShortVideoContainer(container) {
-    const thumbnailContainer = container.querySelector('#thumbnail-container');
-    if (thumbnailContainer && thumbnailContainer.href) {
-        const { pathname } = new URL(thumbnailContainer.href);
-        const match = pathname.match(/^\/source\/([a-zA-Z0-9_\-]{11})\/shorts$/);
-
-        if (match) {
-            return match[1];
-        }
-    }
     let parent = container;
     while (parent && parent.tagName !== 'YTD-REEL-VIDEO-RENDERER') {
         parent = parent.parentElement;
+    }
+    const titleContainer = parent.querySelector('[data-sessionlink="feature=player-title"][href]');
+    if (titleContainer && titleContainer.href) {
+        const videoId = getVideoIdFromUrl(titleContainer.href);
+        if (videoId) {
+            return videoId;
+        }
     }
     const videoContainer = parent && parent.querySelector('div[id^="player-container"');
     const match = videoContainer &&
