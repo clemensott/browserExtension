@@ -140,6 +140,7 @@ export default class ApiHandler {
                 const channelTitle = videos.map(v => v.channelTitle).find(Boolean);
                 return sourceId && {
                     id: sourceId,
+                    youTubeId: channelId,
                     title: this.getUpdate(channelTitle),
                     type: 3,
                     videos: videos.map(video => ({
