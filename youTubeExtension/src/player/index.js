@@ -8,6 +8,7 @@ const constants = {
     ENDING_VIDEO_BUTTON_CLASSNAME: 'yt-extension-ending-video',
     SKIP_AD_PLAYBACKRATE: 8,
     END_VIDEO_PLAYBACKRATE: 8,
+    MAX_AD_PLAYTIME: 32,
 };
 
 let enableEndVideoButton = false;
@@ -68,7 +69,7 @@ function checkIsAdChanged(videoElement) {
 function skipAdvertisement() {
     const container = elementCache.getElement(elementCacheIds.AD_CONTAINER);
     if (container) {
-        const skipButton = container.querySelector('button.ytp-ad-skip-button.ytp-button');
+        const skipButton = container.querySelector('button.ytp-ad-skip-button-modern.ytp-button,button.ytp-ad-skip-button.ytp-button');
         if (skipButton) {
             skipButton.click();
         }
@@ -149,8 +150,9 @@ function loop() {
     const isAdPlayling = isAdvertisingPlayling();
     const videoElement = getVideoElement();
     if (videoElement && isAdPlayling) {
-        if (videoElement.currentTime > 32) {
-            skipAdvertisement();
+        if (videoElement.currentTime > constants.MAX_AD_PLAYTIME) {
+            videoElement.currentTime = videoElement.duration - 1;
+            // skipAdvertisement();
         }
     }
 
