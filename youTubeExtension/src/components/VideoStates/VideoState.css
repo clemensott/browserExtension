@@ -258,7 +258,7 @@ div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-u
 }
 
 h1.ytd-watch-metadata.yt-video-user-state-watch-root {
-    display: flex;
+    display: flex!important;
     flex-direction: row;
     align-items: center;
     overflow: visible;
