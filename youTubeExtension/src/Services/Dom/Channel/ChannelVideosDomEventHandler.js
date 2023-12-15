@@ -67,13 +67,13 @@ export default class ChannelVideosDomEventHandler extends DomEventHandler {
         return tab instanceof Node &&
             document.contains(tab) &&
             tab.parentElement instanceof Node &&
-            tab.parentElement.classList.contains('iron-selected');
+            tab.parentElement.classList.contains('yt-tab-shape-wiz__tab--tab-selected');
     }
 
     static getCurrentTab() {
         return document.querySelector(
-            '#tabsContent > tp-yt-paper-tab.style-scope.iron-selected > div.tab-content.style-scope.tp-yt-paper-tab'
-        );
+            '#tabsContent > yt-tab-group-shape > div.yt-tab-group-shape-wiz__tabs > yt-tab-shape > div.yt-tab-shape-wiz__tab.yt-tab-shape-wiz__tab--tab-selected'
+        )?.parentElement;
     }
 
     static isCurrentVideoListContainer(container) {
