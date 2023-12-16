@@ -28,6 +28,10 @@ const getVideosFuncs = [
         filter(Boolean).
         map(i => i.richItemRenderer?.content),
     data => data?.onResponseReceivedActions?.
+        flatMap(a => a?.reloadContinuationItemsCommand?.continuationItems).
+        filter(Boolean).
+        map(i => i.richItemRenderer?.content),
+    data => data?.onResponseReceivedActions?.
         flatMap(a => a?.appendContinuationItemsAction?.continuationItems),
 ];
 
