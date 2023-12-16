@@ -12,8 +12,9 @@ const constants = {
 };
 
 export default class ChannelVideoHidingService {
-    constructor({ domService, updateSourcesTrackerService }) {
+    constructor({ domService, fetchIntersectorService, updateSourcesTrackerService }) {
         this.domService = domService;
+        this.fetchIntersectorService = fetchIntersectorService;
         this.updateSourcesTrackerService = updateSourcesTrackerService;
 
         this.intervalId = null;
@@ -92,6 +93,14 @@ export default class ChannelVideoHidingService {
 
     isHiding() {
         return !!this.intervalId;
+    }
+
+    get fastMode(){
+        return this.fetchIntersectorService.reduceVideosEnabled;
+    }
+
+    set fastMode(value){
+        this.fetchIntersectorService.setReduceVideosEnabled(value);
     }
 
     addRunningChangeEventListener(callback) {

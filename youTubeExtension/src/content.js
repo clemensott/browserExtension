@@ -15,7 +15,7 @@ import StorageService from './Services/StorageService';
 import OptionsService from './Services/OptionsService';
 import ForegroundVideoOpenService from './Services/ForegroundVideoOpenService';
 import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
-import FetchIntersectorService from './Services/FetchIntersectorService';
+import fetchIntersectorService from './Services/FetchIntersectorService';
 import MessagesService from './Services/MessagesService';
 
 async function main() {
@@ -35,7 +35,11 @@ async function main() {
         updateSourcesTrackerService,
         filterRecommendedVideosService,
     });
-    const channelVideoHidingService = new ChannelVideoHidingService({ domService, updateSourcesTrackerService });
+    const channelVideoHidingService = new ChannelVideoHidingService({
+        domService,
+        fetchIntersectorService,
+        updateSourcesTrackerService,
+    });
     const channelHelperService = new ChannelHelperService({
         channelVideoHidingService,
         domService,
@@ -88,7 +92,7 @@ async function main() {
 
         importBundle('insite.js');
     } else {
-        FetchIntersectorService.disable();
+        fetchIntersectorService.disable();
     }
 }
 

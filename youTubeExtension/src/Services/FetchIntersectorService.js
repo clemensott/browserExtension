@@ -3,14 +3,40 @@ import triggerEvent from '../utils/triggerEvent';
 const constants = {
     FETCH_TEXT_EVENT_NAME: 'FetchIntersectorService.onfetchtext',
     DISABLE_EVENT_NAME: 'FetchIntersectorService.ondisable',
+    REDUCE_VIDEOS_EVENT_NAME: 'FetchIntersectorService.onreducevideos',
 };
+
+function reduceVideos(text) {
+    const obj = JSON.parse(text);
+    return JSON.stringify(obj, (key, value) => {
+        if (['contents', 'continuationItems'].includes(key)
+            && Array.isArray(value)
+            && 'continuationItemRenderer' in value[value.length - 1]) {
+            let foundOne = false;
+            return value.filter(entry => {
+                if ('richItemRenderer' in entry) {
+                    if (foundOne) {
+                        return false;
+                    }
+
+                    foundOne = true;
+                    return true;
+                }
+                return true;
+            });
+        }
+        return value;
+    })
+}
 
 class FetchIntersectorService {
     constructor() {
         this.isSendingEnabled = false;
+        this.reduceVideosEnabled = false;
         this.queue = [];
 
         this.onDisabled = this.onDisabled.bind(this);
+        document.addEventListener(constants.REDUCE_VIDEOS_EVENT_NAME, ({ detail }) => this.reduceVideosEnabled = detail);
     }
 
     sendData(data) {
@@ -56,7 +82,7 @@ class FetchIntersectorService {
                     text,
                 });
             }
-            return text;
+            return that.reduceVideosEnabled ? reduceVideos(text) : text;
         };
         document.addEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
     }
@@ -77,6 +103,11 @@ class FetchIntersectorService {
         this.isSendingEnabled = true;
         this.queue.forEach(data => this.sendData(data));
         this.queue.splice(0);
+    }
+
+    setReduceVideosEnabled(value) {
+        this.reduceVideosEnabled = !!value;
+        triggerEvent(constants.REDUCE_VIDEOS_EVENT_NAME, !!value);
     }
 
     addOnTextListener(callback) {
