@@ -1,4 +1,4 @@
-import getVideoIdFromUrl from "./getVideoIdFromUrl";
+import getVideoIdFromUrl from './getVideoIdFromUrl';
 
 export default function getVideoIdFromVideoContainer(container) {
     const a = container.querySelector('a#thumbnail');
