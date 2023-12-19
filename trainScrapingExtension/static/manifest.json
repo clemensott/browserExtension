@@ -1,0 +1,57 @@
+{
+    "name": "TrainScrapingUtils",
+    "version": "1.0",
+    "description": "Does stuff with train scrapings",
+    "manifest_version": 3,
+    "icons": {
+        "16": "resources/train_16.png",
+        "48": "resources/train_48.png",
+        "128": "resources/train_128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://openrailwaymap.org/*",
+                "https://openrailwaymap.org/*",
+                "http://www.openrailwaymap.org/*",
+                "https://www.openrailwaymap.org/*"
+            ],
+            "js": [
+                "vendor/vanillaSelectBox/vanillaSelectBox.js",
+                "content.js"
+            ],
+            "css": [
+                "vendor/vanillaSelectBox/vanillaSelectBox.css",
+                "content.css"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "insite.js",
+                "resources/icons/delay/black.png",
+                "resources/icons/delay/blue.png",
+                "resources/icons/delay/gray.png",
+                "resources/icons/delay/green.png",
+                "resources/icons/delay/orange.png",
+                "resources/icons/delay/purple.png",
+                "resources/icons/delay/red.png",
+                "resources/icons/delay/white.png",
+                "resources/icons/delay/yellow.png",
+                "resources/icons/product/black.png",
+                "resources/icons/product/darkred.png",
+                "resources/icons/product/red.png",
+                "resources/icons/product/gray.png",
+                "resources/icons/product/lightblue.png",
+                "resources/icons/product/orange.png"
+            ],
+            "matches": [
+                "http://openrailwaymap.org/*",
+                "https://openrailwaymap.org/*",
+                "http://www.openrailwaymap.org/*",
+                "https://www.openrailwaymap.org/*"
+            ]
+        }
+    ]
+}
