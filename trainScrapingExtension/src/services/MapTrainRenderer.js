@@ -80,10 +80,12 @@ export class MapTrainRenderer {
     renderMarker(train, entry) {
         const { name, destination } = train;
         const { lat, long, product_class: productClass, delay, time } = entry;
+        const delayText = typeof delay === 'number' ? `(delay: ${delay} min) ` : '';
+        const timeText = new Date(time).toLocaleTimeString();
         const marker = L.marker(
             [parseCoordinate(long), parseCoordinate(lat)],
             {
-                title: `${name} -> ${destination} (delay: ${delay ?? '?'} min) (at ${time})`,
+                title: `${name} -> ${destination} ${delayText}(at ${timeText})`,
                 icon: this.getIcon(productClass, delay),
             }
         ).addTo(map);

@@ -40,12 +40,16 @@ function createTree({ trains, checkedCheckboxes, onChange }) {
             nameObj.children.push(destinationObj);
         }
 
+        const startTimestamp = train.data[0].time;
+        const startTimeText = new Date(startTimestamp).toLocaleTimeString();
+        const endTimestamp = train.data[train.data.length - 1].time;
+        const endTimeText = new Date(endTimestamp).toLocaleTimeString();
         const trainIdObj = {
             name: train.name,
             destination: train.destination,
             trainId: train.trainId,
             train,
-            label: train.trainId,
+            label: `${startTimeText} - ${endTimeText} Uhr`,
             checked: false,
             parent: destinationObj,
             onChange: e => onChange({ node: trainIdObj, checked: e.target.checked }),
