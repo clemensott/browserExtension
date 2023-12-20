@@ -48,48 +48,6 @@ export class Api {
         }
     }
 
-    async getTagValues(tag) {
-        const fluxQuery = `
-            import "influxdata/influxdb/schema"
-            schema.tagValues(bucket: "${this.bucket}", tag: "${tag}")
-        `;
-        const allValues = [];
-        for await (const { values, tableMeta } of this.queryApi.iterateRows(fluxQuery)) {
-            const { index } = tableMeta.columns.find(c => c.label === '_value');
-            allValues.push(values[index]);
-        }
-
-        return allValues;
-    }
-
-    getTrainNames() {
-        return this.getTagValues('name');
-    }
-
-    getDestinations() {
-        return this.getTagValues('destination');
-    }
-
-    async getRecentTags({ start }) {
-        const fluxQuery = `
-            from(bucket: "${this.bucket}")
-            |> range(start: ${start})
-            |> filter(fn: (r) => r._measurement == "dny_train")
-            |> filter(fn: (r) => r._field == "train_id")
-            |> first()
-        `;
-        const allValues = [];
-        for await (const { values, tableMeta } of this.queryApi.iterateRows(fluxQuery)) {
-            const o = tableMeta.toObject(values);
-            allValues.push({
-                destination: o.destination,
-                name: o.name,
-            });
-        }
-
-        return allValues;
-    }
-
     async searchTrainNames({ needle, start, limit }) {
         needle = needle.replace(/[#.]|[[-^]|[?|{}()]/g, '')
             .replace(/ +/g, ' +');
@@ -173,34 +131,9 @@ export class Api {
             }
         }
 
-        console.log(trainData);
-
         return [...trainData.values()].map(t => ({
             ...t,
             data: [...t.data.values()],
         }));
-    }
-
-    async getDnyMetas({ rangeStart, rangeEnd, limit }) {
-        const response = await this.fetch('/trains/dnyMetas', {
-            query: {
-                rangeStart: rangeStart.toJSON(),
-                rangeEnd: rangeEnd && rangeEnd.toJSON(),
-                limit,
-            },
-        });
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(response.statusText);
-    }
-
-    async getDnys(ids) {
-        const search = ids.map(id => `ids=${id}`).join('&');
-        const response = await this.fetch(`/trains/dnys?${search}`);
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(response.statusText);
     }
 }
