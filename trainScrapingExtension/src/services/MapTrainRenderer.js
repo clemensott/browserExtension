@@ -35,13 +35,21 @@ function getDelayIconName(delay) {
     }
 }
 
+function getTrainKey({ name, destination, trainId }) {
+    return [
+        name,
+        destination,
+        trainId,
+    ].map(part => part ?? '').join('|');
+}
+
 export class MapTrainRenderer {
     constructor(map, iconSize = 10, iconShadowSize = 25) {
         this.map = map;
         this.iconSize = iconSize;
         this.iconShadowSize = iconShadowSize;
         this.icons = new Map();
-        this.markers = [];
+        this.markers = new Map();
         this.insiteCommunicator = new InsiteCommunicator('MapTrainRenderer');
     }
 
@@ -75,7 +83,12 @@ export class MapTrainRenderer {
                 icon: this.getIcon(productClass, delay),
             }
         ).addTo(map);
-        this.markers.push(marker);
+
+        const key = getTrainKey(train);
+        if (!this.markers.has(key)) {
+            this.markers.set(key, []);
+        }
+        this.markers.get(key).push(marker);
     }
 
     renderTrain(train) {
@@ -86,10 +99,14 @@ export class MapTrainRenderer {
         this.insiteCommunicator.addMessageListener(this.onTrains.bind(this));
     }
 
-    onTrains({ detail: trains }) {
-        this.markers.forEach(marker => marker.onRemove(this.map));
-        this.markers.length = 0;
-        trains.forEach(t => this.renderTrain(t));
+    onTrains({ detail: { addedTrains, removedTrains } }) {
+        removedTrains.forEach(train => {
+            const key = getTrainKey(train);
+            this.markers.get(key).forEach(marker => marker.onRemove(this.map));
+            this.markers.delete(key);
+        });
+
+        addedTrains.forEach(train => this.renderTrain(train));
     }
 
     sendTrains(trains) {

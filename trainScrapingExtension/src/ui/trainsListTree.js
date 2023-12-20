@@ -75,6 +75,10 @@ function getCheckedTrains(trees, isBranchChecked = false) {
     });
 }
 
+function excludeTrains(allTrains, excludeTrains) {
+    return [...allTrains.keys()].filter(key => !excludeTrains.has(key)).map(key => allTrains.get(key));
+}
+
 export function createTrainListTree({ onSelectionChange }) {
     let treeRoots = [];
     const checkedCheckboxes = new Set();
@@ -91,11 +95,14 @@ export function createTrainListTree({ onSelectionChange }) {
         ],
     });
 
-    function triggerSelectionChange() {
+    function triggerSelectionChange(reset = false) {
+        const lastCheckedTrains = new Map(checkedTrains.entries());
         checkedTrains.clear();
         getCheckedTrains(treeRoots).forEach(train => checkedTrains.set(getTrainKey(train), train));
         onSelectionChange({
             selectedTrains: [...checkedTrains.values()],
+            addedTrains: reset ? [...checkedTrains.values()] : excludeTrains(checkedTrains, lastCheckedTrains),
+            removedTrains: reset ? [...lastCheckedTrains.values()] : excludeTrains(lastCheckedTrains, checkedTrains),
         });
     }
 
@@ -127,7 +134,7 @@ export function createTrainListTree({ onSelectionChange }) {
             trainsContainer.innerText = 'Nothing to select';
         }
 
-        triggerSelectionChange();
+        triggerSelectionChange(true);
     }
 
     updateTrains([]);

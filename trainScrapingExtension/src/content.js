@@ -24,7 +24,7 @@ async function main() {
     const mapTrainRenderer = new MapTrainRenderer();
     createTrainHistory({
         api,
-        onTrainSelectionChange: e => mapTrainRenderer.sendTrains(e.selectedTrains),
+        onTrainSelectionChange: e => mapTrainRenderer.sendTrains(e),
     });
 }
 
