@@ -4,8 +4,10 @@ import { getIconUrl } from "./icons";
 
 function getProductClassIconName(productClass) {
     switch (productClass) {
-        case 2:
+        case 1:
             return 'darkred';
+        case 2:
+            return 'orange';
         case 4:
             return 'red';
         case 8:
@@ -15,7 +17,7 @@ function getProductClassIconName(productClass) {
         case 32:
             return 'lightblue';
         default:
-            return 'orange';
+            return 'blue';
     }
 }
 
