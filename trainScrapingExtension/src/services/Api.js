@@ -19,26 +19,6 @@ export class Api {
         this.queryApi = this.influxClient.getQueryApi(org);
     }
 
-    getUrl(path, query) {
-        const search = query && Object.entries(query)
-            .filter(([key, value]) => key && typeof value !== 'undefined')
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&');
-        return `${this.baseUrl}${path}${search ? '?' : ''}${search || ''}`;
-    }
-
-    fetch(path, { query, method, body, headers } = {}) {
-        return window.fetch(this.getUrl(path, query), {
-            method,
-            headers: {
-                authorization: `Basic ${this.token}`,
-                ...(body ? { 'Content-Type': 'application/json', } : null),
-                ...headers,
-            },
-            body: body ? JSON.stringify(body) : undefined,
-        })
-    }
-
     async ping() {
         try {
             await this.pingApi.getPing();
@@ -56,7 +36,7 @@ export class Api {
             |> range(start: ${start})
             |> filter(fn: (r) => r._measurement == "dny_train")
             |> filter(fn: (r) => r.name =~ /^(${needle})/)
-            |> filter(fn: (r) => r._field == "train_id")
+            |> filter(fn: (r) => r._field == "dny_id")
             |> group(columns: ["name"])
             |> first()
             |> group(columns: ["_measurement"])
@@ -81,7 +61,8 @@ export class Api {
             |> range(start: ${start})
             |> filter(fn: (r) => r._measurement == "dny_train")
             |> filter(fn: (r) => ${trainNameCondition})
-            |> filter(fn: (r) => r._field == "train_id")
+            |> filter(fn: (r) => r._field == "dny_id")
+            |> group(columns: ["name", "destination"])
             |> first()
         `;
         const allValues = [];
@@ -109,12 +90,13 @@ export class Api {
         const trainData = new Map();
         for await (const { values, tableMeta } of this.queryApi.iterateRows(fluxQuery)) {
             const o = tableMeta.toObject(values);
-            const key = `${o.name}|${o.destination}`;
+            const key = `${o.name}|${o.destination}|${o.train_id}`;
             let train = trainData.get(key);
             if (!train) {
                 train = {
                     name: o.name,
                     destination: o.destination,
+                    trainId: o.train_id,
                     data: new Map(),
                 };
                 trainData.set(key, train);

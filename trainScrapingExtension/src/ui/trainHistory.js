@@ -8,24 +8,14 @@ import { createSidebarSection } from './components/sidebarSection';
 import { createTrainHistoryLegend } from './trainHistoryLegend';
 import { createTrainListTree } from './trainsListTree';
 
-function groupTrainData(trainData, date) {
+function filterTrainDataForDate(trainData, date) {
     const dateString = formatIsoDate(date);
-    return trainData.flatMap(train => {
-        const grouped = train.data.filter(entry => entry.date === dateString).reduce((map, entry) => {
-            if (!map.has(entry.train_id)) {
-                map.set(entry.train_id, []);
-            }
-            map.get(entry.train_id).push(entry);
-            return map;
-        }, new Map());
-
-        return [...grouped].map(([trainId, data]) => ({
-            name: train.name,
-            destination: train.destination,
-            trainId,
-            data,
-        }));
-    });
+    return trainData.map(train => ({
+        name: train.name,
+        destination: train.destination,
+        trainId: train.trainId,
+        data: train.data.filter(entry => entry.date === dateString),
+    })).filter(t => t.data.length);
 }
 
 function getTrainKey({ name, destination }) {
@@ -183,6 +173,8 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
     function updateTrainsTree() {
         const trains = getSelectedTrainNamesAndDestinations();
         const selectedTrainsData = trains.flatMap(train => trainsData.get(getTrainKey(train))).filter(Boolean);
-        trainsListTree.updateTrains(groupTrainData(selectedTrainsData, datePicker.getSelectedDate()));
+        const dateTrainsData = filterTrainDataForDate(selectedTrainsData, datePicker.getSelectedDate());
+        const sortedTrainsData = dateTrainsData.sort((a, b) => a.data[0].time.localeCompare(b.data[0].time));
+        trainsListTree.updateTrains(sortedTrainsData);
     }
 }
