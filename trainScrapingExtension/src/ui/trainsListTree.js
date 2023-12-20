@@ -6,53 +6,51 @@ function getTrainKey({ name, destination, trainId }) {
         name,
         destination,
         trainId,
-    ].join('|');
+    ].map(part => part ?? '').join('|');
 }
 
-function createTree({ trains, checkedTrains, onNameChange, onDestinationChange, onTrainIdChange }) {
+function createTree({ trains, checkedCheckboxes, onChange }) {
     const root = [];
     trains.forEach(train => {
-        const checked = checkedTrains.has(getTrainKey(train));
-
         let nameObj = root.find(t => t.name === train.name);
         if (!nameObj) {
             nameObj = {
                 name: train.name,
                 label: train.name,
-                checked: true,
-                disabled: true,
-                onChange: e => onNameChange({ node: nameObj, checked: e.target.checked }),
+                checked: false,
+                onChange: e => onChange({ node: nameObj, checked: e.target.checked }),
                 children: [],
             };
+            nameObj.checked = checkedCheckboxes.has(getTrainKey(nameObj));
             root.push(nameObj);
         }
-        nameObj.checked = nameObj.checked && checked;
-        nameObj.disabled = nameObj.disabled && train.disabled;
 
         let destinationObj = nameObj.children.find(t => t.destination === train.destination);
         if (!destinationObj) {
             destinationObj = {
+                name: train.name,
                 destination: train.destination,
                 label: train.destination,
-                checked: true,
-                disabled: true,
+                checked: false,
                 parent: nameObj,
-                onChange: e => onDestinationChange({ node: destinationObj, checked: e.target.checked }),
+                onChange: e => onChange({ node: destinationObj, checked: e.target.checked }),
                 children: [],
             };
+            destinationObj.checked = checkedCheckboxes.has(getTrainKey(destinationObj));
             nameObj.children.push(destinationObj);
         }
-        destinationObj.checked = destinationObj.checked && checked;
-        destinationObj.disabled = destinationObj.disabled && train.disabled;
 
         const trainIdObj = {
+            name: train.name,
+            destination: train.destination,
+            trainId: train.trainId,
             train,
             label: train.trainId,
-            checked,
-            disabled: train.disabled,
+            checked: false,
             parent: destinationObj,
-            onChange: e => onTrainIdChange({ node: trainIdObj, checked: e.target.checked }),
+            onChange: e => onChange({ node: trainIdObj, checked: e.target.checked }),
         };
+        trainIdObj.checked = checkedCheckboxes.has(getTrainKey(trainIdObj));
         destinationObj.children.push(trainIdObj);
     });
     return root;
@@ -67,32 +65,19 @@ function connect(trees, containerTrees) {
     }
 }
 
-function setBranchChecked(branch, checked) {
-    branch.setChecked(checked);
-    if (branch.children) {
-        branch.children.forEach(child => setBranchChecked(child, checked));
-    }
-}
-
-function updateChecked(branch) {
-    if (branch.children?.length) {
-        const allChecked = branch.children.map(updateChecked).every(Boolean);
-        branch.setChecked(allChecked);
-    }
-    return branch.getChecked();
-}
-
-function getCheckedTrains(trees) {
+function getCheckedTrains(trees, isBranchChecked = false) {
     return trees.flatMap(tree => {
+        const checked = isBranchChecked || tree.container.getChecked();
         if (tree.children?.length) {
-            return getCheckedTrains(tree.children);
+            return getCheckedTrains(tree.children, checked);
         }
-        return tree.container.getChecked() ? [tree.train] : [];
+        return checked ? [tree.train] : [];
     });
 }
 
 export function createTrainListTree({ onSelectionChange }) {
     let treeRoots = [];
+    const checkedCheckboxes = new Set();
     const checkedTrains = new Map();
 
     const trainsContainer = createElement();
@@ -114,19 +99,13 @@ export function createTrainListTree({ onSelectionChange }) {
         });
     }
 
-    function onNameChange({ node, checked }) {
-        setBranchChecked(node.container, checked);
-        triggerSelectionChange();
-    }
-
-    function onDestinationChange({ node, checked }) {
-        setBranchChecked(node.container, checked);
-        updateChecked(node.parent.container);
-        triggerSelectionChange();
-    }
-
-    function onTrainIdChange({ node }) {
-        updateChecked(node.parent.parent.container);
+    function onChange({ node, checked }) {
+        const key = getTrainKey(node);
+        if (checked) {
+            checkedCheckboxes.add(key);
+        } else {
+            checkedCheckboxes.delete(key);
+        }
         triggerSelectionChange();
     }
 
@@ -134,10 +113,8 @@ export function createTrainListTree({ onSelectionChange }) {
         if (trains.length) {
             treeRoots = createTree({
                 trains,
-                checkedTrains,
-                onNameChange,
-                onDestinationChange,
-                onTrainIdChange,
+                checkedCheckboxes,
+                onChange,
             });
 
             const rootElements = treeRoots.map(root => createCheckboxTree({ tree: root }));
