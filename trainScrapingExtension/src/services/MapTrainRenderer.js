@@ -26,12 +26,14 @@ function getDelayIconName(delay) {
         return 'white';
     } else if (delay < 4) {
         return 'green';
-    } else if (delay < 10) {
+    } else if (delay < 9) {
         return 'yellow';
-    } else if (delay < 25) {
+    } else if (delay < 20) {
         return 'orange';
-    } else if (delay < 60) {
+    } else if (delay < 45) {
         return 'red';
+    } else if (delay < 120) {
+        return 'purple';
     } else {
         return 'black';
     }

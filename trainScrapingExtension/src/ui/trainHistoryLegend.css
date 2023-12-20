@@ -1,0 +1,16 @@
+.ts-trains-legend {
+    margin-top: 30px;
+}
+
+.ts-trains-legend-part {
+    margin-top: 10px;
+}
+
+.ts-trains-legend-icon-text-container {
+    display: flex;
+    align-items: center;
+}
+
+.ts-trains-legend-icon-text {
+    margin-left: 5px;
+}

@@ -5,6 +5,7 @@ import { createDatePicker } from './components/datePicker';
 import { createFormGroup } from './components/formGroup';
 import { createSelect } from './components/select';
 import { createSidebarSection } from './components/sidebarSection';
+import { createTrainHistoryLegend } from './trainHistoryLegend';
 import { createTrainListTree } from './trainsListTree';
 
 function groupTrainData(trainData, date) {
@@ -47,7 +48,7 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
     });
 
     const datePicker = createDatePicker({
-        value: new Date(),
+        value: addDays(new Date(), -1),
         min: addDays(new Date(), -getSelectedDays()),
         max: new Date(),
         onChange: updateTrainsTree,
@@ -86,6 +87,7 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
                 input: datePicker.element,
             }),
             trainsListTree.element,
+            createTrainHistoryLegend(),
         ],
     });
 

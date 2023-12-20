@@ -14,6 +14,7 @@ if (typeof chrome?.runtime?.getURL === 'function') {
             gray: getURL('product/gray.png'),
             lightblue: getURL('product/lightblue.png'),
             orange: getURL('product/orange.png'),
+            blue: getURL('product/blue.png'),
         },
         delay: {
             black: getURL('delay/black.png'),
@@ -24,6 +25,7 @@ if (typeof chrome?.runtime?.getURL === 'function') {
             purple: getURL('delay/purple.png'),
             red: getURL('delay/red.png'),
             white: getURL('delay/white.png'),
+            whiteBlack: getURL('delay/white_black.png'),
             yellow: getURL('delay/yellow.png'),
         },
     };
