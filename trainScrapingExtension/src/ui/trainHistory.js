@@ -69,10 +69,7 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
                 input: createSelect({
                     id: 'train-names',
                     multiple: true,
-                    options: [{
-                        value: '',
-                        text: 'Enter search term',
-                    }],
+                    options: [],
                     onChange: updateTrainDestinations,
                 }),
             }),
