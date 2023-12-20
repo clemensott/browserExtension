@@ -27,10 +27,14 @@ function groupTrainData(trainData, date) {
     });
 }
 
+function getTrainKey({ name, destination }) {
+    return `${name}|${destination}`;
+}
+
 export function createTrainHistory({ api, onTrainSelectionChange }) {
     let trainNameSearchId = 0;
     let groupedTrainDestinations = new Map();
-    let trainsData = [];
+    const trainsData = new Map();
 
     const lastDaysInput = createElement({
         tag: 'input',
@@ -109,6 +113,7 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
     }
 
     function onDaysChanged() {
+        trainsData.clear();
         datePicker.setMin(addDays(new Date(), -getSelectedDays()));
         updateTrainDestinations();
         updateTrainsData();
@@ -158,13 +163,27 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
         })));
     }
 
+    function getSelectedTrainNamesAndDestinations() {
+        return getSelectedTrainDestinations().flatMap(dest => groupedTrainDestinations.get(dest))
+    }
+
     async function updateTrainsData() {
-        const trains = getSelectedTrainDestinations().flatMap(dest => groupedTrainDestinations.get(dest));
-        trainsData = await api.getTrainData({ trains, start: `-${getSelectedDays()}d` });
+        const trains = getSelectedTrainNamesAndDestinations();
+        await trains.reduce(async (promise, train) => {
+            await promise;
+            const key = getTrainKey(train);
+            if (!trainsData.has(key)) {
+                const trainData = await api.getTrainData({ trains: [train], start: `-${getSelectedDays()}d` });
+                trainsData.set(key, trainData);
+            }
+        }, Promise.resolve());
+
         updateTrainsTree();
     }
 
     function updateTrainsTree() {
-        trainsListTree.updateTrains(groupTrainData(trainsData, datePicker.getSelectedDate()));
+        const trains = getSelectedTrainNamesAndDestinations();
+        const selectedTrainsData = trains.flatMap(train => trainsData.get(getTrainKey(train))).filter(Boolean);
+        trainsListTree.updateTrains(groupTrainData(selectedTrainsData, datePicker.getSelectedDate()));
     }
 }
