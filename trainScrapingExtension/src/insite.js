@@ -1,4 +1,4 @@
-import { MapTrainRenderer } from "./services/MapTrainRenderer";
+import { MapTrainRenderer } from './services/MapTrainRenderer';
 
 function main() {
     const mapTrainRenderer = new MapTrainRenderer(map);

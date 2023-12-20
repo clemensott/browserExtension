@@ -1,6 +1,6 @@
-import { parseCoordinate } from "../utils/parseCoordinate";
-import { InsiteCommunicator } from "./InsiteCommunicator";
-import { getIconUrl } from "./icons";
+import { parseCoordinate } from '../utils/parseCoordinate';
+import { InsiteCommunicator } from './InsiteCommunicator';
+import { getIconUrl } from './icons';
 
 function getProductClassIconName(productClass) {
     switch (productClass) {

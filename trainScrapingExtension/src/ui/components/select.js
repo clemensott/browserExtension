@@ -1,4 +1,4 @@
-import { createElement } from "./createElement";
+import { createElement } from './createElement';
 
 function appendOptions({ select, options, selectedValues }) {
     if (Array.isArray(options)) {
