@@ -85,7 +85,7 @@ export default class UpdateSourcesService {
             await promise;
             const videos = handler.extractVideos(data);
             if (videos && videos.length) {
-                console.log('handle videos:', handler.name, videos.length);
+                console.log('handle videos:', handler.name, videos.length, videos);
                 await this.handleVideosUpdates(videos, fetchTime);
                 updateThumbnails(videos);
             }

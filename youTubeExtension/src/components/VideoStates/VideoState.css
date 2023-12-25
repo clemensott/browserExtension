@@ -202,6 +202,10 @@ div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-u
 }
 
 .yt-video-user-state-missing {
+    background: white;
+}
+
+.yt-video-user-state-missing.yt-video-user-state-unkown-at-first {
     background: repeating-linear-gradient(-45deg, white 0 10px, black 10px 20px);
 }
 
@@ -225,12 +229,28 @@ div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-u
     background: #40B940;
 }
 
+.yt-video-user-state-watched.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #009900 10px 20px);
+}
+
+.yt-video-user-state-watched.yt-video-user-state-updating.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #40B940 10px 20px);
+}
+
 .yt-video-user-state-active {
     background: #990000;
 }
 
 .yt-video-user-state-active.yt-video-user-state-updating {
     background: #C94040;
+}
+
+.yt-video-user-state-active.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #990000 10px 20px);
+}
+
+.yt-video-user-state-active.yt-video-user-state-updating.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #C94040 10px 20px);
 }
 
 .yt-video-user-state-inactive {
@@ -241,6 +261,14 @@ div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-u
     background: rgb(158, 50, 158);
 }
 
+.yt-video-user-state-inactive.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, purple 10px 20px);
+}
+
+.yt-video-user-state-inactive.yt-video-user-state-updating.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, rgb(158, 50, 158) 10px 20px);
+}
+
 .yt-video-user-state-inactive-depricated {
     background: #CC7600;
 }
@@ -249,12 +277,28 @@ div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-u
     background: #FC9660;
 }
 
+.yt-video-user-state-inactive-depricated.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #CC7600 10px 20px);
+}
+
+.yt-video-user-state-inactive-depricated.yt-video-user-state-updating.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, #FC9660 10px 20px);
+}
+
 .yt-video-user-state-count {
     background: grey;
 }
 
 .yt-video-user-state-count.yt-video-user-state-updating {
     background: rgb(180, 180, 180);
+}
+
+.yt-video-user-state-inactive-depricated.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, grey 10px 20px);
+}
+
+.yt-video-user-state-inactive-depricated.yt-video-user-state-updating.yt-video-user-state-unkown-at-first {
+    background: repeating-linear-gradient(-45deg, black 0 10px, rgb(180, 180, 180) 10px 20px);
 }
 
 h1.ytd-watch-metadata.yt-video-user-state-watch-root {

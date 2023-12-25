@@ -175,6 +175,7 @@ export default class VideoOverlayService {
         this.updateBroadcast.addEventListener('message', async ({ data }) => {
             switch (data.type) {
                 case 'startHandleVideos':
+                    await this.api.updateUserStateOfVideos(data.videos.map(video => video.id));
                     return this.runLoopNonAsync();
                 case 'endHandleVideos':
                     await this.api.updateUserStateOfVideos(data.videos.map(video => video.id), true);

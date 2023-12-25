@@ -74,6 +74,7 @@ export default class ApiHandler {
 
         videoIds.forEach(videoId => {
             this.setVideoUserState({
+                unkownAtFirst: !response.has(videoId),
                 ...this.getVideoUserState(videoId),
                 ...response.get(videoId),
                 videoId,
