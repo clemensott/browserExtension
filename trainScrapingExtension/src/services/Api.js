@@ -90,13 +90,12 @@ export class Api {
         const trainData = new Map();
         for await (const { values, tableMeta } of this.queryApi.iterateRows(fluxQuery)) {
             const o = tableMeta.toObject(values);
-            const key = `${o.name}|${o.destination}|${o.train_id}`;
+            const key = `${o.name}|${o.destination}|${o.index}`;
             let train = trainData.get(key);
             if (!train) {
                 train = {
                     name: o.name,
                     destination: o.destination,
-                    trainId: o.train_id,
                     data: new Map(),
                 };
                 trainData.set(key, train);
@@ -113,9 +112,36 @@ export class Api {
             }
         }
 
-        return [...trainData.values()].map(t => ({
-            ...t,
-            data: [...t.data.values()],
-        }));
+        const concatenatedTrainData = [...trainData.values()].reduce((map, train) => {
+            const key = `${train.name}|${train.destination}`;
+            if (map.has(key)) {
+                map.get(key).data.push(...train.data.values());
+            } else {
+                map.set(key, {
+                    ...train,
+                    data: [...train.data.values()],
+                });
+            }
+
+            return map;
+        }, new Map());
+
+        return [...concatenatedTrainData.values()].flatMap(t => {
+            const trainIdGroups = t.data.reduce((map, entry) => {
+                if (!map.has(entry.train_id)) {
+                    map.set(entry.train_id, [entry]);
+                } else {
+                    map.get(entry.train_id).push(entry);
+                }
+
+                return map;
+            }, new Map())
+
+            return [...trainIdGroups].map(([trainId, data]) => ({
+                ...t,
+                trainId,
+                data,
+            }));
+        });
     }
 }
