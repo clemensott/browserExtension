@@ -53,7 +53,7 @@ export function createTrainHistoryLegend() {
                 children: [
                     {
                         tag: 'label',
-                        innerText: 'Verspäungen (innerer Kreis):',
+                        innerText: 'Verspätungen (innerer Kreis):',
                         classList: ['ts-trains-legend-header'],
                     },
                     getDalyIconText({ text: '<= 3 Minuten', iconName: 'green' }),
