@@ -4,9 +4,9 @@
     "description": "Does stuff with train scrapings",
     "manifest_version": 3,
     "icons": {
-        "16": "resources/train_16.png",
-        "48": "resources/train_48.png",
-        "128": "resources/train_128.png"
+        "16": "resources/icons/train_16.png",
+        "48": "resources/icons/train_48.png",
+        "128": "resources/icons/train_128.png"
     },
     "content_scripts": [
         {

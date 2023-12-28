@@ -1,3 +1,4 @@
+import { normalizeTrainName } from '../utils/normalizeTrainName';
 import { createCheckboxTree } from './components/checkboxTree';
 import { createElement } from './components/createElement';
 
@@ -16,7 +17,7 @@ function createTree({ trains, checkedCheckboxes, onChange }) {
         if (!nameObj) {
             nameObj = {
                 name: train.name,
-                label: train.name,
+                label: normalizeTrainName(train.name),
                 checked: false,
                 onChange: e => onChange({ node: nameObj, checked: e.target.checked }),
                 children: [],

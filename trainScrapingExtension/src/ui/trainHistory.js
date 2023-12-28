@@ -1,5 +1,6 @@
 import { addDays } from '../utils/addDays';
 import { formatIsoDate } from '../utils/formatIsoDate';
+import { normalizeTrainName } from '../utils/normalizeTrainName';
 import { createElement } from './components/createElement';
 import { createDatePicker } from './components/datePicker';
 import { createFormGroup } from './components/formGroup';
@@ -121,7 +122,7 @@ export function createTrainHistory({ api, onTrainSelectionChange }) {
         if (searchId !== trainNameSearchId) {
             return Promise.reject('Different Search in progess');
         }
-        return names.map(name => ({ value: name, text: name }));
+        return names.map(name => ({ value: name, text: normalizeTrainName(name) }));
     }
 
     function getSelectedTrainDestinations() {
