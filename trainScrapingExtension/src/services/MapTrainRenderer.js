@@ -1,3 +1,4 @@
+import { normalizeTrainName } from '../utils/normalizeTrainName';
 import { parseCoordinate } from '../utils/parseCoordinate';
 import { InsiteCommunicator } from './InsiteCommunicator';
 import { getIconUrl } from './icons';
@@ -85,7 +86,7 @@ export class MapTrainRenderer {
         const marker = L.marker(
             [parseCoordinate(long), parseCoordinate(lat)],
             {
-                title: `${name} -> ${destination} ${delayText}(at ${timeText})`,
+                title: `${normalizeTrainName(name)} -> ${destination} ${delayText}(at ${timeText})`,
                 icon: this.getIcon(productClass, delay),
             }
         ).addTo(map);
