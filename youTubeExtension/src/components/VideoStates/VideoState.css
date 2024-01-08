@@ -306,7 +306,8 @@ h1.ytd-watch-metadata.yt-video-user-state-watch-root {
     flex-direction: row;
     align-items: center;
     overflow: visible;
-    max-height: 8.4rem;
+    max-height: 8.4rem!important;
+    overflow: visible!important;
 }
 
 .yt-video-user-state-watch-root>yt-formatted-string {
