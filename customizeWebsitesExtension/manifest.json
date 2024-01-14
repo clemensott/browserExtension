@@ -66,6 +66,14 @@
         },
         {
             "matches": [
+                "https://www.ecosia.org/*"
+            ],
+            "js": [
+                "ecosia_content.js"
+            ]
+        },
+        {
+            "matches": [
                 "http://*/*",
                 "https://*/*"
             ],
