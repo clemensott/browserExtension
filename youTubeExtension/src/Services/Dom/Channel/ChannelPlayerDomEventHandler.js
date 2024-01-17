@@ -2,7 +2,7 @@ import DomEventHandler from '../DomEventHandler';
 
 
 export default class ChannelPlayerDomEventHandler extends DomEventHandler {
-    constructor() {
+    constructor(navigationService) {
         super({
             eventName: 'ChannelPlayerDomEventHandler.change',
             elementsGetter: ChannelPlayerDomEventHandler.getChannelHeader,
@@ -11,6 +11,10 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
             triggerEventOnRunChange: true,
         });
 
+        this.navigationService = navigationService;
+        this.paused = true;
+
+        this.onUrlChange = this.onUrlChange.bind(this);
         this.onSomething = this.onSomething.bind(this);
     }
 
@@ -18,15 +22,31 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
         return document.querySelector('ytd-channel-video-player-renderer ytd-player video');
     }
 
+    start() {
+        this.navigationService.addOnUrlChangeEventHandler(this.onUrlChange);
+        super.start();
+    }
+
+    stop() {
+        this.navigationService.removeOnUrlChangeEventHandler(this.onUrlChange);
+        super.stop();
+    }
+
+    onUrlChange() {
+        this.paused = false;
+    }
+
     onChange({ lastElements, currentElements }) {
         if (lastElements instanceof Node) {
             this.unsubscribe(lastElements);
         }
         if (currentElements instanceof Node) {
+            this.subscribe(currentElements);
+            this.paused = false;
+
             if (currentElements.readyState >= 3 || !currentElements.paused) {
                 currentElements.pause();
-            } else {
-                this.subscribe(currentElements);
+                this.paused = true;
             }
         }
     }
@@ -44,9 +64,9 @@ export default class ChannelPlayerDomEventHandler extends DomEventHandler {
     }
 
     onSomething({ target }) {
-        if (!target.paused) {
+        if (!this.paused && !target.paused) {
             target.pause();
-            this.unsubscribe(target);
+            this.paused = true;
         }
     }
 }

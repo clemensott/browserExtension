@@ -12,7 +12,7 @@ export default class DomEventService {
         this.channelVideosCount = new ChannelVideosDomEventHandler({
             updateTrackerService: updateSourcesTrackerService,
         });
-        this.channelPlayer = new ChannelPlayerDomEventHandler();
+        this.channelPlayer = new ChannelPlayerDomEventHandler(navigationService);
         this.masterHeadContainer = new DomEventHandler({
             eventName: 'DomEventService.masterHeadContainer',
             elementsGetter: this.getMasterHeadContianer,
