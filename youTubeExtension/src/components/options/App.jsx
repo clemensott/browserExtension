@@ -3,6 +3,7 @@ import StorageService from '../../Services/StorageService';
 import OptionsService from '../../Services/OptionsService';
 import API from '../../Services/API';
 import clsx from 'clsx';
+import { Checkbox } from './Checkbox';
 import './App.css';
 
 const options = new OptionsService(new StorageService());
@@ -18,9 +19,11 @@ async function pingApi(baseUrl) {
 }
 
 export default function App() {
-    const [enableDomManipulation, setEnableDomManipulation] = useState(false);
-    const [enablePauseChannelTrailer, setEnablePauseChannelTrailer] = useState(false);
-    const [enableVideoPlayerManipulation, setEnableVideoPlayerManipulation] = useState(true);
+    const [isDomManipulationEnabled, setIsDomManipulationEnabled] = useState(false);
+    const [subscriptionBoxReloadSeconds, setSubscriptionBoxReloadSeconds] = useState('');
+    const [isVideoPlayerManipulationEnabled, setIsVideoPlayerManipulationEnabled] = useState(true);
+    const [isEndVideoButtonEnabled, setIsEndVideoButtonEnabled] = useState(false);
+    const [isPauseChannelTrailerEnabled, setIsPauseChannelTrailerEnabled] = useState(false);
     const [hideDislikeVideoButton, setHideDislikeVideoButton] = useState(false);
     const [hideDownloadVideoButton, setHideDownloadVideoButton] = useState(false);
     const [hideClipVideoButton, setHideClipVideoButton] = useState(false);
@@ -31,8 +34,6 @@ export default function App() {
     const [apiBaseUrlValid, setApiBaseUrlValid] = useState(true);
     const [apiUsername, setApiUsername] = useState('');
     const [apiPassword, setApiPassword] = useState('');
-    const enableEndVideoButton = useRef();
-    const subscriptionboxReloadSeconds = useRef();
     const pingApiId = useRef(0);
 
     const checkBaseUrlValid = async url => {
@@ -48,9 +49,12 @@ export default function App() {
         (async () => {
             await options.load();
 
-            setEnableDomManipulation(!!options.isDomManipulationEnabled);
-            setEnablePauseChannelTrailer(!!options.isPauseChannelTrailerEnabled);
-            setEnableVideoPlayerManipulation(!!options.isVideoPlayerManipulationEnabled);
+            setIsDomManipulationEnabled(!!options.isDomManipulationEnabled);
+            setSubscriptionBoxReloadSeconds(String(options.subscriptionBoxReloadSeconds));
+
+            setIsVideoPlayerManipulationEnabled(!!options.isVideoPlayerManipulationEnabled);
+            setIsEndVideoButtonEnabled(!!options.isEndVideoButtonEnabled);
+            setIsPauseChannelTrailerEnabled(!!options.isPauseChannelTrailerEnabled);
 
             setHideDislikeVideoButton(!!options.hideDislikeVideoButton);
             setHideDownloadVideoButton(!!options.hideDownloadVideoButton);
@@ -72,12 +76,12 @@ export default function App() {
     }, [apiBaseUrl]);
 
     const saveOptions = () => {
-        options.isDomManipulationEnabled = !!enableDomManipulation;
-        options.subscriptionBoxReloadSeconds = parseInt(subscriptionboxReloadSeconds.current.value, 10);
+        options.isDomManipulationEnabled = !!isDomManipulationEnabled;
+        options.subscriptionBoxReloadSeconds = Number.parseInt(subscriptionBoxReloadSeconds, 10);
 
-        options.isVideoPlayerManipulationEnabled = !!enableVideoPlayerManipulation;
-        options.isPauseChannelTrailerEnabled = !!enablePauseChannelTrailer;
-        options.isEndVideoButtonEnabled = !!enableEndVideoButton.current.checked;
+        options.isVideoPlayerManipulationEnabled = !!isVideoPlayerManipulationEnabled;
+        options.isEndVideoButtonEnabled = !!isEndVideoButtonEnabled;
+        options.isPauseChannelTrailerEnabled = !!isPauseChannelTrailerEnabled;
 
         options.hideDislikeVideoButton = !!hideDislikeVideoButton;
         options.hideDownloadVideoButton = !!hideDownloadVideoButton;
@@ -100,73 +104,57 @@ export default function App() {
             </div>
 
             <div className="form-section">
-                <h2>User Interface Manipulation</h2>
-
-                <div className="info-text">
-                    Adds various additional elements to user interface.
-                </div>
-
-                <div className="form-group">
-                    <input
-                        id="enable-dom-manipulation"
-                        type="checkbox"
-                        checked={enableDomManipulation}
-                        onChange={e => setEnableDomManipulation(e.target.checked)}
-                    />
-                    <label htmlFor="enable-dom-manipulation">Enable various user interface manipulations</label>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="subscriptionbox-reload-time">Subscription box reload countdown in seconds</label>
-                    <input
-                        ref={subscriptionboxReloadSeconds}
-                        id="subscriptionbox-reload-time"
-                        type="number"
-                        min="1"
-                        step="1"
-                        className="form-control"
-                        defaultValue={options.subscriptionBoxReloadSeconds}
-                        disabled={!enableDomManipulation}
-                    />
-                </div>
-            </div>
-
-            <div className="form-section">
                 <h2>Video Player Manipulation</h2>
 
                 <div className="info-text">
                     Fast forwards, mutes and turn ads black.
                 </div>
 
-                <div className="form-group">
-                    <input
-                        id="enable-player-manipulation-video-button"
-                        type="checkbox"
-                        checked={enableVideoPlayerManipulation}
-                        onChange={e => setEnableVideoPlayerManipulation(e.target.checked)}
-                    />
-                    <label htmlFor="enable-player-manipulation-video-button">Enable video player manipulation</label>
+                <Checkbox
+                    checked={isVideoPlayerManipulationEnabled}
+                    label="Enable video player manipulation"
+                    onChange={e => setIsVideoPlayerManipulationEnabled(e.target.checked)}
+                />
+
+                <Checkbox
+                    checked={isEndVideoButtonEnabled}
+                    disabled={!isVideoPlayerManipulationEnabled}
+                    label="Enable end video button"
+                    onChange={e => setIsEndVideoButtonEnabled(e.target.checked)}
+                />
+
+                <Checkbox
+                    checked={isPauseChannelTrailerEnabled}
+                    label="Enable pausing channel trailer"
+                    onChange={e => setIsPauseChannelTrailerEnabled(e.target.checked)}
+                />
+            </div>
+
+            <div className="form-section">
+                <h2>User Interface Manipulation</h2>
+
+                <div className="info-text">
+                    Adds various additional elements to user interface.
                 </div>
 
-                <div className="form-group">
-                    <input
-                        id="enable-pause-channel-trailer-button"
-                        type="checkbox"
-                        checked={enablePauseChannelTrailer}
-                        onChange={e => setEnablePauseChannelTrailer(e.target.checked)}
-                    />
-                    <label htmlFor="enable-pause-channel-trailer-button">Enable pausing channel trailer</label>
-                </div>
+                <Checkbox
+                    checked={isDomManipulationEnabled}
+                    label="Enable various user interface manipulations"
+                    onChange={e => setIsDomManipulationEnabled(e.target.checked)}
+                />
 
                 <div className="form-group">
+                    <label htmlFor="subscriptionbox-reload-time">Subscription box reload countdown in seconds</label>
                     <input
-                        ref={enableEndVideoButton}
-                        id="enable-end-video-button"
-                        type="checkbox"
-                        defaultChecked={options.isEndVideoButtonEnabled}
-                        disabled={!enableVideoPlayerManipulation}
+                        id="subscriptionbox-reload-time"
+                        type="number"
+                        min="1"
+                        step="1"
+                        className="form-control"
+                        value={subscriptionBoxReloadSeconds}
+                        disabled={!isDomManipulationEnabled}
+                        onChange={e => setSubscriptionBoxReloadSeconds(e.target.value)}
                     />
-                    <label htmlFor="enable-end-video-button">Enable end video button</label>
                 </div>
             </div>
 
@@ -177,65 +165,41 @@ export default function App() {
                     Hide certain GUI elements on site.
                 </div>
 
-                <div className="form-group">
-                    <input
-                        id="hide-dislike-video-button"
-                        type="checkbox"
-                        checked={hideDislikeVideoButton}
-                        onChange={e => setHideDislikeVideoButton(e.target.checked)}
-                    />
-                    <label htmlFor="hide-dislike-video-button">Dislike video Button</label>
-                </div>
+                <Checkbox
+                    checked={hideDislikeVideoButton}
+                    label="Dislike video Button"
+                    onChange={e => setHideDislikeVideoButton(e.target.checked)}
+                />
 
-                <div className="form-group">
-                    <input
-                        id="hide-download-video-button"
-                        type="checkbox"
-                        checked={hideDownloadVideoButton}
-                        onChange={e => setHideDownloadVideoButton(e.target.checked)}
-                    />
-                    <label htmlFor="hide-download-video-button">Download video button</label>
-                </div>
+                <Checkbox
+                    checked={hideDownloadVideoButton}
+                    label="Download video button"
+                    onChange={e => setHideDownloadVideoButton(e.target.checked)}
+                />
 
-                <div className="form-group">
-                    <input
-                        id="hide-clip-video-button"
-                        type="checkbox"
-                        checked={hideClipVideoButton}
-                        onChange={e => setHideClipVideoButton(e.target.checked)}
-                    />
-                    <label htmlFor="hide-clip-video-button">Clip video button</label>
-                </div>
+                <Checkbox
+                    checked={hideClipVideoButton}
+                    label="Clip video button"
+                    onChange={e => setHideClipVideoButton(e.target.checked)}
+                />
 
-                <div className="form-group">
-                    <input
-                        id="hide-thank-video-button"
-                        type="checkbox"
-                        checked={hideThankVideoButton}
-                        onChange={e => setHideThankVideoButton(e.target.checked)}
-                    />
-                    <label htmlFor="hide-thank-video-button">Thank video button</label>
-                </div>
+                <Checkbox
+                    checked={hideThankVideoButton}
+                    label="Thank video button"
+                    onChange={e => setHideThankVideoButton(e.target.checked)}
+                />
 
-                <div className="form-group">
-                    <input
-                        id="hide-save-video-button"
-                        type="checkbox"
-                        checked={hideSaveVideoButton}
-                        onChange={e => setHideSaveVideoButton(e.target.checked)}
-                    />
-                    <label htmlFor="hide-save-video-button">Save video button</label>
-                </div>
+                <Checkbox
+                    checked={hideSaveVideoButton}
+                    label="Save video button"
+                    onChange={e => setHideSaveVideoButton(e.target.checked)}
+                />
 
-                <div className="form-group">
-                    <input
-                        id="hide-recommendation-props"
-                        type="checkbox"
-                        checked={hideRecommendationPromps}
-                        onChange={e => setHideRecommendationPromps(e.target.checked)}
-                    />
-                    <label htmlFor="hide-recommendation-props">Recommendation promps</label>
-                </div>
+                <Checkbox
+                    checked={hideRecommendationPromps}
+                    label="Recommendation promps"
+                    onChange={e => setHideRecommendationPromps(e.target.checked)}
+                />
             </div>
 
             <div className="form-section">
