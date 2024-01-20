@@ -49,13 +49,13 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: '16'
+        node-version: '20'
 
     - name: Build
       run: |
         cd youTubeExtension
         npm install
-        npm run package:linux
+        npm run package
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
