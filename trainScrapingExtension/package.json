@@ -4,19 +4,19 @@
     "description": "Displays train scraping data on openrailwaymaps",
     "main": "content.js",
     "scripts": {
+        "clean": "npx rimraf dist",
+        "copy-files": "npx copyfiles static dist",
         "build": "node esbuild.config.js",
-        "start": "npm run build & node dist/content.js",
-        "package:windows": "xcopy static dist /s /y /i & npm run build",
-        "package:linux": "cp -R static/. dist/ & npm run build"
+        "package": "npm run clean && npm run copy-files && npm run build"
     },
     "author": "Clemens Ott",
     "license": "ISC",
-    "devDependencies": {
-        "esbuild": "^0.18.10"
-    },
     "dependencies": {
         "@influxdata/influxdb-client": "^1.33.2",
         "@influxdata/influxdb-client-apis": "^1.33.2",
-        "clsx": "^1.2.1"
+        "clsx": "^1.2.1",
+        "copyfiles": "^2.4.1",
+        "esbuild": "^0.18.10",
+        "rimraf": "^5.0.5"
     }
 }
