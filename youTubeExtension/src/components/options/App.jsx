@@ -23,6 +23,7 @@ export default function App() {
     const [subscriptionBoxReloadSeconds, setSubscriptionBoxReloadSeconds] = useState('');
     const [isVideoPlayerManipulationEnabled, setIsVideoPlayerManipulationEnabled] = useState(true);
     const [isEndVideoButtonEnabled, setIsEndVideoButtonEnabled] = useState(false);
+    const [isSaveTimestampEnabled, setIsSaveTimestampEnabled] = useState(false);
     const [isPauseChannelTrailerEnabled, setIsPauseChannelTrailerEnabled] = useState(false);
     const [hideDislikeVideoButton, setHideDislikeVideoButton] = useState(false);
     const [hideDownloadVideoButton, setHideDownloadVideoButton] = useState(false);
@@ -54,6 +55,7 @@ export default function App() {
 
             setIsVideoPlayerManipulationEnabled(!!options.isVideoPlayerManipulationEnabled);
             setIsEndVideoButtonEnabled(!!options.isEndVideoButtonEnabled);
+            setIsSaveTimestampEnabled(!!options.isSaveTimestampEnabled);
             setIsPauseChannelTrailerEnabled(!!options.isPauseChannelTrailerEnabled);
 
             setHideDislikeVideoButton(!!options.hideDislikeVideoButton);
@@ -81,6 +83,7 @@ export default function App() {
 
         options.isVideoPlayerManipulationEnabled = !!isVideoPlayerManipulationEnabled;
         options.isEndVideoButtonEnabled = !!isEndVideoButtonEnabled;
+        options.isSaveTimestampEnabled = !!isSaveTimestampEnabled;
         options.isPauseChannelTrailerEnabled = !!isPauseChannelTrailerEnabled;
 
         options.hideDislikeVideoButton = !!hideDislikeVideoButton;
@@ -121,6 +124,13 @@ export default function App() {
                     disabled={!isVideoPlayerManipulationEnabled}
                     label="Enable end video button"
                     onChange={e => setIsEndVideoButtonEnabled(e.target.checked)}
+                />
+
+                <Checkbox
+                    checked={isSaveTimestampEnabled}
+                    disabled={!isVideoPlayerManipulationEnabled}
+                    label="Automaticly adding timestamp of current video to URL"
+                    onChange={e => setIsSaveTimestampEnabled(e.target.checked)}
                 />
 
                 <Checkbox

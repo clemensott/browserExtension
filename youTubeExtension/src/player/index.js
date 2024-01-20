@@ -12,6 +12,8 @@ const constants = {
 };
 
 let enableEndVideoButton = false;
+let isSaveTimestampEnabled = false;
+let lastTimestampSeconds = null;
 let isEndingVideo = false;
 
 
@@ -73,6 +75,45 @@ function skipAdvertisement() {
         if (skipButton) {
             skipButton.click();
         }
+    }
+}
+
+function buildUrl({ origin, pathname, search, hash }) {
+    let url = origin + pathname;
+    if (search) {
+        url += `?${search}`;
+    }
+    if (hash) {
+        url += `?${hash}`;
+    }
+    return url;
+}
+
+function replaceTimestampOfCurrentUrl(timestamp) {
+    const { origin, pathname, search, hash } = location;
+    const params = new URLSearchParams(search);
+    if (timestamp) {
+        params.set('t', `${timestamp}s`);
+    } else {
+        params.delete('t');
+    }
+
+    return buildUrl({
+        origin,
+        pathname,
+        search: params.toString(),
+        hash,
+    });
+}
+
+function updateUrlTimestamp(videoElement) {
+    const seconds = Math.floor(videoElement.currentTime);
+    console.log('seconds:', videoElement.currentTime, seconds, lastTimestampSeconds)
+    if (seconds !== lastTimestampSeconds) {
+        lastTimestampSeconds = seconds;
+        const newUrl = replaceTimestampOfCurrentUrl(seconds);
+        console.log('new url:', newUrl)
+        history.replaceState(history.state, null, newUrl);
     }
 }
 
@@ -156,6 +197,10 @@ function loop() {
         }
     }
 
+    if (videoElement && !isAdPlayling && isSaveTimestampEnabled) {
+        updateUrlTimestamp(videoElement);
+    }
+
     if (enableEndVideoButton) {
         addEndVideoHandling();
     }
@@ -165,8 +210,9 @@ function loop() {
 export default function setup(options) {
     if (options.isVideoPlayerManipulationEnabled) {
         enableEndVideoButton = options.isEndVideoButtonEnabled;
+        isSaveTimestampEnabled = options.isSaveTimestampEnabled;
 
-        console.log('start player ad handler:', { enableEndVideoButton });
+        console.log('start player ad handler:', { enableEndVideoButton, isSaveTimestampEnabled });
 
         setInterval(loop, 1000);
         setIntervalUntil(() => !getVideoElement(), 20);

@@ -11,6 +11,10 @@ const optionKeys = {
         key: 'IS_END_VIDEO_BUTTON_ENABLED',
         defaultValue: false,
     },
+    IS_SAVE_TIMESTAMP_ENABLED: {
+        key: 'IS_SAVE_TIMESTAMP_ENABLED',
+        defaultValue: false,
+    },
     IS_DOM_MANIPULATION_ENABLED: {
         key: 'IS_DOM_MANIPULATION_ENABLED',
         defaultValue: false,
@@ -113,6 +117,14 @@ export default class OptionsService {
 
     set isEndVideoButtonEnabled(value) {
         return this.set(optionKeys.IS_END_VIDEO_BUTTON_ENABLED.key, value);
+    }
+
+    get isSaveTimestampEnabled() {
+        return this.get(optionKeys.IS_SAVE_TIMESTAMP_ENABLED.key);
+    }
+
+    set isSaveTimestampEnabled(value) {
+        return this.set(optionKeys.IS_SAVE_TIMESTAMP_ENABLED.key, value);
     }
 
     get isDomManipulationEnabled() {
