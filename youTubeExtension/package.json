@@ -5,7 +5,7 @@
   "main": "content.js",
   "scripts": {
     "clean": "npx rimraf dist",
-    "copy-files": "npx copyfiles static dist",
+    "copy-files": "npx copyfiles -u 1 \"./static/**/*.*\" dist",
     "build": "node esbuild.config.js",
     "package": "npm run clean && npm run copy-files && npm run build"
   },

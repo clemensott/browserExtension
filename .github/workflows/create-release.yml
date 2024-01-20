@@ -1,0 +1,120 @@
+name: Create new release
+
+on: 
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  create-release:
+    name: Create release with artifacts of builds
+    runs-on: ubuntu-latest
+    needs: [build-customize-websites-extension, build-hide-content-extension, build-train-scraping-extension, build-youtube-extension]
+    permissions:
+      contents: write
+    steps:
+    - name: Download customize websites extension
+      uses: actions/download-artifact@v4
+      with:
+        name: customize-websites-extension
+        path: customize-websites-extension
+    - name: Archive extension
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: customize-websites-extension
+        filename: 'customize-websites-extension.zip'
+    - name: Download hide content extension
+      uses: actions/download-artifact@v4
+      with:
+        name: hide-content-extension
+        path: hide-content-extension
+    - name: Archive extension
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: hide-content-extension
+        filename: 'hide-content-extension.zip'
+    - name: Download train scraping extension
+      uses: actions/download-artifact@v4
+      with:
+        name: train-scraping-extension
+        path: train-scraping-extension
+    - name: Archive extension
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: train-scraping-extension
+        filename: 'train-scraping-extension.zip'
+    - name: Download youtube extension
+      uses: actions/download-artifact@v4
+      with:
+        name: youtube-extension
+        path: youtube-extension
+    - name: Archive extension
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: youtube-extension
+        filename: 'youtube-extension.zip'
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "*.zip"
+
+  build-customize-websites-extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: customize-websites-extension
+        path: "./customizeWebsitesExtension"
+
+  build-hide-content-extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hide-content-extension
+        path: "./hideContentExtension"
+
+  build-train-scraping-extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build
+      run: |
+        cd trainScrapingExtension
+        npm install
+        npm run package
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: train-scraping-extension
+        path: "./trainScrapingExtension/dist"
+
+  build-youtube-extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build
+      run: |
+        cd youTubeExtension
+        npm install
+        npm run package
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: youtube-extension
+        path: "./youTubeExtension/dist"
