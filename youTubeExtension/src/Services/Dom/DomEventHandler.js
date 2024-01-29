@@ -10,7 +10,7 @@ export default class DomEventHandler {
         this.lastTimeout = null;
         this.triggerEventOnRunChange = triggerEventOnRunChange || false;
         this.intervalId = null;
-        this.lastElements = null;
+        this.currentElements = null;
 
         if (elementsExists) {
             this.elementsExists = elementsExists;
@@ -30,14 +30,14 @@ export default class DomEventHandler {
 
     start() {
         if (!this.intervalId) {
-            const timeout = this.getIntervalTimeount(this.lastElements);
+            const timeout = this.getIntervalTimeount(this.currentElements);
             this.intervalId = setInterval(this.onTick, timeout);
             this.lastTimeout = timeout;
 
             if (this.triggerEventOnRunChange) {
                 this.triggerEvent({
                     lastElements: null,
-                    currentElements: this.lastElements,
+                    currentElements: this.currentElements,
                 });
                 this.onTick();
             }
@@ -51,7 +51,7 @@ export default class DomEventHandler {
 
             if (this.triggerEventOnRunChange) {
                 this.triggerEvent({
-                    lastElements: this.lastElements,
+                    lastElements: this.currentElements,
                     currentElements: null,
                 });
             }
@@ -59,17 +59,18 @@ export default class DomEventHandler {
     }
 
     onTick() {
-        const currentElements = this.elementsExists(this.lastElements) ?
-            this.lastElements : this.getElements(this.lastElements);
-        if (this.detectChange(currentElements, this.lastElements)) {
+        const currentElements = this.elementsExists(this.currentElements) ?
+            this.currentElements : this.getElements(this.currentElements);
+        const lastElements = this.currentElements;
+        this.currentElements = currentElements;
+        if (this.detectChange(currentElements, lastElements)) {
             this.triggerEvent({
-                lastElements: this.lastElements,
+                lastElements,
                 currentElements,
             });
         }
 
         this.updateIntervalTime(currentElements);
-        this.lastElements = currentElements;
     }
 
     elementsExists(last) {

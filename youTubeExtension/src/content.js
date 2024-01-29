@@ -1,5 +1,4 @@
 import importBundle from './insite/importBundle';
-import setupPlayerService from './player';
 import ChannelHelperService from './Services/Dom/Channel/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
 import InitDataService from './Services/InitDataService';
@@ -17,12 +16,14 @@ import ForegroundVideoOpenService from './Services/ForegroundVideoOpenService';
 import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRecommendedVideosService';
 import fetchIntersectorService from './Services/FetchIntersectorService';
 import MessagesService from './Services/MessagesService';
+import { WatchPlayerService } from './Services/Dom/WatchPlayerService';
 
 async function main() {
     const optionsService = new OptionsService(new StorageService());
     await optionsService.load();
 
-    setupPlayerService(optionsService);
+    const watchPlayerService = new WatchPlayerService(optionsService);
+    watchPlayerService.start();
 
     const updateSourcesTrackerService = new UpdateSourcesTrackerService();
     const navigationService = new NavigationEventService();

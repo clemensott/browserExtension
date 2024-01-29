@@ -36,7 +36,7 @@ export default class ReloadSubscriptionBoxDomEventHandler extends DomEventHandle
     startBackupReload() {
         clearTimeout(this.reloadTimeoutId);
         this.reloadTimeoutId = setTimeout(() => {
-            if (this.getReloadingEnabled() && !this.elementsExists(this.lastElements)) {
+            if (this.getReloadingEnabled() && !this.elementsExists(this.currentElements)) {
                 this.reloadTimeoutId = setTimeout(tryReloadSubscriptions, this.getReloadingSeconds() * 1000);
             }
         }, 5000);
