@@ -24,6 +24,7 @@ export class WatchPlayerService extends DomEventHandler {
 
         this.onDuractionChange = this.onDuractionChange.bind(this);
         this.onPause = this.onPause.bind(this);
+        this.onClickProgressBar = this.onClickProgressBar.bind(this);
         this.handleEndVideo = this.handleEndVideo.bind(this);
     }
 
@@ -49,7 +50,16 @@ export class WatchPlayerService extends DomEventHandler {
     }
 
     getElements(obj) {
-        const { videoElement, movieContainer, muteButton, volumeIndicator, adContainer, nextVideoButton, endVideoButton } = obj || {};
+        const {
+            videoElement,
+            movieContainer,
+            muteButton,
+            volumeIndicator,
+            adContainer,
+            nextVideoButton,
+            endVideoButton,
+            progressBar,
+        } = obj || {};
 
         return {
             videoElement: document.contains(videoElement) ? videoElement : WatchPlayerService.getVideoElement(),
@@ -59,6 +69,7 @@ export class WatchPlayerService extends DomEventHandler {
             adContainer: document.contains(adContainer) ? adContainer : WatchPlayerService.getAdContainerButton(),
             nextVideoButton: document.contains(nextVideoButton) ? nextVideoButton : WatchPlayerService.getNextVideoButton(),
             endVideoButton: document.contains(endVideoButton) ? endVideoButton : WatchPlayerService.getEndVideoButton(),
+            progressBar: document.contains(progressBar) ? progressBar : WatchPlayerService.getProgressBar(),
         };
     }
 
@@ -90,6 +101,10 @@ export class WatchPlayerService extends DomEventHandler {
         return document.querySelector('#movie_player a.yt-extension-end-video');
     }
 
+    static getProgressBar() {
+        return document.querySelector('#movie_player div.ytp-progress-bar');
+    }
+
     onChange({ lastElements, currentElements }) {
         if (lastElements?.videoElement !== currentElements?.videoElement) {
             if (lastElements?.videoElement) {
@@ -101,6 +116,16 @@ export class WatchPlayerService extends DomEventHandler {
                 currentElements.videoElement.addEventListener('durationchange', this.onDuractionChange);
                 currentElements.videoElement.addEventListener('pause', this.onPause);
                 this.checkIsAdChanged(currentElements);
+            }
+        }
+
+        if (lastElements?.progressBar !== currentElements?.progressBar) {
+            if (lastElements?.progressBar) {
+                lastElements.progressBar.removeEventListener('click', this.onClickProgressBar);
+            }
+
+            if (currentElements?.progressBar) {
+                currentElements.progressBar.addEventListener('click', this.onClickProgressBar);
             }
         }
 
@@ -177,16 +202,21 @@ export class WatchPlayerService extends DomEventHandler {
         }
     }
 
-    onPause({ target }) {
-        if (this.isSaveTimestampEnabled && !this.isAdvertisingPlayling()) {
-            this.updateUrlTimestamp(target);
-        }
+    onPause() {
+        this.updateUrlTimestamp();
     }
 
-    updateUrlTimestamp(videoElement) {
-        const seconds = Math.floor(videoElement.currentTime);
-        const newUrl = WatchPlayerService.replaceTimestampOfCurrentUrl(seconds);
-        history.replaceState(history.state, null, newUrl);
+    onClickProgressBar() {
+        this.updateUrlTimestamp();
+    }
+
+    updateUrlTimestamp() {
+        const { videoElement } = this.currentElements || {};
+        if (this.isSaveTimestampEnabled && videoElement && !this.isAdvertisingPlayling()) {
+            const seconds = Math.floor(videoElement.currentTime);
+            const newUrl = WatchPlayerService.replaceTimestampOfCurrentUrl(seconds);
+            history.replaceState(history.state, null, newUrl);
+        }
     }
 
     static replaceTimestampOfCurrentUrl(timestamp) {
