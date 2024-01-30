@@ -1,5 +1,4 @@
 import './vendors/webextension-polyfill/browser-polyfill.min.js';
-console.log('donwload url content context Menu:', browser);
 
 const menuId = 'downloadLinkItem';
 browser.runtime.onInstalled.addListener((details) => {
