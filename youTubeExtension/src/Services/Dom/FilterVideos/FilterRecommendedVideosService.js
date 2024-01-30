@@ -251,7 +251,7 @@ export default class FilterRecommendedVideosService {
     }
 
     filterLastContainers(videoIds = null) {
-        this.filterContainers(this.videoContainersDomEventHandler.lastElements, null, videoIds);
+        this.filterContainers(this.videoContainersDomEventHandler.currentElements, null, videoIds);
     }
 
     onVideoContainersChange({ currentElements, lastElements }) {
@@ -356,7 +356,7 @@ export default class FilterRecommendedVideosService {
     }
 
     sortLastContainers() {
-        this.sortContainers(this.videoContainersDomEventHandler.lastElements, null);
+        this.sortContainers(this.videoContainersDomEventHandler.currentElements, null);
     }
 
     sortContainers(currentElements, lastElements) {
