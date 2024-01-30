@@ -29,6 +29,23 @@ function getVideoIdOfShortVideoContainer(container) {
     return match && match[1];
 }
 
+function getWatchVideoContainer() {
+    return [...document.querySelectorAll(
+        '#title > h1,#owner-and-teaser,ytd-video-primary-info-renderer #info,div#actions.ytd-reel-player-overlay-renderer'
+    )].find(container => {
+        let current = container;
+        while (current) {
+            if (current.hasAttribute('hidden')) {
+                return false;
+            }
+
+            current = current.parentElement;
+        }
+
+        return true;
+    });
+}
+
 export default class VideoOverlayService {
     constructor({ api, videoOpenService }) {
         this.api = api;
@@ -50,7 +67,7 @@ export default class VideoOverlayService {
     async loopHandle(fast = false, forceUserStateUpdate = false) {
         try {
             if (!fast || !this.videoContainers) {
-                this.videoContainers = this.getVideoContainers();
+                this.videoContainers = VideoOverlayService.getVideoContainers();
             }
             this.videoContainers.forEach(container => container.videoId = container.getVideoId());
             this.updateUI();
@@ -66,22 +83,15 @@ export default class VideoOverlayService {
         }
     }
 
-    getVideoContainers() {
-        const watchVideos = [{
-            container: document.querySelector(
-                '#title > h1'
-            ) || document.querySelector(
-                '#bottom-row'
-            ) || document.querySelector(
-                '#owner-and-teaser'
-            ) || document.querySelector(
-                'ytd-video-primary-info-renderer #info'
-            ),
+    static getVideoContainers() {
+        const watchContainer = getWatchVideoContainer();
+        const watchVideos = watchContainer ? [{
+            container: watchContainer,
             getVideoId: () => getCurrentVideoId(),
             additionalClassName: 'yt-video-user-state-watch',
             insertReferenceNodeSelector: '#comment-teaser, #flex',
             addRootContainerClass: 'yt-video-user-state-watch-root',
-        }];
+        }] : [];
 
         const shortVideos = [
             'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
@@ -158,7 +168,7 @@ export default class VideoOverlayService {
         };
 
         setIntervalUntil(() => {
-            if (!this.getVideoContainers().length) return true;
+            if (!VideoOverlayService.getVideoContainers().length) return true;
 
             this.loop.run();
             return false;
