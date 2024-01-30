@@ -1,18 +1,19 @@
 let lastInfos = null;
 let lastModalContainer = null;
 
-chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
+browser.runtime.onMessage.addListener((msg) => {
     // console.log('main message:', msg);
     if (msg.type === 'show_hide_element_modal' && lastInfos) {
         showModal(lastInfos.elements);
     } else if (msg.type === 'element_infos' && (!lastModalContainer || !lastModalContainer.parentElement)) {
         lastInfos = msg.data;
     }
-    sendResponse(null);
+    
+    return false;
 });
 
 function sendHideMessage(elementId, type) {
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: 'hide_element',
         data: {
             type,
@@ -22,7 +23,7 @@ function sendHideMessage(elementId, type) {
 }
 
 function sendHighlightElementMessage(elementId, type) {
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: 'change_highlight_element',
         data: {
             type,

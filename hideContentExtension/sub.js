@@ -3,7 +3,7 @@ console.log('Hello sub:', !!window.isTop, window.location.href);
 let lastEvent = null;
 let elementsBackgroundColors = {};
 
-chrome.runtime.onMessage.addListener((msg) => {
+browser.runtime.onMessage.addListener((msg) => {
     switch (msg.type) {
         case 'change_highlight_element':
             handleHighlight(msg.data.elementId, msg.data.type);
@@ -25,6 +25,8 @@ chrome.runtime.onMessage.addListener((msg) => {
             }
             break;
     }
+
+    return false;
 });
 
 function handleHighlight(elementId, type) {
@@ -81,7 +83,7 @@ function sendElementInfos(current, element, win) {
         },
         localElements: localElementsMap,
     };
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: lastEvent.type,
         data: lastEvent.data,
     });

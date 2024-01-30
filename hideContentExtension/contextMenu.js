@@ -1,28 +1,26 @@
-console.log('context Menu');
+import './vendors/webextension-polyfill/browser-polyfill.min.js';
 
 const menuId = 'hideElementItem';
-self.addEventListener('install', function (e) {
-    e.waitUntil(new Promise(resolve => {
-        chrome.contextMenus.removeAll(function () {
-            chrome.contextMenus.create({
-                id: menuId,
-                title: 'Hide Element',
-                contexts: ['all'],
-            }, resolve);
-        });
-    }));
+browser.runtime.onInstalled.addListener((details) => {
+    if (details.reason !== "install" && details.reason !== "update") return;
+    browser.contextMenus.create({
+        id: menuId,
+        title: 'Hide Element',
+        contexts: ['all'],
+    });
 });
 
-chrome.contextMenus.onClicked.addListener((e, tab, ...params) => {
+browser.contextMenus.onClicked.addListener((e, tab, ...params) => {
     console.log('onClicked:', menuId, e, tab, params);
     if (e.menuItemId === menuId) {
-        chrome.tabs.sendMessage(tab.id, { type: 'show_hide_element_modal' });
+        browser.tabs.sendMessage(tab.id, { type: 'show_hide_element_modal' });
     }
 });
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function (message, sender) {
     if (['element_infos', 'change_highlight_element', 'hide_element'].includes(message.type)) {
-        chrome.tabs.sendMessage(sender.tab.id, message);
-        sendResponse(null);
+        browser.tabs.sendMessage(sender.tab.id, message);
     }
+
+    return false;
 });

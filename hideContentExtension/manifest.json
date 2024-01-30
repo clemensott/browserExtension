@@ -13,7 +13,12 @@
         "activeTab"
     ],
     "background": {
-        "service_worker": "contextMenu.js"
+        "scripts":[
+            "vendors/webextension-polyfill/browser-polyfill.min.js",
+            "contextMenu.js"
+        ],
+        "service_worker": "contextMenu.js",
+        "type": "module"
     },
     "content_scripts": [
         {
@@ -22,6 +27,7 @@
                 "https://*/*"
             ],
             "js": [
+                "vendors/webextension-polyfill/browser-polyfill.min.js",
                 "main.js"
             ]
         },
@@ -31,6 +37,7 @@
                 "https://*/*"
             ],
             "js": [
+                "vendors/webextension-polyfill/browser-polyfill.min.js",
                 "sub.js"
             ],
             "all_frames": true
