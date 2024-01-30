@@ -13,6 +13,7 @@
     ],
     "background": {
         "scripts":[
+            "vendors/webextension-polyfill/browser-polyfill.min.js",
             "download_content_context_menu.js"
         ],
         "service_worker": "download_content_context_menu.js",
