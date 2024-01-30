@@ -1,20 +1,18 @@
-console.log('donwload url content context Menu');
+import './vendors/webextension-polyfill/browser-polyfill.min.js';
+console.log('donwload url content context Menu:', browser);
 
 const menuId = 'downloadLinkItem';
-self.addEventListener('install', function (e) {
-    e.waitUntil(new Promise(resolve => {
-        chrome.contextMenus.removeAll(function () {
-            chrome.contextMenus.create({
-                id: menuId,
-                title: 'Download Target',
-                contexts: ['link', 'selection'],
-                documentUrlPatterns: ['http://*/*', 'https://*/*'],
-            }, resolve);
-        });
-    }));
+browser.runtime.onInstalled.addListener((details) => {
+    if (details.reason !== "install" && details.reason !== "update") return;
+    browser.contextMenus.create({
+        id: menuId,
+        title: 'Download Target',
+        contexts: ['link', 'selection'],
+        documentUrlPatterns: ['http://*/*', 'https://*/*'],
+    });
 });
 
-chrome.contextMenus.onClicked.addListener(async (e, tab, ...params) => {
+browser.contextMenus.onClicked.addListener(async (e, tab, ...params) => {
     function correctUrl(url) {
         if (url.startsWith('https://') || url.startsWith('http://')) {
             return url;
@@ -47,14 +45,14 @@ chrome.contextMenus.onClicked.addListener(async (e, tab, ...params) => {
         const response = await fetch(href);
         const size = response.headers.get('content-length');
         if (size && size > 4 * 1024 * 1024) {
-            chrome.tabs.sendMessage(tab.id, {
+            browser.tabs.sendMessage(tab.id, {
                 type: 'download_url_content_size',
                 size,
                 fileName: getFileName(href),
             });
         }
 
-        chrome.tabs.sendMessage(tab.id, {
+        browser.tabs.sendMessage(tab.id, {
             type: 'download_url_content_start',
             downloadId,
             fileName: getFileName(href),
@@ -65,7 +63,7 @@ chrome.contextMenus.onClicked.addListener(async (e, tab, ...params) => {
         while (true) {
             const { done, value } = await reader.read();
 
-            chrome.tabs.sendMessage(tab.id, {
+            browser.tabs.sendMessage(tab.id, {
                 type: 'download_url_content_data',
                 downloadId,
                 data: value,

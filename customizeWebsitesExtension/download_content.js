@@ -32,7 +32,7 @@
         downloads.delete(id);
     }
 
-    chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
+    browser.runtime.onMessage.addListener((msg) => {
         console.log('message:', msg.type);
         switch (msg.type) {
             case 'download_url_content_size':
@@ -50,7 +50,8 @@
                 }
                 break;
         }
-        sendResponse(null);
+
+        return false;
     });
 
 })();

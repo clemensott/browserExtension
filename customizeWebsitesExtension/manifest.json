@@ -12,7 +12,11 @@
         "contextMenus"
     ],
     "background": {
-        "service_worker": "download_content_context_menu.js"
+        "scripts":[
+            "download_content_context_menu.js"
+        ],
+        "service_worker": "download_content_context_menu.js",
+        "type": "module"
     },
     "content_scripts": [
         {
@@ -92,6 +96,7 @@
                 "https://*/*"
             ],
             "js": [
+                "vendors/webextension-polyfill/browser-polyfill.min.js",
                 "download_content.js"
             ]
         }
