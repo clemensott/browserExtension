@@ -8,6 +8,10 @@
     height: 100%;
 }
 
+div.overlay.ytd-reel-video-renderer {
+    overflow: visible!important;
+}
+
 div.ytd-reel-player-overlay-renderer > .yt-video-user-state-container.yt-video-user-state-watch > div.yt-video-user-state-item {
     flex-direction: column;
 }
