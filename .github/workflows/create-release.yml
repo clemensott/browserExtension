@@ -22,8 +22,8 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: customize-websites-extension-chrome
-        filename: 'customize-websites-extension-chrome.zip'
+        directory: customize-websites-extension-chrome
+        filename: '../customize-websites-extension-chrome.zip'
     - name: Download customize websites extension firefox
       uses: actions/download-artifact@v4
       with:
@@ -33,19 +33,30 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: customize-websites-extension-firefox
-        filename: 'customize-websites-extension-firefox.zip'
-    - name: Download hide content extension
+        directory: customize-websites-extension-firefox
+        filename: '../customize-websites-extension-firefox.zip'
+    - name: Download hide content extension chrome
       uses: actions/download-artifact@v4
       with:
-        name: hide-content-extension
-        path: hide-content-extension
-    - name: Archive hide content extension
+        name: hide-content-extension-chrome
+        path: hide-content-extension-chrome
+    - name: Archive hide content extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: hide-content-extension
-        filename: 'hide-content-extension.zip'
+        directory: hide-content-extension-chrome
+        filename: '../hide-content-extension-chrome.zip'
+    - name: Download hide content extension firefox
+      uses: actions/download-artifact@v4
+      with:
+        name: hide-content-extension-firefox
+        path: hide-content-extension-firefox
+    - name: Archive hide content extension firefox
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: hide-content-extension-firefox
+        filename: '../hide-content-extension-firefox.zip'
     - name: Download train scraping extension
       uses: actions/download-artifact@v4
       with:
@@ -55,8 +66,8 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: train-scraping-extension
-        filename: 'train-scraping-extension.zip'
+        directory: train-scraping-extension
+        filename: '../train-scraping-extension.zip'
     - name: Download youtube extension
       uses: actions/download-artifact@v4
       with:
@@ -66,8 +77,8 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: youtube-extension
-        filename: 'youtube-extension.zip'
+        directory: youtube-extension
+        filename: '../youtube-extension.zip'
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "*.zip"
@@ -107,11 +118,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Upload Artifacts
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build chrome
+      run: |
+        cp -r hideContentExtension hideContentExtensionChrome
+        cd hideContentExtensionChrome
+        node build.js chrome
+        rm manifest.src.json
+    - name: Upload chrome artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: hide-content-extension
-        path: "./hideContentExtension"
+        name: hide-content-extension-chrome
+        path: "./hideContentExtensionChrome"
+    - name: Build firefox
+      run: |
+        cp -r hideContentExtension hideContentExtensionFirefox
+        cd hideContentExtensionFirefox
+        node build.js firefox
+        rm manifest.src.json
+    - name: Upload firefox artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hide-content-extension-firefox
+        path: "./hideContentExtensionFirefox"
 
   build-train-scraping-extension:
     runs-on: ubuntu-latest
