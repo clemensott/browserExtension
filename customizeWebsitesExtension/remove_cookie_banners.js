@@ -168,6 +168,10 @@ const actionConfigs = [
         getHide('.cmp-root-container'),
         getRemoveClasses('html', 'cmp-modal-open'),
     ],
+    [
+        getHide('div.close[data-testid="modalBackground"][data-scroll-lock-scrollable="true"]'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
