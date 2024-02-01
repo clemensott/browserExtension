@@ -13,10 +13,15 @@ function sanitizeString(str) {
     }).toString()
 
     const code = `(${funcCode})()`;
-    const div = document.createElement('div');
-    div.innerHTML = `<svg onload="eval(this.dataset.code)" data-code="${sanitizeString(code)}" />`;
-    div.style.display = 'none';
-    document.body.appendChild(div);
+    const isFirefox = typeof InstallTrigger !== 'undefined';
+    if (isFirefox) {
+        window.eval(code);
+    } else {
+        const div = document.createElement('div');
+        div.innerHTML = `<svg onload="eval(this.dataset.code)" data-code="${sanitizeString(code)}" />`;
+        div.style.display = 'none';
+        document.body.appendChild(div);
+    }
 })();
 
 export function importCode(code) {

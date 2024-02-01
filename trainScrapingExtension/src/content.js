@@ -1,12 +1,13 @@
-import './services/icons';
+import { importIcons } from './services/iconsImport';
 import { createTrainHistory } from './ui/trainHistory';
 import { importCode } from './utils/import';
 import { MapTrainRenderer } from './services/MapTrainRenderer';
 import { createApi } from './utils/createApi';
+import browser from 'webextension-polyfill';
 
 
 async function importInsite() {
-    const url = chrome.runtime.getURL('insite.js');
+    const url = browser.runtime.getURL('insite.js');
     const response = await fetch(url);
     const code = await response.text();
 
@@ -14,6 +15,8 @@ async function importInsite() {
 }
 
 async function main() {
+    importIcons();
+
     const api = createApi();
     if (!api || !await api.ping()) {
         return;

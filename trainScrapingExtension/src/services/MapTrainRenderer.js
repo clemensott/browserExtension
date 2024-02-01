@@ -106,7 +106,8 @@ export class MapTrainRenderer {
         this.insiteCommunicator.addMessageListener(this.onTrains.bind(this));
     }
 
-    onTrains({ detail: { addedTrains, removedTrains } }) {
+    onTrains({ detail }) {
+        const { addedTrains, removedTrains } = JSON.parse(detail);
         removedTrains.forEach(train => {
             const key = getTrainKey(train);
             this.markers.get(key).forEach(marker => marker.onRemove(this.map));
@@ -117,6 +118,6 @@ export class MapTrainRenderer {
     }
 
     sendTrains(trains) {
-        this.insiteCommunicator.sendMessage(trains);
+        this.insiteCommunicator.sendMessage(JSON.stringify(trains));
     }
 }
