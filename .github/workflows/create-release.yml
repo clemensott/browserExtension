@@ -13,17 +13,28 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Download customize websites extension
+    - name: Download customize websites extension chrome
       uses: actions/download-artifact@v4
       with:
-        name: customize-websites-extension
-        path: customize-websites-extension
-    - name: Archive customize website extension
+        name: customize-websites-extension-chrome
+        path: customize-websites-extension-chrome
+    - name: Archive customize website extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        path: customize-websites-extension
-        filename: 'customize-websites-extension.zip'
+        path: customize-websites-extension-chrome
+        filename: 'customize-websites-extension-chrome.zip'
+    - name: Download customize websites extension firefox
+      uses: actions/download-artifact@v4
+      with:
+        name: customize-websites-extension-firefox
+        path: customize-websites-extension-firefox
+    - name: Archive customize website extension firefox
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: customize-websites-extension-firefox
+        filename: 'customize-websites-extension-firefox.zip'
     - name: Download hide content extension
       uses: actions/download-artifact@v4
       with:
@@ -65,11 +76,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Upload Artifacts
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build chrome
+      run: |
+        cp -r customizeWebsitesExtension customizeWebsitesExtensionChrome
+        cd customizeWebsitesExtensionChrome
+        node build.js chrome
+        rm manifest.src.json
+    - name: Upload chrome artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: customize-websites-extension
-        path: "./customizeWebsitesExtension"
+        name: customize-websites-extension-chrome
+        path: "./customizeWebsitesExtensionChrome"
+    - name: Build firefox
+      run: |
+        cp -r customizeWebsitesExtension customizeWebsitesExtensionFirefox
+        cd customizeWebsitesExtensionFirefox
+        node build.js firefox
+        rm manifest.src.json
+    - name: Upload firefox artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: customize-websites-extension-firefox
+        path: "./customizeWebsitesExtensionFirefox"
 
   build-hide-content-extension:
     runs-on: ubuntu-latest
