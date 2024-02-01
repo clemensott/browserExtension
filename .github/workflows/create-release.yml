@@ -18,7 +18,7 @@ jobs:
       with:
         name: customize-websites-extension
         path: customize-websites-extension
-    - name: Archive extension
+    - name: Archive customize website extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
@@ -29,7 +29,7 @@ jobs:
       with:
         name: hide-content-extension
         path: hide-content-extension
-    - name: Archive extension
+    - name: Archive hide content extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
@@ -40,7 +40,7 @@ jobs:
       with:
         name: train-scraping-extension
         path: train-scraping-extension
-    - name: Archive extension
+    - name: Archive train scraping extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
@@ -51,7 +51,7 @@ jobs:
       with:
         name: youtube-extension
         path: youtube-extension
-    - name: Archive extension
+    - name: Archive youtube extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
