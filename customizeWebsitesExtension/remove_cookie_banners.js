@@ -172,6 +172,11 @@ const actionConfigs = [
         getHide('div.close[data-testid="modalBackground"][data-scroll-lock-scrollable="true"]'),
         clearOverflow('body'),
     ],
+    [
+        getHide('.privacy-consent--backdrop'),
+        getHide('.privacy-consent--modal'),
+        getRemoveClasses('body', 'privacy-consent--active'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
