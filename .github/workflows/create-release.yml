@@ -153,10 +153,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 'latest'
-    - name: Build
+    - name: NPM Install
       run: |
         cd trainScrapingExtension
         npm install
+    - name: Package
+      run: |
         npm run package
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -172,10 +174,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 'latest'
-    - name: Build
+    - name: NPM Install
       run: |
         cd youTubeExtension
         npm install
+    - name: Package
+      run: |
         npm run package:chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
