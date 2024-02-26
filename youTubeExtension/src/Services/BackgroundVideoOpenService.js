@@ -1,6 +1,7 @@
 import { openVideoType } from '../constants';
 import getPlaylistIdFromUrl from '../utils/getPlaylistIdFromUrl';
 import getVideoIdFromUrl from '../utils/getVideoIdFromUrl';
+import browser from 'webextension-polyfill';
 
 const constants = {
     LAST_TAB_STATES_KEY: 'LAST_TABS_STATE',
@@ -20,7 +21,7 @@ function getUrlsFromBookmarkTreeNodes(nodes) {
 }
 
 async function getBookmarkVideoIds() {
-    const tree = await chrome.bookmarks.getTree();
+    const tree = await browser.bookmarks.getTree();
     const allUrls = getUrlsFromBookmarkTreeNodes(tree);
     return allUrls.map(getVideoIdFromUrl).filter(Boolean);
 }
@@ -44,7 +45,7 @@ function getOpenVideos(tabState) {
 }
 
 async function getOpenYoutubeTabIds() {
-    const openTabs = await chrome.tabs.query({
+    const openTabs = await browser.tabs.query({
         discarded: false,
         url: 'https://www.youtube.com/*',
     });
@@ -70,13 +71,13 @@ export default class BackgroundVideoOpenService {
     start() {
         this.messagesService.onRequestOpenVideos(this.onRequestOpenVideos);
         this.messagesService.onLocalOpenVideosChange(this.onLocalOpenVideosChange);
-        chrome.tabs.onUpdated.addListener(this.onTabUpdated);
-        chrome.tabs.onRemoved.addListener(this.onTabRemoved);
-        chrome.tabs.onReplaced.addListener(this.onTabReplaced);
+        browser.tabs.onUpdated.addListener(this.onTabUpdated);
+        browser.tabs.onRemoved.addListener(this.onTabRemoved);
+        browser.tabs.onReplaced.addListener(this.onTabReplaced);
 
-        chrome.bookmarks.onCreated.addListener(this.onBookmarkChanged);
-        chrome.bookmarks.onChanged.addListener(this.onBookmarkChanged);
-        chrome.bookmarks.onRemoved.addListener(this.onBookmarkChanged);
+        browser.bookmarks.onCreated.addListener(this.onBookmarkChanged);
+        browser.bookmarks.onChanged.addListener(this.onBookmarkChanged);
+        browser.bookmarks.onRemoved.addListener(this.onBookmarkChanged);
     }
 
     async loadLastTabStates() {
@@ -106,7 +107,7 @@ export default class BackgroundVideoOpenService {
 
     async getSyncedTabStates() {
         const tabStates = await this.getLastTabStates();
-        const openTabs = await chrome.tabs.query({
+        const openTabs = await browser.tabs.query({
             url: 'https://www.youtube.com/*',
         });
 

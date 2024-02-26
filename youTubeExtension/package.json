@@ -6,8 +6,11 @@
   "scripts": {
     "clean": "npx rimraf dist",
     "copy-files": "npx copyfiles -u 1 \"./static/**/*.*\" dist",
+    "adjust:chrome": "node adjustManifestForBrowser.js chrome",
+    "adjust:firefox": "node adjustManifestForBrowser.js firefox",
     "build": "node esbuild.config.js",
-    "package": "npm run clean && npm run copy-files && npm run build"
+    "package:chrome": "npm run clean && npm run copy-files && npm run adjust:chrome && npm run build",
+    "package:firefox": "npm run clean && npm run copy-files && npm run adjust:firefox && npm run build"
   },
   "author": "Clemens Ott",
   "license": "ISC",
@@ -23,6 +26,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
-    "styled-components": "^5.3.10"
+    "styled-components": "^5.3.10",
+    "webextension-polyfill": "^0.10.0"
   }
 }
