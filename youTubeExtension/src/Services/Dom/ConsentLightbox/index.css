@@ -1,0 +1,4 @@
+body:not(.hideConsentLightBox) tp-yt-iron-overlay-backdrop,
+body:not(.hideConsentLightBox) ytd-consent-bump-v2-lightbox {
+    display: none;
+}

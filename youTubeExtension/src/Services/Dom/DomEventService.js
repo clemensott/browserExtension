@@ -5,6 +5,7 @@ import ChannelPlayerDomEventHandler from './Channel/ChannelPlayerDomEventHandler
 import DomEventHandler from './DomEventHandler';
 import HideWatchVideoElementsService from './HideWatchVideoElementsService';
 import ReloadSubscriptionBoxDomEventHandler from './ReloadSubscriptionBoxDomEventHandler';
+import './ConsentLightbox/index.css';
 
 export default class DomEventService {
     constructor({ optionsService, navigationService, updateSourcesTrackerService, filterRecommendedVideosService }) {
