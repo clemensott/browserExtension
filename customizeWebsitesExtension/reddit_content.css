@@ -4,6 +4,8 @@ div > div > div.promotedlink {
     display: none;
 }
 
-div[data-adclicklocation="background"] + div:not([class]) > div:not([class]) {
+div[data-adclicklocation="background"] + div:not([class]) > div:not([class]),
+shreddit-ad-post,
+shreddit-comments-page-ad {
     display: none!important;
 }
