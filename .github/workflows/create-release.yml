@@ -159,6 +159,7 @@ jobs:
         npm install
     - name: Package
       run: |
+        cd youTubeExtension
         npm run package
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -180,6 +181,7 @@ jobs:
         npm install
     - name: Package
       run: |
+        cd youTubeExtension
         npm run package:chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
