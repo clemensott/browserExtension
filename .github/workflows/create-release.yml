@@ -57,17 +57,22 @@ jobs:
         type: 'zip'
         directory: hide-content-extension-firefox
         filename: '../hide-content-extension-firefox.zip'
-    - name: Download train scraping extension
+    - name: Download train scraping extension chrome
       uses: actions/download-artifact@v4
       with:
-        name: train-scraping-extension
-        path: train-scraping-extension
+        name: train-scraping-extension-chrome
+        path: train-scraping-extension-chrome
     - name: Archive train scraping extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: train-scraping-extension
-        filename: '../train-scraping-extension.zip'
+        directory: train-scraping-extension-chrome
+        filename: '../train-scraping-extension-chrome.zip'
+    - name: Download train scraping extension firefox
+      uses: actions/download-artifact@v4
+      with:
+        name: train-scraping-extension-firefox.xpi
+        path: train-scraping-extension-firefox.xpi
     - name: Download youtube extension
       uses: actions/download-artifact@v4
       with:
@@ -81,7 +86,7 @@ jobs:
         filename: '../youtube-extension.zip'
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "*.zip"
+        artifacts: "*.zip,*.xpi"
 
   build-customize-websites-extension:
     runs-on: ubuntu-latest
@@ -161,11 +166,24 @@ jobs:
       run: |
         cd trainScrapingExtension
         npm run package
-    - name: Upload Artifacts
+    - name: Upload Artifacts chrome
       uses: actions/upload-artifact@v4
       with:
-        name: train-scraping-extension
+        name: train-scraping-extension-chrome
         path: "./trainScrapingExtension/dist"
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd trainScrapingExtension\dist
+        npx web-ext sign --channel=unlisted
+        find ./web-ext-artifacts -name "*.xpi" -type f | rename './web-ext-artifacts/train-scraping-extension-firefox.xpi'
+    - name: Upload Artifacts firefox
+      uses: actions/upload-artifact@v4
+      with:
+        name: train-scraping-extension-firefox.xpi
+        path: "./trainScrapingExtension/dist/web-ext-artifacts/train-scraping-extension-firefox.xpi"
 
   build-youtube-extension:
     runs-on: ubuntu-latest
