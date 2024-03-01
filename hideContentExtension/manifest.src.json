@@ -3,6 +3,11 @@
     "version": "1.0",
     "description": "Hides stuff from webpage",
     "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{todo: add id}"
+        }
+    },
     "icons": {
         "16": "657564_eraser_16x16.png",
         "48": "657564_eraser_48x48.png",

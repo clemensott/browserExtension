@@ -27,28 +27,20 @@ jobs:
     - name: Move customize website extension firefox
       run: |
         mv customize-websites-extension/firefox.xpi ./customize-websites-extension-firefox.xpi
-    - name: Download hide content extension chrome
+    - name: Download hide content extension
       uses: actions/download-artifact@v4
       with:
-        name: hide-content-extension-chrome
-        path: hide-content-extension-chrome
+        name: hide-content-extension
+        path: hide-content-extension
     - name: Archive hide content extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         directory: hide-content-extension-chrome
         filename: '../hide-content-extension-chrome.zip'
-    - name: Download hide content extension firefox
-      uses: actions/download-artifact@v4
-      with:
-        name: hide-content-extension-firefox
-        path: hide-content-extension-firefox
-    - name: Archive hide content extension firefox
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        directory: hide-content-extension-firefox
-        filename: '../hide-content-extension-firefox.zip'
+    - name: Move hide content extension firefox
+      run: |
+        mv hide-content-extension/firefox.xpi ./hide-content-extension-firefox.xpi
     - name: Download train scraping extension
       uses: actions/download-artifact@v4
       with:
@@ -131,26 +123,33 @@ jobs:
         node-version: 'latest'
     - name: Build chrome
       run: |
-        cp -r hideContentExtension hideContentExtensionChrome
-        cd hideContentExtensionChrome
-        node build.js chrome
+        mkdir artifact
+        cp -r hideContentExtension dist-chrome
+        cd dist-chrome
+        node adjustManifest.js chrome
         rm manifest.src.json
-    - name: Upload chrome artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: hide-content-extension-chrome
-        path: "./hideContentExtensionChrome"
+        rm adjustManifest.js
     - name: Build firefox
       run: |
-        cp -r hideContentExtension hideContentExtensionFirefox
-        cd hideContentExtensionFirefox
-        node build.js firefox
+        cp -r hideContentExtension dist-firefox
+        cd dist-firefox
+        node adjustManifest.js firefox
         rm manifest.src.json
-    - name: Upload firefox artifacts
+        rm adjustManifest.js
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd dist-firefox
+        npm install -g web-ext
+        web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hide-content-extension-firefox
-        path: "./hideContentExtensionFirefox"
+        name: hide-content-extension
+        path: "./artifact"
 
   build-train-scraping-extension:
     runs-on: ubuntu-latest
