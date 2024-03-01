@@ -1,61 +1,61 @@
 {
-    "name": "YouTube utils extension",
-    "version": "1.0.4",
-    "description": "does some useful stuff on youtube",
-    "manifest_version": 3,
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "{d159a001-cbf5-44b9-b4e9-456ad39b3dcf}"
-        }
+  "name": "YouTube utils extension",
+  "version": "2.13.7",
+  "description": "does some useful stuff on youtube",
+  "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{d159a001-cbf5-44b9-b4e9-456ad39b3dcf}"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "fast.js"
+      ],
+      "run_at": "document_start"
     },
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
-    },
-    "options_page": "options.html",
-    "content_scripts": [
-        {
-            "matches": [
-                "https://www.youtube.com/*"
-            ],
-            "js": [
-                "fast.js"
-            ],
-            "run_at": "document_start"
-        },
-        {
-            "matches": [
-                "https://www.youtube.com/*"
-            ],
-            "js": [
-                "content.js"
-            ],
-            "css": [
-                "content.css"
-            ]
-        }
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ]
+    }
+  ],
+  "permissions": [
+    "bookmarks",
+    "tabs",
+    "storage"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
     ],
-    "permissions": [
-        "bookmarks",
-        "tabs",
-        "storage"
-    ],
-    "background": {
-        "scripts": [
-            "background.js"
-        ],
-        "service_worker": "background.js"
-    },
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "fastInsite.js",
-                "insite.js"
-            ],
-            "matches": [
-                "https://www.youtube.com/*"
-            ]
-        }
-    ]
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fastInsite.js",
+        "insite.js"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
+    }
+  ]
 }

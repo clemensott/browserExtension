@@ -1,6 +1,6 @@
 {
   "name": "trainscrapingextension",
-  "version": "v2.13.6",
+  "version": "2.13.7",
   "description": "Displays train scraping data on openrailwaymaps",
   "main": "content.js",
   "scripts": {
