@@ -1,51 +1,51 @@
 {
-    "name": "Hider",
-    "version": "1.0",
-    "description": "Hides stuff from webpage",
-    "manifest_version": 3,
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "{todo: add id}"
-        }
-    },
-    "icons": {
-        "16": "657564_eraser_16x16.png",
-        "48": "657564_eraser_48x48.png",
-        "128": "657564_eraser_128x128.png"
-    },
-    "permissions": [
-        "contextMenus",
-        "activeTab"
+  "name": "Hider",
+  "version": "v2.13.5",
+  "description": "Hides stuff from webpage",
+  "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{todo: add id}"
+    }
+  },
+  "icons": {
+    "16": "657564_eraser_16x16.png",
+    "48": "657564_eraser_48x48.png",
+    "128": "657564_eraser_128x128.png"
+  },
+  "permissions": [
+    "contextMenus",
+    "activeTab"
+  ],
+  "background": {
+    "scripts": [
+      "vendors/webextension-polyfill/browser-polyfill.min.js",
+      "contextMenu.js"
     ],
-    "background": {
-        "scripts":[
-            "vendors/webextension-polyfill/browser-polyfill.min.js",
-            "contextMenu.js"
-        ],
-        "service_worker": "contextMenu.js",
-        "type": "module"
+    "service_worker": "contextMenu.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "vendors/webextension-polyfill/browser-polyfill.min.js",
+        "main.js"
+      ]
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "vendors/webextension-polyfill/browser-polyfill.min.js",
-                "main.js"
-            ]
-        },
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "vendors/webextension-polyfill/browser-polyfill.min.js",
-                "sub.js"
-            ],
-            "all_frames": true
-        }
-    ]
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "vendors/webextension-polyfill/browser-polyfill.min.js",
+        "sub.js"
+      ],
+      "all_frames": true
+    }
+  ]
 }
