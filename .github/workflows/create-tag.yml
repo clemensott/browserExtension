@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'name of the tag'
+        description: 'name of the tag without prefix (e.g.: 1.0.0)'
         required: true
         type: string
 
@@ -45,7 +45,7 @@ jobs:
         rm tmp.json
     - name: Bump youtube extension version
       run: |
-        cd trainScrapingExtension
+        cd youTubeExtension
         
         cp package.json tmp.json
         jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > package.json
@@ -61,8 +61,8 @@ jobs:
     - name: Commit & Push
       run: |
         git config --global user.name "${{ github.actor }}"
-        git commit -am "Bump version to ${{ github.event.inputs.tag }}"
+        git commit -am "Bump version to v${{ github.event.inputs.tag }}"
         git push origin
 
-        git tag ${{ github.event.inputs.tag }}
+        git tag v${{ github.event.inputs.tag }}
         git push origin --tags
