@@ -57,38 +57,34 @@ jobs:
         type: 'zip'
         directory: hide-content-extension-firefox
         filename: '../hide-content-extension-firefox.zip'
-    - name: Download train scraping extension chrome
+    - name: Download train scraping extension
       uses: actions/download-artifact@v4
       with:
-        name: train-scraping-extension-chrome
-        path: train-scraping-extension-chrome
-    - name: Archive train scraping extension
+        name: train-scraping-extension
+        path: train-scraping-extension
+    - name: Archive train scraping extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: train-scraping-extension-chrome
-        filename: '../train-scraping-extension-chrome.zip'
-    - name: Download train scraping extension firefox
+        directory: train-scraping-extension/chrome
+        filename: '../../train-scraping-extension-chrome.zip'
+    - name: Move train scraping extension firefox
+      run: |
+        mv train-scraping-extension/firefox.xpi ./train-scraping-extension-firefox.xpi
+    - name: Download youtube extension
       uses: actions/download-artifact@v4
       with:
-        name: train-scraping-extension-firefox.xpi
-        path: train-scraping-extension-firefox.xpi
-    - name: Download youtube extension chrome
-      uses: actions/download-artifact@v4
-      with:
-        name: youtube-extension-chrome
-        path: youtube-extension-chrome
-    - name: Archive youtube extension
+        name: youtube-extension
+        path: youtube-extension
+    - name: Archive youtube extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: youtube-extension-chrome
-        filename: '../youtube-extension-chrome.zip'
-    - name: Download train scraping extension firefox
-      uses: actions/download-artifact@v4
-      with:
-        name: youtube-extension-firefox.xpi
-        path: youtube-extension-firefox.xpi
+        directory: youtube-extension/chrome
+        filename: '../../youtube-extension-chrome.zip'
+    - name: Move youtube extension firefox
+      run: |
+        mv youtube-extension/firefox.xpi ./youtube-extension-firefox.xpi
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "*.zip,*.xpi"
@@ -171,11 +167,7 @@ jobs:
       run: |
         cd trainScrapingExtension
         npm run package
-    - name: Upload Artifacts chrome
-      uses: actions/upload-artifact@v4
-      with:
-        name: train-scraping-extension-chrome
-        path: "./trainScrapingExtension/dist"
+        cp dist artifact/chrome
     - name: Sign firefox
       env:
         WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
@@ -183,12 +175,12 @@ jobs:
       run: |
         cd trainScrapingExtension/dist
         npx web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "./web-ext-artifacts/extension.xpi"
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
     - name: Upload Artifacts firefox
       uses: actions/upload-artifact@v4
       with:
-        name: train-scraping-extension-firefox.xpi
-        path: "./trainScrapingExtension/dist/web-ext-artifacts/extension.xpi"
+        name: train-scraping-extension
+        path: "./trainScrapingExtension/artifact"
 
   build-youtube-extension:
     runs-on: ubuntu-latest
@@ -206,6 +198,7 @@ jobs:
       run: |
         cd youTubeExtension
         npm run package:chrome
+        mv dist artifact/chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -222,9 +215,9 @@ jobs:
       run: |
         cd youTubeExtension/dist
         npx web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "./web-ext-artifacts/extension.xpi"
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
     - name: Upload Artifacts firefox
       uses: actions/upload-artifact@v4
       with:
-        name: train-scraping-extension-firefox.xpi
-        path: "./youTubeExtension/dist/web-ext-artifacts/extension.xpi"
+        name: youtube-extension
+        path: "./youTubeExtension/artifact"
