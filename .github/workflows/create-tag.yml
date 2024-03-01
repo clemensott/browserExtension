@@ -38,7 +38,7 @@ jobs:
         rm tmp.json
 
         cd static
-        cp package.json tmp.json
+        cp manifest.json tmp.json
         jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > manifest.json
         rm tmp.json
     - name: Bump youtube extension version
@@ -53,7 +53,7 @@ jobs:
         rm tmp.json
 
         cd static
-        cp package.json tmp.json
+        cp manifest.json tmp.json
         jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > manifest.json
         rm tmp.json
     - name: Commit & Push
