@@ -1,6 +1,6 @@
 {
   "name": "TrainScrapingUtils",
-  "version": "v2.13.5",
+  "version": "v2.13.6",
   "description": "Does stuff with train scrapings",
   "manifest_version": 3,
   "browser_specific_settings": {
