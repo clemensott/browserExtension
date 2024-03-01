@@ -167,7 +167,7 @@ jobs:
       run: |
         cd trainScrapingExtension
         npm run package
-        cp dist artifact/chrome
+        cp -r dist artifact/chrome
     - name: Sign firefox
       env:
         WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
@@ -198,7 +198,7 @@ jobs:
       run: |
         cd youTubeExtension
         npm run package:chrome
-        mv dist artifact/chrome
+        cp -r dist artifact/chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
