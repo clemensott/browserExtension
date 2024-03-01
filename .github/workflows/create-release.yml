@@ -94,6 +94,8 @@ jobs:
         mkdir dist
         cp -r customizeWebsitesExtension dist
         cd dist
+        pwd
+        ls
         node adjustManifest.js chrome
         rm manifest.src.json
         rm adjustManifest.js
