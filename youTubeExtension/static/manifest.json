@@ -1,8 +1,13 @@
 {
     "name": "YouTube utils extension",
-    "version": "1.0",
+    "version": "1.0.0",
     "description": "does some useful stuff on youtube",
     "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{d159a001-cbf5-44b9-b4e9-456ad39b3dcf}"
+        }
+    },
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",

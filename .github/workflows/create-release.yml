@@ -73,17 +73,22 @@ jobs:
       with:
         name: train-scraping-extension-firefox.xpi
         path: train-scraping-extension-firefox.xpi
-    - name: Download youtube extension
+    - name: Download youtube extension chrome
       uses: actions/download-artifact@v4
       with:
-        name: youtube-extension
-        path: youtube-extension
+        name: youtube-extension-chrome
+        path: youtube-extension-chrome
     - name: Archive youtube extension
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: youtube-extension
-        filename: '../youtube-extension.zip'
+        directory: youtube-extension-chrome
+        filename: '../youtube-extension-chrome.zip'
+    - name: Download train scraping extension firefox
+      uses: actions/download-artifact@v4
+      with:
+        name: youtube-extension-firefox.xpi
+        path: youtube-extension-firefox.xpi
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "*.zip,*.xpi"
@@ -178,12 +183,12 @@ jobs:
       run: |
         cd trainScrapingExtension/dist
         npx web-ext sign --channel=unlisted
-        find ./web-ext-artifacts -name "*.xpi" -type f | rename './web-ext-artifacts/train-scraping-extension-firefox.xpi'
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "./web-ext-artifacts/extension.xpi"
     - name: Upload Artifacts firefox
       uses: actions/upload-artifact@v4
       with:
         name: train-scraping-extension-firefox.xpi
-        path: "./trainScrapingExtension/dist/web-ext-artifacts/train-scraping-extension-firefox.xpi"
+        path: "./trainScrapingExtension/dist/web-ext-artifacts/extension.xpi"
 
   build-youtube-extension:
     runs-on: ubuntu-latest
@@ -197,12 +202,29 @@ jobs:
       run: |
         cd youTubeExtension
         npm install
-    - name: Package
+    - name: Package chrome
       run: |
         cd youTubeExtension
         npm run package:chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: youtube-extension
+        name: youtube-extension-chrome
         path: "./youTubeExtension/dist"
+    - name: Package firefox
+      run: |
+        cd youTubeExtension
+        npm run package:firefox
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd youTubeExtension/dist
+        npx web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "./web-ext-artifacts/extension.xpi"
+    - name: Upload Artifacts firefox
+      uses: actions/upload-artifact@v4
+      with:
+        name: train-scraping-extension-firefox.xpi
+        path: "./youTubeExtension/dist/web-ext-artifacts/extension.xpi"
