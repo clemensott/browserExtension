@@ -91,13 +91,13 @@ jobs:
         node-version: 'latest'
     - name: Build chrome
       run: |
+        mkdir artifact
         cp -r customizeWebsitesExtension dist
         cd dist
         node adjustManifest.js chrome
         rm manifest.src.json
         rm adjustManifest.js
         
-        mkdir artifact
         cp -r . ../artifact/chrome
     - name: Build firefox
       run: |
