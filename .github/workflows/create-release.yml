@@ -91,6 +91,7 @@ jobs:
         node-version: 'latest'
     - name: Build chrome
       run: |
+        mkdir dist
         cp -r customizeWebsitesExtension dist
         cd dist
         node adjustManifest.js chrome
