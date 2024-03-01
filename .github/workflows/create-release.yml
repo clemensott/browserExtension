@@ -167,6 +167,7 @@ jobs:
       run: |
         cd trainScrapingExtension
         npm run package
+        mkdir artifact
         cp -r dist artifact/chrome
     - name: Sign firefox
       env:
@@ -198,6 +199,7 @@ jobs:
       run: |
         cd youTubeExtension
         npm run package:chrome
+        mkdir artifact
         cp -r dist artifact/chrome
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
