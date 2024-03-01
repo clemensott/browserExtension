@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'name of the tag without prefix (e.g.: 1.0.0)'
+        description: 'tag without prefix (e.g.: 1.0.0)'
         required: true
         type: string
 
