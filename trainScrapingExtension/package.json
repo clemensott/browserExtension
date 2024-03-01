@@ -1,24 +1,24 @@
 {
-    "name": "trainscrapingextension",
-    "version": "1.0.0",
-    "description": "Displays train scraping data on openrailwaymaps",
-    "main": "content.js",
-    "scripts": {
-        "clean": "npx rimraf dist",
-        "copy-files": "npx copyfiles -u 1 \"./static/**/*.*\" dist",
-        "build": "node esbuild.config.js",
-        "package": "npm run clean && npm run copy-files && npm run build"
-    },
-    "author": "Clemens Ott",
-    "license": "ISC",
-    "dependencies": {
-        "@influxdata/influxdb-client": "^1.33.2",
-        "@influxdata/influxdb-client-apis": "^1.33.2",
-        "clsx": "^1.2.1",
-        "copyfiles": "^2.4.1",
-        "esbuild": "^0.18.10",
-        "rimraf": "^5.0.5",
-        "web-ext": "^7.11.0",
-        "webextension-polyfill": "^0.10.0"
-    }
+  "name": "trainscrapingextension",
+  "version": "v2.13.5",
+  "description": "Displays train scraping data on openrailwaymaps",
+  "main": "content.js",
+  "scripts": {
+    "clean": "npx rimraf dist",
+    "copy-files": "npx copyfiles -u 1 \"./static/**/*.*\" dist",
+    "build": "node esbuild.config.js",
+    "package": "npm run clean && npm run copy-files && npm run build"
+  },
+  "author": "Clemens Ott",
+  "license": "ISC",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.33.2",
+    "@influxdata/influxdb-client-apis": "^1.33.2",
+    "clsx": "^1.2.1",
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.18.10",
+    "rimraf": "^5.0.5",
+    "web-ext": "^7.11.0",
+    "webextension-polyfill": "^0.10.0"
+  }
 }

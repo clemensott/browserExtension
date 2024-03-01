@@ -1,110 +1,110 @@
 {
-    "name": "Customize Websites",
-    "version": "1.0.0",
-    "description": "does usefull stuff on websites",
-    "manifest_version": 3,
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "{67be2251-19d2-4436-b98b-09dd72e72773}"
-        }
-    },
-    "icons": {
-        "16": "icon_16.png",
-        "48": "icon_48.png",
-        "128": "icon_128.png"
-    },
-    "permissions": [
-        "contextMenus"
+  "name": "Customize Websites",
+  "version": "v2.13.5",
+  "description": "does usefull stuff on websites",
+  "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{67be2251-19d2-4436-b98b-09dd72e72773}"
+    }
+  },
+  "icons": {
+    "16": "icon_16.png",
+    "48": "icon_48.png",
+    "128": "icon_128.png"
+  },
+  "permissions": [
+    "contextMenus"
+  ],
+  "background": {
+    "scripts": [
+      "vendors/webextension-polyfill/browser-polyfill.min.js",
+      "download_content_context_menu.js"
     ],
-    "background": {
-        "scripts":[
-            "vendors/webextension-polyfill/browser-polyfill.min.js",
-            "download_content_context_menu.js"
-        ],
-        "service_worker": "download_content_context_menu.js",
-        "type": "module"
+    "service_worker": "download_content_context_menu.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://neue.radkersburger-bahn.at/*"
+      ],
+      "css": [
+        "nrb_content.css"
+      ]
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "http://neue.radkersburger-bahn.at/*"
-            ],
-            "css": [
-                "nrb_content.css"
-            ]
-        },
-        {
-            "matches": [
-                "https://www.instagram.com/*"
-            ],
-            "js": [
-                "instagram_content.js"
-            ],
-            "css": [
-                "instagram_content.css"
-            ]
-        },
-        {
-            "matches": [
-                "https://twitter.com/*",
-                "https://mobile.twitter.com/*",
-                "https://www.twitter.com/*"
-            ],
-            "js": [
-                "twitter_content.js"
-            ]
-        },
-        {
-            "matches": [
-                "https://www.reddit.com/*"
-            ],
-            "js": [
-                "reddit_notification_bug.js",
-                "reddit_content.js"
-            ],
-            "css": [
-                "reddit_content.css"
-            ]
-        },
-        {
-            "matches": [
-                "https://dietagespresse.com/*"
-            ],
-            "css": [
-                "dietagespresse_content.css"
-            ]
-        },
-        {
-            "matches": [
-                "https://www.ecosia.org/*"
-            ],
-            "js": [
-                "ecosia_content.js"
-            ]
-        },
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "remove_cookie_banners.js"
-            ],
-            "css": [
-                "remove_cookie_banner.css",
-                "remove_ad.css"
-            ],
-            "all_frames": true
-        },
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "vendors/webextension-polyfill/browser-polyfill.min.js",
-                "download_content.js"
-            ]
-        }
-    ]
+    {
+      "matches": [
+        "https://www.instagram.com/*"
+      ],
+      "js": [
+        "instagram_content.js"
+      ],
+      "css": [
+        "instagram_content.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://twitter.com/*",
+        "https://mobile.twitter.com/*",
+        "https://www.twitter.com/*"
+      ],
+      "js": [
+        "twitter_content.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.reddit.com/*"
+      ],
+      "js": [
+        "reddit_notification_bug.js",
+        "reddit_content.js"
+      ],
+      "css": [
+        "reddit_content.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://dietagespresse.com/*"
+      ],
+      "css": [
+        "dietagespresse_content.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.ecosia.org/*"
+      ],
+      "js": [
+        "ecosia_content.js"
+      ]
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "remove_cookie_banners.js"
+      ],
+      "css": [
+        "remove_cookie_banner.css",
+        "remove_ad.css"
+      ],
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "vendors/webextension-polyfill/browser-polyfill.min.js",
+        "download_content.js"
+      ]
+    }
+  ]
 }
