@@ -1,8 +1,13 @@
 {
     "name": "Customize Websites",
-    "version": "1.0",
+    "version": "1.0.0",
     "description": "does usefull stuff on websites",
     "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{67be2251-19d2-4436-b98b-09dd72e72773}"
+        }
+    },
     "icons": {
         "16": "icon_16.png",
         "48": "icon_48.png",

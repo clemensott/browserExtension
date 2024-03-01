@@ -13,28 +13,20 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Download customize websites extension chrome
+    - name: Download customize websites extension
       uses: actions/download-artifact@v4
       with:
-        name: customize-websites-extension-chrome
-        path: customize-websites-extension-chrome
+        name: customize-websites-extension
+        path: customize-websites-extension
     - name: Archive customize website extension chrome
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: customize-websites-extension-chrome
-        filename: '../customize-websites-extension-chrome.zip'
-    - name: Download customize websites extension firefox
-      uses: actions/download-artifact@v4
-      with:
-        name: customize-websites-extension-firefox
-        path: customize-websites-extension-firefox
-    - name: Archive customize website extension firefox
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        directory: customize-websites-extension-firefox
-        filename: '../customize-websites-extension-firefox.zip'
+        directory: customize-websites-extension/chrome
+        filename: '../../customize-websites-extension-chrome.zip'
+    - name: Move customize website extension firefox
+      run: |
+        mv customize-websites-extension/firefox.xpi ./customize-websites-extension-firefox.xpi
     - name: Download hide content extension chrome
       uses: actions/download-artifact@v4
       with:
@@ -99,26 +91,35 @@ jobs:
         node-version: 'latest'
     - name: Build chrome
       run: |
-        cp -r customizeWebsitesExtension customizeWebsitesExtensionChrome
-        cd customizeWebsitesExtensionChrome
-        node build.js chrome
+        cp -r customizeWebsitesExtension dist
+        cd dist
+        node adjustManifest.js chrome
         rm manifest.src.json
-    - name: Upload chrome artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: customize-websites-extension-chrome
-        path: "./customizeWebsitesExtensionChrome"
+        rm adjustManifest.js
+        
+        mkdir artifact
+        cp -r dist artifact/chrome
     - name: Build firefox
       run: |
-        cp -r customizeWebsitesExtension customizeWebsitesExtensionFirefox
-        cd customizeWebsitesExtensionFirefox
-        node build.js firefox
+        cp -r customizeWebsitesExtension dist
+        cd dist
+        node adjustManifest.js firefox
         rm manifest.src.json
-    - name: Upload firefox artifacts
+        rm adjustManifest.js
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd dist
+        npm install -g web-ext
+        web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "./artifact/firefox.xpi"
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: customize-websites-extension-firefox
-        path: "./customizeWebsitesExtensionFirefox"
+        name: customize-websites-extension
+        path: "./artifact"
 
   build-hide-content-extension:
     runs-on: ubuntu-latest
@@ -177,7 +178,7 @@ jobs:
         cd trainScrapingExtension/dist
         npx web-ext sign --channel=unlisted
         mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload Artifacts firefox
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: train-scraping-extension
@@ -213,7 +214,7 @@ jobs:
         cd youTubeExtension/dist
         npx web-ext sign --channel=unlisted
         mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload Artifacts firefox
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: youtube-extension
