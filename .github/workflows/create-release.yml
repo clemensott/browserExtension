@@ -101,8 +101,8 @@ jobs:
         cp -r . ../artifact/chrome
     - name: Build firefox
       run: |
-        cp -r customizeWebsitesExtension dist-chrome
-        cd dist-chrome
+        cp -r customizeWebsitesExtension dist-firefox
+        cd dist-firefox
         node adjustManifest.js firefox
         rm manifest.src.json
         rm adjustManifest.js
