@@ -111,7 +111,7 @@ jobs:
         WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
         WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
       run: |
-        cd dist
+        cd dist-firefox
         npm install -g web-ext
         web-ext sign --channel=unlisted
         mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
