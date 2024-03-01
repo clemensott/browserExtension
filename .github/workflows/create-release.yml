@@ -176,7 +176,7 @@ jobs:
         WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
         WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
       run: |
-        cd trainScrapingExtension\dist
+        cd trainScrapingExtension/dist
         npx web-ext sign --channel=unlisted
         find ./web-ext-artifacts -name "*.xpi" -type f | rename './web-ext-artifacts/train-scraping-extension-firefox.xpi'
     - name: Upload Artifacts firefox
