@@ -92,8 +92,8 @@ jobs:
     - name: Build chrome
       run: |
         mkdir artifact
-        cp -r customizeWebsitesExtension dist
-        cd dist
+        cp -r customizeWebsitesExtension dist-chrome
+        cd dist-chrome
         node adjustManifest.js chrome
         rm manifest.src.json
         rm adjustManifest.js
@@ -101,8 +101,8 @@ jobs:
         cp -r . ../artifact/chrome
     - name: Build firefox
       run: |
-        cp -r customizeWebsitesExtension dist
-        cd dist
+        cp -r customizeWebsitesExtension dist-chrome
+        cd dist-chrome
         node adjustManifest.js firefox
         rm manifest.src.json
         rm adjustManifest.js
