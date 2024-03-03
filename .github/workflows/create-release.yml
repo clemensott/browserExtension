@@ -6,6 +6,155 @@ on:
     - 'v*'
 
 jobs:
+  build-customize-websites-extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build chrome
+      run: |
+        mkdir artifact
+        cp -r customizeWebsitesExtension dist-chrome
+        cd dist-chrome
+        node adjustManifest.js chrome
+        rm manifest.src.json
+        rm adjustManifest.js
+        
+        cp -r . ../artifact/chrome
+    - name: Build firefox
+      run: |
+        cp -r customizeWebsitesExtension dist-firefox
+        cd dist-firefox
+        node adjustManifest.js firefox
+        rm manifest.src.json
+        rm adjustManifest.js
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd dist-firefox
+        npm install -g web-ext
+        web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: customize-websites-extension
+        path: "./artifact"
+
+  build-hide-content-extension:
+    runs-on: ubuntu-latest
+    needs: [build-customize-websites-extension]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: Build chrome
+      run: |
+        mkdir artifact
+        cp -r hideContentExtension dist-chrome
+        cd dist-chrome
+        node adjustManifest.js chrome
+        rm manifest.src.json
+        rm adjustManifest.js
+    - name: Build firefox
+      run: |
+        cp -r hideContentExtension dist-firefox
+        cd dist-firefox
+        node adjustManifest.js firefox
+        rm manifest.src.json
+        rm adjustManifest.js
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd dist-firefox
+        npm install -g web-ext
+        web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: hide-content-extension
+        path: "./artifact"
+
+  build-train-scraping-extension:
+    runs-on: ubuntu-latest
+    needs: [build-hide-content-extension]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: NPM Install
+      run: |
+        cd trainScrapingExtension
+        npm install
+    - name: Package
+      run: |
+        cd trainScrapingExtension
+        npm run package
+        mkdir artifact
+        cp -r dist artifact/chrome
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd trainScrapingExtension/dist
+        npx web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: train-scraping-extension
+        path: "./trainScrapingExtension/artifact"
+
+  build-youtube-extension:
+    runs-on: ubuntu-latest
+    needs: [build-train-scraping-extension]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    - name: NPM Install
+      run: |
+        cd youTubeExtension
+        npm install
+    - name: Package chrome
+      run: |
+        cd youTubeExtension
+        npm run package:chrome
+        mkdir artifact
+        cp -r dist artifact/chrome
+    - name: Package firefox
+      run: |
+        cd youTubeExtension
+        npm run package:firefox
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd youTubeExtension/dist
+        npx web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: youtube-extension
+        path: "./youTubeExtension/artifact"
+
   create-release:
     name: Create release with artifacts of builds
     runs-on: ubuntu-latest
@@ -72,149 +221,3 @@ jobs:
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "*.zip,*.xpi"
-
-  build-customize-websites-extension:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
-    - name: Build chrome
-      run: |
-        mkdir artifact
-        cp -r customizeWebsitesExtension dist-chrome
-        cd dist-chrome
-        node adjustManifest.js chrome
-        rm manifest.src.json
-        rm adjustManifest.js
-        
-        cp -r . ../artifact/chrome
-    - name: Build firefox
-      run: |
-        cp -r customizeWebsitesExtension dist-firefox
-        cd dist-firefox
-        node adjustManifest.js firefox
-        rm manifest.src.json
-        rm adjustManifest.js
-    - name: Sign firefox
-      env:
-        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-      run: |
-        cd dist-firefox
-        npm install -g web-ext
-        web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: customize-websites-extension
-        path: "./artifact"
-
-  build-hide-content-extension:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
-    - name: Build chrome
-      run: |
-        mkdir artifact
-        cp -r hideContentExtension dist-chrome
-        cd dist-chrome
-        node adjustManifest.js chrome
-        rm manifest.src.json
-        rm adjustManifest.js
-    - name: Build firefox
-      run: |
-        cp -r hideContentExtension dist-firefox
-        cd dist-firefox
-        node adjustManifest.js firefox
-        rm manifest.src.json
-        rm adjustManifest.js
-    - name: Sign firefox
-      env:
-        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-      run: |
-        cd dist-firefox
-        npm install -g web-ext
-        web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: hide-content-extension
-        path: "./artifact"
-
-  build-train-scraping-extension:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
-    - name: NPM Install
-      run: |
-        cd trainScrapingExtension
-        npm install
-    - name: Package
-      run: |
-        cd trainScrapingExtension
-        npm run package
-        mkdir artifact
-        cp -r dist artifact/chrome
-    - name: Sign firefox
-      env:
-        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-      run: |
-        cd trainScrapingExtension/dist
-        npx web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: train-scraping-extension
-        path: "./trainScrapingExtension/artifact"
-
-  build-youtube-extension:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
-    - name: NPM Install
-      run: |
-        cd youTubeExtension
-        npm install
-    - name: Package chrome
-      run: |
-        cd youTubeExtension
-        npm run package:chrome
-        mkdir artifact
-        cp -r dist artifact/chrome
-    - name: Package firefox
-      run: |
-        cd youTubeExtension
-        npm run package:firefox
-    - name: Sign firefox
-      env:
-        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-      run: |
-        cd youTubeExtension/dist
-        npx web-ext sign --channel=unlisted
-        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: youtube-extension
-        path: "./youTubeExtension/artifact"
