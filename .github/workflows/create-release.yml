@@ -185,8 +185,8 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        directory: hide-content-extension-chrome
-        filename: '../hide-content-extension-chrome.zip'
+        directory: hide-content-extension/chrome
+        filename: '../../hide-content-extension-chrome.zip'
     - name: Move hide content extension firefox
       run: |
         mv hide-content-extension/firefox.xpi ./hide-content-extension-firefox.xpi
