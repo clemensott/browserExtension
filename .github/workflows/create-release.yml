@@ -63,6 +63,8 @@ jobs:
         node adjustManifest.js chrome
         rm manifest.src.json
         rm adjustManifest.js
+
+        cp -r . ../artifact/chrome
     - name: Build firefox
       run: |
         cp -r hideContentExtension dist-firefox
