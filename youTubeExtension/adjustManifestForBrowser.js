@@ -12,7 +12,9 @@ async function main() {
     const browserType = getBrowserType();
     switch (browserType) {
         case 'chrome':
+            delete manifest.browser_specific_settings;
             delete manifest.background.scripts;
+            delete manifest.options_ui;
             break;
 
         case 'firefox':
