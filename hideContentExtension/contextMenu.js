@@ -1,13 +1,12 @@
-import './vendors/webextension-polyfill/browser-polyfill.min.js';
-
 const menuId = 'hideElementItem';
 browser.runtime.onInstalled.addListener((details) => {
-    if (details.reason !== "install" && details.reason !== "update") return;
-    browser.contextMenus.create({
-        id: menuId,
-        title: 'Hide Element',
-        contexts: ['all'],
-    });
+    if (['install', 'update'].includes(details.reason)) {
+        browser.contextMenus.create({
+            id: menuId,
+            title: 'Hide Element',
+            contexts: ['all'],
+        });
+    }
 });
 
 browser.contextMenus.onClicked.addListener((e, tab, ...params) => {
