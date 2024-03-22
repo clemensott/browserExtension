@@ -5,9 +5,11 @@ const constants = {
     EVENTNAME: 'youtube-extension-storage-service-set',
 };
 
+const { browser } = globalThis;
+
 /**
  * A wrapper for the storage interface to enable it for dev enviroment.
- * chrome.storage.local interface is only available in prd enviroment of options page.
+ * browser.storage.local interface is only available in prd enviroment of options page.
  * This service provides a interface which saves the data in the localStorage
  */
 export default class StorageService {
@@ -21,8 +23,8 @@ export default class StorageService {
     }
 
     onSetData({ detail }) {
-        if (chrome && chrome.storage && chrome.storage.local) {
-            chrome.storage.local.set(detail);
+        if (browser && browser.storage && browser.storage.local) {
+            browser.storage.local.set(detail);
         } else {
             const storedData = JSON.parse(localStorage.getItem(constants.STORAGE_KEY) || '{}');
             localStorage.setItem(constants.STORAGE_KEY, JSON.stringify({
@@ -41,9 +43,9 @@ export default class StorageService {
     }
 
     get(keys) {
-        if (chrome && chrome.storage && chrome.storage.local) {
+        if (browser && browser.storage && browser.storage.local) {
             return new Promise(resolve => {
-                chrome.storage.local.get(keys, resolve);
+                browser.storage.local.get(keys, resolve);
             });
         }
 

@@ -5,6 +5,8 @@ const constants = {
     BOOKMARK_OPEN_VIDEO: 'bookmark_open_videos',
 };
 
+const { browser } = globalThis;
+
 export default class MessagesService {
     constructor() {
         this.callbacks = {
@@ -14,7 +16,7 @@ export default class MessagesService {
             bookmarkOpenVideos: [],
         };
 
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+        browser.runtime.onMessage.addListener(this.onMessage.bind(this));
     }
 
     onMessage(message, sender, sendResponse) {
@@ -35,7 +37,7 @@ export default class MessagesService {
     }
 
     sendRequestOpenVideos() {
-        return chrome.runtime.sendMessage(null, {
+        return browser.runtime.sendMessage(null, {
             type: constants.REQUEST_OPEN_VIDEOS,
         });
     }
@@ -45,7 +47,7 @@ export default class MessagesService {
     }
 
     sendLocalOpenVideosChange(data) {
-        chrome.runtime.sendMessage(null, {
+        browser.runtime.sendMessage(null, {
             type: constants.LOCAL_OPEN_VIDEOS_CHANGE,
             data,
         });
@@ -56,7 +58,7 @@ export default class MessagesService {
     }
 
     sendTabOpenVideosChange(tabIds, data) {
-        tabIds.forEach(tabId => chrome.tabs.sendMessage(tabId, {
+        tabIds.forEach(tabId => browser.tabs.sendMessage(tabId, {
             type: constants.TAB_OPEN_VIDEOS_CHANGE,
             data,
         }));
@@ -67,7 +69,7 @@ export default class MessagesService {
     }
 
     sendBookmarkOpenVideos(tabIds, data) {
-        tabIds.forEach(tabId => chrome.tabs.sendMessage(tabId, {
+        tabIds.forEach(tabId => browser.tabs.sendMessage(tabId, {
             type: constants.BOOKMARK_OPEN_VIDEO,
             data,
         }));
