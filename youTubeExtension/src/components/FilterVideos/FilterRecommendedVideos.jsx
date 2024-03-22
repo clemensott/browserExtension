@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import ReadMoreIcon from '@mui/icons-material/ReadMore';
+import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField, ToggleButton } from '@mui/material';
+import { ReadMore as ReadMoreIcon } from '@mui/icons-material';
 
 const jsonValues = {
     null: JSON.stringify(null),
@@ -237,6 +237,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange,
                             forceRerender();
                         }}
                     >
+                        {/* RM */}
                         <ReadMoreIcon />
                     </ToggleButton>
                 </FormControl>
