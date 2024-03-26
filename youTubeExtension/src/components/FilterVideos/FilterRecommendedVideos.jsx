@@ -237,7 +237,6 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange,
                             forceRerender();
                         }}
                     >
-                        {/* RM */}
                         <ReadMoreIcon />
                     </ToggleButton>
                 </FormControl>
