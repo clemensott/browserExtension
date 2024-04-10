@@ -18,14 +18,14 @@ export class WatchPlayerService extends DomEventHandler {
         });
 
         this.isVideoPlayerManipulationEnabled = optionsService.isVideoPlayerManipulationEnabled;
-        this.isEndVideoButtonEnabled = optionsService.isEndVideoButtonEnabled;
+        this.isFastForwardVideoButtonEnabled = optionsService.isFastForwardVideoButtonEnabled;
         this.isSaveTimestampEnabled = optionsService.isSaveTimestampEnabled;
-        this.isEndingVideo = false;
+        this.fastForwardVideo = null;
 
         this.onDuractionChange = this.onDuractionChange.bind(this);
         this.onPause = this.onPause.bind(this);
         this.onClickProgressBar = this.onClickProgressBar.bind(this);
-        this.handleEndVideo = this.handleEndVideo.bind(this);
+        this.handleFastForwardVideo = this.handleFastForwardVideo.bind(this);
     }
 
     start() {
@@ -57,7 +57,7 @@ export class WatchPlayerService extends DomEventHandler {
             volumeIndicator,
             adContainer,
             nextVideoButton,
-            endVideoButton,
+            fastForwardVideoButton,
             progressBar,
         } = obj || {};
 
@@ -68,7 +68,7 @@ export class WatchPlayerService extends DomEventHandler {
             volumeIndicator: document.contains(volumeIndicator) ? volumeIndicator : WatchPlayerService.getVolumeIndicator(),
             adContainer: document.contains(adContainer) ? adContainer : WatchPlayerService.getAdContainerButton(),
             nextVideoButton: document.contains(nextVideoButton) ? nextVideoButton : WatchPlayerService.getNextVideoButton(),
-            endVideoButton: document.contains(endVideoButton) ? endVideoButton : WatchPlayerService.getEndVideoButton(),
+            fastForwardVideoButton: document.contains(fastForwardVideoButton) ? fastForwardVideoButton : WatchPlayerService.getFastForwardVideoButton(),
             progressBar: document.contains(progressBar) ? progressBar : WatchPlayerService.getProgressBar(),
         };
     }
@@ -97,7 +97,7 @@ export class WatchPlayerService extends DomEventHandler {
         return document.querySelector('#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-left-controls > a.ytp-next-button.ytp-button');
     }
 
-    static getEndVideoButton() {
+    static getFastForwardVideoButton() {
         return document.querySelector('#movie_player a.yt-extension-end-video');
     }
 
@@ -108,46 +108,51 @@ export class WatchPlayerService extends DomEventHandler {
     onChange({ lastElements, currentElements }) {
         if (lastElements?.videoElement !== currentElements?.videoElement) {
             if (lastElements?.videoElement) {
-                lastElements.videoElement.removeEventListener('durationchange', this.onDuractionChange);
-                lastElements.videoElement.removeEventListener('pause', this.onPause);
+                const { videoElement } = lastElements;
+                videoElement.removeEventListener('durationchange', this.onDuractionChange);
+                videoElement.removeEventListener('pause', this.onPause);
             }
 
             if (currentElements?.videoElement) {
-                currentElements.videoElement.addEventListener('durationchange', this.onDuractionChange);
-                currentElements.videoElement.addEventListener('pause', this.onPause);
-                this.checkIsAdChanged(currentElements);
+                const { videoElement } = currentElements;
+                videoElement.addEventListener('durationchange', this.onDuractionChange);
+                videoElement.addEventListener('pause', this.onPause);
+                this.checkPlayerState(currentElements);
             }
         }
 
         if (lastElements?.progressBar !== currentElements?.progressBar) {
             if (lastElements?.progressBar) {
-                lastElements.progressBar.removeEventListener('click', this.onClickProgressBar);
+                const { progressBar } = lastElements;
+                progressBar.removeEventListener('click', this.onClickProgressBar);
             }
 
             if (currentElements?.progressBar) {
-                currentElements.progressBar.addEventListener('click', this.onClickProgressBar);
+                const { progressBar } = currentElements;
+                progressBar.addEventListener('click', this.onClickProgressBar);
             }
         }
 
         if (lastElements?.nextVideoButton !== currentElements?.nextVideoButton) {
             if (lastElements?.nextVideoButton) {
-                lastElements.endVideoButton?.remove();
+                const { fastForwardVideoButton } = lastElements;
+                fastForwardVideoButton?.remove();
             }
 
-            if (this.isEndVideoButtonEnabled && currentElements?.nextVideoButton && !currentElements.endVideoButton) {
-                currentElements.nextVideoButton.classList.add('yt-extension-next-video');
+            if (this.isFastForwardVideoButtonEnabled && currentElements?.nextVideoButton && !currentElements.fastForwardVideoButton) {
+                currentElements.fastForwardVideoButton = this.createFastForwardVideoButton();
 
-                currentElements.endVideoButton = this.createEndVideoButton();
-                currentElements.endVideoButton.addEventListener('click', this.handleEndVideo);
-                currentElements.nextVideoButton.parentElement
-                    .insertBefore(currentElements.endVideoButton, currentElements.nextVideoButton);
+                const { nextVideoButton, fastForwardVideoButton } = currentElements;
+                nextVideoButton.classList.add('yt-extension-next-video');
+                fastForwardVideoButton.addEventListener('click', this.handleFastForwardVideo);
+                nextVideoButton.parentElement.insertBefore(fastForwardVideoButton, nextVideoButton);
             }
         }
     }
 
 
     onDuractionChange() {
-        this.checkIsAdChanged();
+        this.checkPlayerState();
     }
 
 
@@ -156,11 +161,16 @@ export class WatchPlayerService extends DomEventHandler {
         return volumeIndicator ? volumeIndicator.style.left === '0px' : null;
     }
 
-    setMuteState(mute, force) {
+    setPlayerMuted(mute = true) {
+        const { videoElement } = this.currentElements;
+        videoElement.muted = !!mute;
+    }
+
+    restorePlayerMuted() {
         const { videoElement } = this.currentElements;
         const isMuted = this.isUiMuted();
-        if (force || (typeof isMuted === 'boolean' && isMuted === !!mute)) {
-            videoElement.muted = mute;
+        if (typeof isMuted === 'boolean') {
+            videoElement.muted = isMuted;
         }
     }
 
@@ -169,16 +179,19 @@ export class WatchPlayerService extends DomEventHandler {
         return movieContainer && movieContainer.classList.contains('ad-interrupting');
     }
 
-    checkIsAdChanged() {
+    checkPlayerState() {
         const { videoElement } = this.currentElements;
-        if (!videoElement || this.isEndingVideo) return;
+        if (!videoElement) return;
 
         const isAdPlayling = this.isAdvertisingPlayling();
         if (isAdPlayling) {
             videoElement.playbackRate = constants.SKIP_AD_PLAYBACKRATE;
-            this.setMuteState(true, true);
+            this.setPlayerMuted();
+        } else if (this.fastForwardVideo) {
+            videoElement.playbackRate = constants.END_VIDEO_PLAYBACKRATE;
+            this.setPlayerMuted();
         } else {
-            this.setMuteState(false, false);
+            this.restorePlayerMuted();
         }
     }
 
@@ -236,61 +249,62 @@ export class WatchPlayerService extends DomEventHandler {
         });
     }
 
-    createEndVideoButton() {
+    createFastForwardVideoButton() {
         const button = document.createElement('a');
         button.classList.add('yt-extension-end-video');
         button.title = 'Fast forward to end of video';
         button.innerHTML = `
             <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%">
-                <path class="ytp-svg-fill" d="M 12,24 20.5,18 12,12 V 24 z M 22,12 v 12 h 2 V 12 h -2 z"></path>
-            </svg>`;
+                <path class="ytp-svg-fill yt-extension-fast-forward-path" d="M 12,24 20.5,18 12,12 V 24 z M 22,24 30.5,18 22,12 V 24 z"/>
+                <path class="ytp-svg-fill yt-extension-play-path" d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z" />
+            </svg>
+        `;
+
+        if (this.fastForwardVideo) {
+            button.classList.add(constants.ENDING_VIDEO_BUTTON_CLASSNAME);
+        }
         return button;
     }
 
-    handleEndVideo({ target }) {
-        const that = this;
-        const { videoElement } = this.currentElements;
+    restoreFastForwardHandling() {
+        const { videoElement, fastForwardVideoButton } = this.currentElements;
+        const { intervalId, oldPlaybackRate } = this.fastForwardVideo;
+
+        clearInterval(intervalId);
+
+        fastForwardVideoButton.classList.remove(constants.ENDING_VIDEO_BUTTON_CLASSNAME);
+
+        videoElement.playbackRate = oldPlaybackRate;
+        this.fastForwardVideo = null;
+
+        this.checkPlayerState();
+    }
+
+    handleFastForwardVideo() {
+        const { videoElement, fastForwardVideoButton } = this.currentElements;
         if (videoElement.currentTime >= videoElement.duration) {
             return;
         }
 
-        const oldPlaybackRate = videoElement.playbackRate;
-        const currentVideoId = getCurrentVideoId();
-
-        function removeHandlers() {
-            clearInterval(checkVideoChangedIntervalId);
-            that.isEndingVideo = false;
-            videoElement.removeEventListener('ended', onEnded);
-            target.classList.remove(constants.ENDING_VIDEO_BUTTON_CLASSNAME);
+        if (this.fastForwardVideo) {
+            this.restoreFastForwardHandling();
+            return;
         }
 
-        function checkVideoChanged() {
-            if (currentVideoId !== getCurrentVideoId()) {
-                removeHandlers();
+        const checkVideoChanged = () => {
+            if (this.fastForwardVideo.videoId !== getCurrentVideoId()) {
+                this.restoreFastForwardHandling();
             }
         }
 
-        function onEnded() {
-            if (!this.isAdvertisingPlayling()) {
-                if (videoElement.playbackRate === constants.END_VIDEO_PLAYBACKRATE) {
-                    videoElement.playbackRate = oldPlaybackRate;
+        this.fastForwardVideo = {
+            oldPlaybackRate: videoElement.playbackRate,
+            videoId: getCurrentVideoId(),
+            intervalId: setInterval(checkVideoChanged, 100)
+        };
 
-                    const uiMuted = that.isUiMuted();
-                    if (typeof uiMuted === 'boolean') {
-                        videoElement.muted = false;
-                    }
-                }
-                removeHandlers();
-            }
-        }
-
-        const checkVideoChangedIntervalId = setInterval(checkVideoChanged, 100);
-        videoElement.addEventListener('ended', onEnded);
-
-        that.isEndingVideo = true;
-        videoElement.playbackRate = constants.END_VIDEO_PLAYBACKRATE;
-        videoElement.muted = true;
+        fastForwardVideoButton.classList.add(constants.ENDING_VIDEO_BUTTON_CLASSNAME);
         videoElement.play();
-        target.classList.add(constants.ENDING_VIDEO_BUTTON_CLASSNAME);
+        this.checkPlayerState();
     }
 }

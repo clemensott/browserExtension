@@ -7,8 +7,8 @@ const optionKeys = {
         key: 'IS_PAUSE_CHANNEL_TRAILER_ENABLED',
         defaultValue: false,
     },
-    IS_END_VIDEO_BUTTON_ENABLED: {
-        key: 'IS_END_VIDEO_BUTTON_ENABLED',
+    IS_FAST_FORWARD_VIDEO_BUTTON_ENABLED: {
+        key: 'IS_FAST_FORWARD_VIDEO_BUTTON_ENABLED',
         defaultValue: false,
     },
     IS_SAVE_TIMESTAMP_ENABLED: {
@@ -111,12 +111,12 @@ export default class OptionsService {
         return this.set(optionKeys.IS_PAUSE_CHANNEL_TRAILER_ENABLED.key, value);
     }
 
-    get isEndVideoButtonEnabled() {
-        return this.get(optionKeys.IS_END_VIDEO_BUTTON_ENABLED.key);
+    get isFastForwardVideoButtonEnabled() {
+        return this.get(optionKeys.IS_FAST_FORWARD_VIDEO_BUTTON_ENABLED.key);
     }
 
-    set isEndVideoButtonEnabled(value) {
-        return this.set(optionKeys.IS_END_VIDEO_BUTTON_ENABLED.key, value);
+    set isFastForwardVideoButtonEnabled(value) {
+        return this.set(optionKeys.IS_FAST_FORWARD_VIDEO_BUTTON_ENABLED.key, value);
     }
 
     get isSaveTimestampEnabled() {

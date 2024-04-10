@@ -22,7 +22,7 @@ export default function App() {
     const [isDomManipulationEnabled, setIsDomManipulationEnabled] = useState(false);
     const [subscriptionBoxReloadSeconds, setSubscriptionBoxReloadSeconds] = useState('');
     const [isVideoPlayerManipulationEnabled, setIsVideoPlayerManipulationEnabled] = useState(true);
-    const [isEndVideoButtonEnabled, setIsEndVideoButtonEnabled] = useState(false);
+    const [isFastForwardVideoButtonEnabled, setIsEndVideoButtonEnabled] = useState(false);
     const [isSaveTimestampEnabled, setIsSaveTimestampEnabled] = useState(false);
     const [isPauseChannelTrailerEnabled, setIsPauseChannelTrailerEnabled] = useState(false);
     const [hideDislikeVideoButton, setHideDislikeVideoButton] = useState(false);
@@ -54,7 +54,7 @@ export default function App() {
             setSubscriptionBoxReloadSeconds(String(options.subscriptionBoxReloadSeconds));
 
             setIsVideoPlayerManipulationEnabled(!!options.isVideoPlayerManipulationEnabled);
-            setIsEndVideoButtonEnabled(!!options.isEndVideoButtonEnabled);
+            setIsEndVideoButtonEnabled(!!options.isFastForwardVideoButtonEnabled);
             setIsSaveTimestampEnabled(!!options.isSaveTimestampEnabled);
             setIsPauseChannelTrailerEnabled(!!options.isPauseChannelTrailerEnabled);
 
@@ -82,7 +82,7 @@ export default function App() {
         options.subscriptionBoxReloadSeconds = Number.parseInt(subscriptionBoxReloadSeconds, 10);
 
         options.isVideoPlayerManipulationEnabled = !!isVideoPlayerManipulationEnabled;
-        options.isEndVideoButtonEnabled = !!isEndVideoButtonEnabled;
+        options.isFastForwardVideoButtonEnabled = !!isFastForwardVideoButtonEnabled;
         options.isSaveTimestampEnabled = !!isSaveTimestampEnabled;
         options.isPauseChannelTrailerEnabled = !!isPauseChannelTrailerEnabled;
 
@@ -120,9 +120,9 @@ export default function App() {
                 />
 
                 <Checkbox
-                    checked={isEndVideoButtonEnabled}
+                    checked={isFastForwardVideoButtonEnabled}
                     disabled={!isVideoPlayerManipulationEnabled}
-                    label="Enable end video button"
+                    label="Enable fast forward video button"
                     onChange={e => setIsEndVideoButtonEnabled(e.target.checked)}
                 />
 

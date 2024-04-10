@@ -17,9 +17,6 @@ export default async function createApiHandler(options) {
         return apiHandler;
     }
 
-    console.warn('API init error. You may need to update credentials:\n' +
-        'localStorage.setItem("subscriptionBoxUsername", "");\n' +
-        'localStorage.setItem("subscriptionBoxPassword", "");\n' +
-        'localStorage.setItem("subscriptionBoxBaseUrl", "");');
+    console.warn('API init error. You may need to update credentials.');
     return null;
 }

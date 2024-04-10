@@ -23,9 +23,14 @@ body:not(.disable-video-player-manipulation) ytd-engagement-panel-section-list-r
 }
 
 a.yt-extension-end-video {
+    width: 46px;
     cursor: pointer;
 }
 
-a.yt-extension-end-video.yt-extension-ending-video {
+a.yt-extension-end-video:not(.yt-extension-ending-video) > svg > path.yt-extension-play-path {
+    display: none;
+}
+
+a.yt-extension-end-video.yt-extension-ending-video > svg > path.yt-extension-fast-forward-path {
     display: none;
 }
