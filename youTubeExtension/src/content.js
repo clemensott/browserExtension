@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill';
 import importBundle from './insite/importBundle';
 import ChannelHelperService from './Services/Dom/Channel/ChannelHelperService';
 import createApiHandler from './utils/createApiHandler';
@@ -19,7 +20,8 @@ import MessagesService from './Services/MessagesService';
 import { WatchPlayerService } from './Services/Dom/WatchPlayerService';
 
 async function main() {
-    const optionsService = new OptionsService(new StorageService());
+    const storageService = new StorageService(browser);
+    const optionsService = new OptionsService(storageService);
     await optionsService.load();
 
     const watchPlayerService = new WatchPlayerService(optionsService);

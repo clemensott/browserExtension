@@ -14,7 +14,8 @@ import { subsribeConsentLightBoxRemove } from '../Services/Dom/ConsentLightbox';
 
     subsribeConsentLightBoxRemove();
 
-    const optionsService = new OptionsService(new StorageService());
+    const storageService = new StorageService();
+    const optionsService = new OptionsService(storageService);
     await optionsService.load();
 
     Object.assign(window, {

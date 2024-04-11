@@ -1,11 +1,11 @@
+import browser from 'webextension-polyfill';
+
 const constants = {
     REQUEST_OPEN_VIDEOS: 'request_open_videos',
     LOCAL_OPEN_VIDEOS_CHANGE: 'local_open_videos_change',
     TAB_OPEN_VIDEOS_CHANGE: 'tab_open_videos_change',
     BOOKMARK_OPEN_VIDEO: 'bookmark_open_videos',
 };
-
-const { browser } = globalThis;
 
 export default class MessagesService {
     constructor() {

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import browser from 'webextension-polyfill';
 import StorageService from '../../Services/StorageService';
 import OptionsService from '../../Services/OptionsService';
 import API from '../../Services/API';
@@ -6,7 +7,8 @@ import clsx from 'clsx';
 import { Checkbox } from './Checkbox';
 import './App.css';
 
-const options = new OptionsService(new StorageService());
+const storageService = new StorageService(browser);
+const options = new OptionsService(storageService);
 
 async function pingApi(baseUrl) {
     try {
