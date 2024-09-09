@@ -177,6 +177,24 @@ const actionConfigs = [
         getHide('.privacy-consent--modal'),
         getRemoveClasses('body', 'privacy-consent--active'),
     ],
+    [
+        getHide('div.modal-backdrop'),
+        getHide('div.modal-backdrop + div.modal'),
+        getRemoveClasses('body', 'modal-open', 'modal-fade', 'consent-modal'),
+    ],
+    [
+        getHide('div#modal:has([data-purpose="cookieBar.button.accept"])'),
+        getRemoveClasses('body', 'noScrolling'),
+    ],
+    [
+        getHide('div#cookie-law-info-bar'),
+        getHide('div.cli-modal-backdrop.cli-fade.cli-popupbar-overlay.cli-show'),
+        getRemoveClasses('body', 'cli-barmodal-open'),
+    ],
+    [
+        getHide('svi-policy-layover'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
