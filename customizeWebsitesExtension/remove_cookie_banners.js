@@ -195,6 +195,10 @@ const actionConfigs = [
         getHide('svi-policy-layover'),
         clearOverflow('body'),
     ],
+    [
+        getRemove('div#cmpwrapper.cmpwrapper'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
