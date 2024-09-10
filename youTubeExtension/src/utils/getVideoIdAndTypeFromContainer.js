@@ -1,5 +1,5 @@
 export default function getVideoIdAndTypeFromContainer(container) {
-    const a = container.querySelector('a#thumbnail');
+    const a = container.querySelector('a#thumbnail,a.reel-item-endpoint');
     if (!a) {
         return {
             videoId: null,
