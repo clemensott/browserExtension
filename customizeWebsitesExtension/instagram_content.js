@@ -74,6 +74,10 @@ function setupBodyElementObserver() {
     observer.observe(document.body, {
         childList: true,
     });
+
+    Array.from(document.body.children)
+        .filter(element => isLoginOverlay(element) || isCookieBanner(element))
+        .forEach(setHidden);
 }
 
 function sanitizeString(str) {
