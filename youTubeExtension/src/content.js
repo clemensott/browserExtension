@@ -18,6 +18,7 @@ import FilterRecommendedVideosService from './Services/Dom/FilterVideos/FilterRe
 import fetchIntersectorService from './Services/FetchIntersectorService';
 import MessagesService from './Services/MessagesService';
 import { WatchPlayerService } from './Services/Dom/WatchPlayerService';
+import './content.css';
 
 async function main() {
     const storageService = new StorageService(browser);
@@ -63,6 +64,8 @@ async function main() {
         updateSourcesTrackerService.init();
         videoOpenService.start();
         window.videoOpenService = videoOpenService;
+    } else {
+        document.body.classList.add('yt-extension-disabled');
     }
 
     if (apiHandler) {

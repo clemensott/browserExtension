@@ -1,0 +1,3 @@
+body:not(.yt-extension-disabled) ytd-ad-slot-renderer {
+    display: none;
+}
