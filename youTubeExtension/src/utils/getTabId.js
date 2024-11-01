@@ -1,6 +1,11 @@
 const key = 'tabId';
-sessionStorage.setItem(key, Math.random());
 
 export default function getTabId() {
-    return sessionStorage.getItem(key);
+    let id = sessionStorage.getItem(key);
+    if (!id) {
+        id = Math.random().toString();
+        sessionStorage.setItem(key, Math.random());
+    }
+
+    return id;
 }

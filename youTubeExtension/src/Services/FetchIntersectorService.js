@@ -36,6 +36,27 @@ class FetchIntersectorService {
         this.queue = [];
         this.wins = new Set();
 
+        this.bodyMutationObserver = new MutationObserver(records => records.forEach(record => {
+            record.addedNodes.forEach(addedNode => {
+                if (addedNode.tagName?.toLowerCase() === 'iframe') {
+                    this.wrapResponse(addedNode.contentWindow);
+                }
+            })
+        }));
+        this.documentMutationObserver = new MutationObserver(records => records.forEach(record => {
+            record.addedNodes.forEach(addedNode => {
+                if (addedNode.tagName?.toLowerCase() === 'body') {
+                    this.bodyMutationObserver.observe(addedNode, {
+                        subtree: false,
+                        childList: true,
+                        attributes: false,
+                    });
+                    this.documentMutationObserver.disconnect();
+                    this.checkBody(addedNode);
+                }
+            })
+        }));
+
         this.onDisabled = this.onDisabled.bind(this);
         document.addEventListener(constants.REDUCE_VIDEOS_EVENT_NAME, ({ detail }) => this.reduceVideosEnabled = detail);
     }
@@ -67,6 +88,7 @@ class FetchIntersectorService {
     }
 
     wrapResponse(win) {
+        console.log('wrap window')
         if (!win || this.wins.has(win)) {
             return;
         }
@@ -93,35 +115,13 @@ class FetchIntersectorService {
         this.wins.add(win);
     }
 
+    checkBody(body) {
+        const bodyWins = [...body.querySelectorAll('iframe')].map(iframe => iframe.contentWindow);
+        bodyWins.forEach(win => this.wrapResponse(win));
+    }
+
     enable() {
-        function checkBody(body) {
-            const bodyWins = [...body.querySelectorAll('iframe')].map(iframe => iframe.contentWindow);
-            bodyWins.forEach(win => this.wrapResponse(win));
-        }
-
-        const bodyMutationObserver = new MutationObserver(records => records.forEach(record => {
-            record.addedNodes.forEach(addedNode => {
-                if (addedNode.tagName?.toLowerCase() === 'iframe') {
-                    this.wrapResponse(addedNode.contentWindow);
-                }
-            })
-        }));
-
-        const documentMutationObserver = new MutationObserver(records => records.forEach(record => {
-            record.addedNodes.forEach(addedNode => {
-                if (addedNode.tagName?.toLowerCase() === 'body') {
-                    bodyMutationObserver.observe(addedNode, {
-                        subtree: false,
-                        childList: true,
-                        attributes: false,
-                    });
-                    documentMutationObserver.disconnect();
-                    checkBody(addedNode);
-                }
-            })
-        }));
-
-        documentMutationObserver.observe(document, {
+        this.documentMutationObserver.observe(document, {
             subtree: true,
             childList: true,
             attributes: false,
@@ -137,14 +137,21 @@ class FetchIntersectorService {
     }
 
     unwrapResponse(win) {
-        if (typeof win.Response.prototype.oldText === 'function') {
-            win.Response.prototype.text = win.Response.prototype.oldText;
+        try {
+            if (typeof win.Response.prototype.oldText === 'function') {
+                console.log('unwrap2:', win);
+                win.Response.prototype.text = win.Response.prototype.oldText;
+            }
+        } catch {
+        } finally {
+            this.wins.delete(win);
         }
-
-        this.wins.delete(win);
     }
 
     disable() {
+        this.documentMutationObserver.disconnect();
+        this.bodyMutationObserver.disconnect();
+
         this.wins.forEach(win => this.unwrapResponse(win));
         document.removeEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
         triggerEvent(constants.DISABLE_EVENT_NAME, null);

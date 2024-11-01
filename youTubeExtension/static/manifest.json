@@ -23,9 +23,10 @@
         "https://www.youtube.com/*"
       ],
       "js": [
-        "fast.js"
+        "fastInsite.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "world": "MAIN"
     },
     {
       "matches": [
