@@ -34,6 +34,7 @@ class FetchIntersectorService {
         this.isSendingEnabled = false;
         this.reduceVideosEnabled = false;
         this.queue = [];
+        this.wins = new Set();
 
         this.onDisabled = this.onDisabled.bind(this);
         document.addEventListener(constants.REDUCE_VIDEOS_EVENT_NAME, ({ detail }) => this.reduceVideosEnabled = detail);
@@ -55,7 +56,7 @@ class FetchIntersectorService {
         }
     }
 
-    isResponseRelevant(url) {
+    static isResponseRelevant(url) {
         return [
             'https://www.youtube.com/youtubei/v1/next',
             'https://www.youtube.com/youtubei/v1/browse',
@@ -65,18 +66,23 @@ class FetchIntersectorService {
         ].some(u => url.startsWith(u))
     }
 
-    enable() {
-        if (typeof Response.prototype.oldText === 'function' &&
-            Response.prototype.text !== Response.prototype.oldText) {
+    wrapResponse(win) {
+        console.log('wrap response:', win);
+        if (!win || this.wins.has(win)) {
+            return;
+        }
+
+        if (typeof win.Response.prototype.oldText === 'function' &&
+            win.Response.prototype.text !== win.Response.prototype.oldText) {
             return;
         }
         const that = this;
-        if (typeof Response.prototype.oldText !== 'function') {
-            Response.prototype.oldText = Response.prototype.text;
+        if (typeof win.Response.prototype.oldText !== 'function') {
+            win.Response.prototype.oldText = win.Response.prototype.text;
         }
-        Response.prototype.text = async function () {
-            const text = await Response.prototype.oldText.call(this);
-            if (that.isResponseRelevant(this.url)) {
+        win.Response.prototype.text = async function () {
+            const text = await win.Response.prototype.oldText.call(this);
+            if (FetchIntersectorService.isResponseRelevant(this.url)) {
                 that.handleData({
                     url: this.url,
                     text,
@@ -84,13 +90,63 @@ class FetchIntersectorService {
             }
             return that.reduceVideosEnabled ? reduceVideos(text) : text;
         };
+
+        this.wins.add(win);
+    }
+
+    enable() {
+        function checkBody(body) {
+            const bodyWins = [...body.querySelectorAll('iframe')].map(iframe => iframe.contentWindow);
+            bodyWins.forEach(win => this.wrapResponse(win));
+        }
+
+        const bodyMutationObserver = new MutationObserver(records => records.forEach(record => {
+            record.addedNodes.forEach(addedNode => {
+                if (addedNode.tagName?.toLowerCase() === 'iframe') {
+                    this.wrapResponse(addedNode.contentWindow);
+                }
+            })
+        }));
+
+        const documentMutationObserver = new MutationObserver(records => records.forEach(record => {
+            record.addedNodes.forEach(addedNode => {
+                if (addedNode.tagName?.toLowerCase() === 'body') {
+                    bodyMutationObserver.observe(addedNode, {
+                        subtree: false,
+                        childList: true,
+                        attributes: false,
+                    });
+                    documentMutationObserver.disconnect();
+                    checkBody(addedNode);
+                }
+            })
+        }));
+
+        documentMutationObserver.observe(document, {
+            subtree: true,
+            childList: true,
+            attributes: false,
+        });
+
+        if (document.body) {
+            checkBody(document.body);
+        }
+
+        this.wrapResponse(window);
+
         document.addEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
     }
 
-    disable() {
-        if (typeof Response.prototype.oldText === 'function') {
-            Response.prototype.text = Response.prototype.oldText;
+    unwrapResponse(win) {
+        if (typeof win.Response.prototype.oldText === 'function') {
+            win.Response.prototype.text = win.Response.prototype.oldText;
         }
+
+        this.wins.delete(win);
+    }
+
+    disable() {
+        this.wins.forEach(win => this.unwrapResponse(win));
         document.removeEventListener(constants.DISABLE_EVENT_NAME, this.onDisabled);
         triggerEvent(constants.DISABLE_EVENT_NAME, null);
     }

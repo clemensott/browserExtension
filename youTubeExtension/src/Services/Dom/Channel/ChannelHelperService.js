@@ -23,7 +23,7 @@ export default class ChannelHelperService {
         this.domService.channelVideosCount.addEventListener(this.onChannelVideosChange.bind(this));
     }
 
-    onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {
+    onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {  
         if (lastContainer && lastContainer.headerButtons) {
             lastContainer.headerButtons.classList.remove('yt-channel-helper-service-inner-header-container');
         }
