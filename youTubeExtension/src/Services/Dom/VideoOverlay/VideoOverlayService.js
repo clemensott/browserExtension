@@ -4,8 +4,8 @@ import setIntervalUntil from '../../../utils/setIntervalUntil';
 import AtOnceService from '../../AtOnceService';
 import addToggleDisplayVideoState from '../../../components/addToggleDisplayVideoState';
 import VideoOverlayRenderer from './VideoOverlayRenderer';
-import './VideoOverlayService.css';
 import getVideoIdFromUrl from '../../../utils/getVideoIdFromUrl';
+import './VideoOverlayService.css';
 
 const videoStateContainerClassName = 'yt-video-user-state-container';
 const videoOpenContainerClassName = 'yt-video-open-container';
@@ -15,7 +15,7 @@ function getVideoIdOfShortVideoContainer(container) {
     while (parent && parent.tagName !== 'YTD-REEL-VIDEO-RENDERER') {
         parent = parent.parentElement;
     }
-    const titleContainer = parent.querySelector('[data-sessionlink="feature=player-title"][href]');
+    const titleContainer = parent.querySelector('[data-sessionlink="feature=player-title"][href],.ytp-title-link.yt-uix-sessionlink[href]');
     if (titleContainer && titleContainer.href) {
         const videoId = getVideoIdFromUrl(titleContainer.href);
         if (videoId) {
@@ -31,7 +31,7 @@ function getVideoIdOfShortVideoContainer(container) {
 
 function getWatchVideoContainer() {
     return [...document.querySelectorAll(
-        '#title > h1,#owner-and-teaser,ytd-video-primary-info-renderer #info,div#actions.ytd-reel-player-overlay-renderer'
+        '#title > h1,#owner-and-teaser,ytd-video-primary-info-renderer #info'
     )].find(container => {
         let current = container;
         while (current) {
@@ -93,10 +93,21 @@ export default class VideoOverlayService {
             addRootContainerClass: 'yt-video-user-state-watch-root',
         }] : [];
 
+        const shortWatchVideos = [
+            'div#actions.ytd-reel-player-overlay-renderer',
+        ]
+            .flatMap(selector => Array.from(document.querySelectorAll(selector)))
+            .map(container => ({
+                container,
+                getVideoId: () => getVideoIdOfShortVideoContainer(container),
+                additionalClassName: 'yt-video-user-state-watch',
+                addRootContainerClass: 'yt-video-user-state-watch-root',
+            }));
+
         const shortVideos = [
             'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
         ]
-            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+            .flatMap(selector => Array.from(document.querySelectorAll(selector)))
             .map(container => ({
                 container,
                 getVideoId: () => getVideoIdOfShortVideoContainer(container),
@@ -119,7 +130,7 @@ export default class VideoOverlayService {
             '#items > ytd-playlist-panel-video-renderer',
             '#contents > ytd-playlist-video-renderer',
         ]
-            .map(selector => Array.from(document.querySelectorAll(selector))).flat()
+            .flatMap(selector => Array.from(document.querySelectorAll(selector)))
             .map(container => ({
                 container,
                 getVideoId: () => getVideoIdFromVideoContainer(container),
@@ -128,6 +139,7 @@ export default class VideoOverlayService {
 
         return [
             ...watchVideos,
+            ...shortWatchVideos,
             ...shortVideos,
             ...recommendedVideos,
             ...listVideos,
