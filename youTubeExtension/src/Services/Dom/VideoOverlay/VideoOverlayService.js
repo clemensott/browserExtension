@@ -118,6 +118,7 @@ export default class VideoOverlayService {
             '#items > ytd-video-renderer',
             '#items > ytd-playlist-panel-video-renderer',
             '#contents > ytd-playlist-video-renderer',
+            '#items > yt-lockup-view-model',
         ]
             .map(selector => Array.from(document.querySelectorAll(selector))).flat()
             .map(container => ({

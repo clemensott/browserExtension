@@ -1,5 +1,5 @@
 export function parseDuration(rawDuration) {
-    if (!rawDuration) {
+    if (typeof rawDuration !== 'string') {
         return null;
     }
     const parts = rawDuration.split(':');

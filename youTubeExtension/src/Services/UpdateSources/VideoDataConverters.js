@@ -1,4 +1,5 @@
 import { parseDuration, parseFormattedInt } from './utils';
+import { extractViews } from './utils/extractViews';
 
 export function fromWatchVideo(raw, videoId) {
     if (!Array.isArray(raw)) {
@@ -122,18 +123,18 @@ export function fromReelPlayerOverlayRenderer({ reelPlayerOverlayRenderer: raw }
         title: raw.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.
             reelTitleText?.runs?.map(r => r.text).filter(Boolean).join('')
             || raw.metapanel?.reelMetapanelViewModel?.metadataItems?.
-            map(r=>r?.shortsVideoTitleViewModel?.text?.content).find(Boolean),
+                map(r => r?.shortsVideoTitleViewModel?.text?.content).find(Boolean),
         channelTitle: raw.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.
             channelTitleText?.runs?.map(r => r.text).find(Boolean),
         channelId: raw.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.
             channelNavigationEndpoint?.browseEndpoint?.browseId
             || raw.metapanel?.reelMetapanelViewModel?.metadataItems?.
-            map(r=>r?.reelChannelBarViewModel?.subscribeButtonViewModel?.subscribeButtonViewModel?.channelId).find(Boolean),
+                map(r => r?.reelChannelBarViewModel?.subscribeButtonViewModel?.subscribeButtonViewModel?.channelId).find(Boolean),
         likes: raw?.likeButton?.likeButtonRenderer?.likeCount,
     };
 }
 
-export function fromShortsLockupViewModel( { shortsLockupViewModel: raw}, additionalData){
+export function fromShortsLockupViewModel({ shortsLockupViewModel: raw }, additionalData) {
     const { channelTitle, channelId } = additionalData || {};
     const videoId = raw?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId;
     return videoId && {
@@ -152,5 +153,26 @@ export function fromPlaylistVideoRenderer({ playlistVideoRenderer: raw }) {
         channelTitle: raw.shortBylineText?.runs?.map(r => r.text).find(Boolean),
         channelId: raw.shortBylineText?.runs?.map(r => r.navigationEndpoint?.browseEndpoint?.browseId).find(Boolean),
         duration: parseInt(raw.lengthSeconds),
+    };
+}
+
+export function fromLockupViewModel({ lockupViewModel: raw }) {
+    if (!raw?.contentId) {
+        return null;
+    }
+
+    const metaViewModel = raw.metadata?.lockupMetadataViewModel;
+    const metadataRows = metaViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+    const metadataParts = metadataRows?.flatMap(r => r?.metadataParts);
+    const channelMetaPart = metadataParts?.find(p => p?.text?.commandRuns?.
+        some(r => r?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.webPageType === 'WEB_PAGE_TYPE_CHANNEL'));
+    return {
+        id: raw.contentId,
+        title: metaViewModel?.title?.content,
+        channelTitle: channelMetaPart.text.content,
+        channelId: channelMetaPart?.text?.commandRuns?.map(r => r?.onTap?.innertubeCommand?.browseEndpoint?.browseId).find(Boolean),
+        duration: raw.contentImage?.thumbnailViewModel?.overlays?.flatMap(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.
+            map(b=>parseDuration(b?.thumbnailBadgeViewModel?.text)).find(Boolean),
+        views: metadataParts?.map(p => extractViews(p?.text?.content))?.find(v => typeof v === 'number'),
     };
 }
