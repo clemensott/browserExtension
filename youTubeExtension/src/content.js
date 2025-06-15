@@ -95,10 +95,12 @@ async function main() {
         } catch (err) {
             console.error('init display video state service:', err);
         }
-
-        importBundle('insite.js');
     } else {
         fetchIntersectorService.disable();
+    }
+
+    if (optionsService.isDomManipulationEnabled) {
+        importBundle('insite.js');
     }
 }
 

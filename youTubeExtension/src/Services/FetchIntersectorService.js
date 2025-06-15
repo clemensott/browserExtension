@@ -88,7 +88,6 @@ class FetchIntersectorService {
     }
 
     wrapResponse(win) {
-        console.log('wrap window')
         if (!win || this.wins.has(win)) {
             return;
         }

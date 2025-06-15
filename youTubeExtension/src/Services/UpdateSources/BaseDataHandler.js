@@ -14,8 +14,7 @@ class BaseDataHandler {
     }
 
     getVideos(data) {
-        for (const key in this.getVideosFuncs) {
-            const getVideosFunc = this.getVideosFuncs[key];
+        for (const getVideosFunc of this.getVideosFuncs) {
             const rawVideos = getVideosFunc(data)?.filter(Boolean);
             if (rawVideos && rawVideos.length) {
                 return rawVideos;
@@ -30,8 +29,7 @@ class BaseDataHandler {
     }
 
     convertVideo(raw, additionalData) {
-        for (const key in converterList) {
-            const converter = converterList[key];
+        for (const converter of converterList) {
             const video = converter(raw, additionalData);
             if (video) {
                 return video;
