@@ -118,14 +118,14 @@ const actionConfigs = [
     ],
     [
         getHide('#cmpbox2'),
-        getHide('#cmpbox'),
+        getRemove('#cmpbox'),
         clearOverflow('body'),
     ],
     [
         getHide('#cmpbox'),
     ],
     [
-        getHide('#didomi-host'),
+        getRemove('#didomi-host'),
         getRemoveClasses('body', 'didomi-popup-open'),
     ],
     [
@@ -147,6 +147,7 @@ const actionConfigs = [
     ],
     [
         getHide('#onetrust-consent-sdk'),
+        getHide('div[data-nosnippet="data-nosnippet"]'),
         getRemoveClasses('body', 'onetrust-no-scroll'),
         clearOverflow('body'),
     ],
@@ -198,6 +199,33 @@ const actionConfigs = [
     [
         getRemove('div#cmpwrapper.cmpwrapper'),
         clearOverflow('body'),
+    ],
+    [
+        getRemove('#consentBanner'),
+        clearOverflow('body'),
+    ],
+    [
+        getHide('#modal_cct'),
+        getHide('.modal-backdrop'),
+        getRemoveClasses('body', 'modal-open'),
+    ],
+    [
+        getHide('#PrivacyCategoryAlert'),
+        getHide('.modal-backdrop'),
+        getRemoveClasses('body', 'modal-open'),
+    ],
+    [
+        getHide('#dr_cookie_banner_container'),
+        getHide('#dr_blocking_div'),
+    ],
+    [
+        getHide('.ccm-root'),
+        getRemoveClasses('body', 'ccm-blocked'),
+        getRemoveClasses('html', 'ccm-blocked'),
+    ],
+    [
+        getRemove('#iubenda-cs-banner'),
+        clearOverflow('html'),
     ],
 ];
 
