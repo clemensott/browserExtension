@@ -3,8 +3,8 @@ import createApiHandler from '../utils/createApiHandler';
 import StorageService from '../Services/StorageService';
 import OptionsService from '../Services/OptionsService';
 import SpeedMeasurer from './speedMeasure';
+import { allDataHandlers } from '../Services/UpdateSources/AllDataHandlers';
 import { subsribeConsentLightBoxRemove } from '../Services/Dom/ConsentLightbox';
-
 
 (async function () {
     const initDataService = new InitDataService();
@@ -22,5 +22,6 @@ import { subsribeConsentLightBoxRemove } from '../Services/Dom/ConsentLightbox';
         createApiHandler,
         optionsService,
         trainsSpeed: new SpeedMeasurer(),
+        updateHandlers: allDataHandlers,
     });
 })();

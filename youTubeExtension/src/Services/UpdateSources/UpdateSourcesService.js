@@ -1,32 +1,8 @@
 import getTabId from '../../utils/getTabId';
 import groupBy from '../../utils/groupBy';
 import fetchIntersectorService from '../FetchIntersectorService';
-import watchVideoDataHandler from './WatchVideoDataHandler';
-import watchVideoDetailsDataHandler from './WatchVideoDetailsDataHandler';
-import shortsWatchDataHandler from './ShortsWatchDataHandler';
-import recommendationVideosDataHandler from './RecommendationVideosDataHandler';
-import watchPlaylistVideosDataHandler from './WatchPlaylistVideosDataHandler';
-import channelVideosDataHandler from './ChannelVideosDataHandler';
-import subBoxVideosDataHandler from './SubBoxVideosDataHandler';
-import searchPrimaryVideosDataHandler from './SearchPrimaryVideosDataHandler';
-import searchSecondaryVideosDataHandler from './SearchSecondaryVideosDataHandler';
-import playlistVideosDataHandler from './PlaylistVideosDataHandler';
-import homeDataHandler from './HomeDataHandler';
+import { allDataHandlers } from './AllDataHandlers';
 
-
-const handlers = [
-    watchVideoDataHandler,
-    watchVideoDetailsDataHandler,
-    shortsWatchDataHandler,
-    recommendationVideosDataHandler,
-    watchPlaylistVideosDataHandler,
-    channelVideosDataHandler,
-    subBoxVideosDataHandler,
-    searchPrimaryVideosDataHandler,
-    searchSecondaryVideosDataHandler,
-    playlistVideosDataHandler,
-    homeDataHandler,
-];
 
 export default class UpdateSourcesService {
     constructor(api) {
@@ -81,7 +57,7 @@ export default class UpdateSourcesService {
             thumbnailUpdatePromises.push(this.handleThumbnailsUpdate(visibleVideos.map(v => v.id)));
         }
 
-        await handlers.reduce(async (promise, handler) => {
+        await Object.values(allDataHandlers).reduce(async (promise, handler) => {
             await promise;
             const videos = handler.extractVideos(data);
             if (videos && videos.length) {
