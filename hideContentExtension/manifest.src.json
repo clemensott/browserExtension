@@ -1,6 +1,6 @@
 {
   "name": "Hider",
-  "version": "2.22.1",
+  "version": "2.22.2",
   "description": "Hides stuff from webpage",
   "manifest_version": 3,
   "browser_specific_settings": {
