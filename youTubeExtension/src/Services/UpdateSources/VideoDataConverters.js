@@ -134,16 +134,6 @@ export function fromReelPlayerOverlayRenderer({ reelPlayerOverlayRenderer: raw }
     };
 }
 
-export function fromLockupViewModel({ lockupViewModel: raw }) {
-    return raw && {
-        id: raw.contentId,
-        title: raw.metadata?.lockupMetadataViewModel?.title?.content,
-        channelTitle: raw.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.at(0)?.metadataParts?.at(0)?.text?.content,
-        channelId: raw.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId,
-        duration: parseDuration(raw.contentImage?.thumbnailViewModel?.overlays?.map(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.find(Boolean)?.map(t => t?.thumbnailBadgeViewModel?.text)?.find(Boolean)),
-    };
-}
-
 export function fromShortsLockupViewModel({ shortsLockupViewModel: raw }, additionalData) {
     const { channelTitle, channelId } = additionalData || {};
     const videoId = raw?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId;
@@ -167,22 +157,11 @@ export function fromPlaylistVideoRenderer({ playlistVideoRenderer: raw }) {
 }
 
 export function fromLockupViewModel({ lockupViewModel: raw }) {
-    if (!raw?.contentId) {
-        return null;
-    }
-
-    const metaViewModel = raw.metadata?.lockupMetadataViewModel;
-    const metadataRows = metaViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
-    const metadataParts = metadataRows?.flatMap(r => r?.metadataParts);
-    const channelMetaPart = metadataParts?.find(p => p?.text?.commandRuns?.
-        some(r => r?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.webPageType === 'WEB_PAGE_TYPE_CHANNEL'));
-    return {
+    return raw && {
         id: raw.contentId,
-        title: metaViewModel?.title?.content,
-        channelTitle: channelMetaPart.text.content,
-        channelId: channelMetaPart?.text?.commandRuns?.map(r => r?.onTap?.innertubeCommand?.browseEndpoint?.browseId).find(Boolean),
-        duration: raw.contentImage?.thumbnailViewModel?.overlays?.flatMap(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.
-            map(b=>parseDuration(b?.thumbnailBadgeViewModel?.text)).find(Boolean),
-        views: metadataParts?.map(p => extractViews(p?.text?.content))?.find(v => typeof v === 'number'),
+        title: raw.metadata?.lockupMetadataViewModel?.title?.content,
+        channelTitle: raw.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.at(0)?.metadataParts?.at(0)?.text?.content,
+        channelId: raw.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId,
+        duration: parseDuration(raw.contentImage?.thumbnailViewModel?.overlays?.map(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.find(Boolean)?.map(t => t?.thumbnailBadgeViewModel?.text)?.find(Boolean)),
     };
 }
