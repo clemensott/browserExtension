@@ -134,6 +134,16 @@ export function fromReelPlayerOverlayRenderer({ reelPlayerOverlayRenderer: raw }
     };
 }
 
+export function fromLockupViewModel({ lockupViewModel: raw }) {
+    return raw && {
+        id: raw.contentId,
+        title: raw.metadata?.lockupMetadataViewModel?.title?.content,
+        channelTitle: raw.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.at(0)?.metadataParts?.at(0)?.text?.content,
+        channelId: raw.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId,
+        duration: parseDuration(raw.contentImage?.thumbnailViewModel?.overlays?.map(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.find(Boolean)?.map(t => t?.thumbnailBadgeViewModel?.text)?.find(Boolean)),
+    };
+}
+
 export function fromShortsLockupViewModel({ shortsLockupViewModel: raw }, additionalData) {
     const { channelTitle, channelId } = additionalData || {};
     const videoId = raw?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId;
