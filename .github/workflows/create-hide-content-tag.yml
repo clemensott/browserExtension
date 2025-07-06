@@ -1,0 +1,34 @@
+name: Create tag of hide content extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag without prefix (e.g.: 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT }}
+    - name: Bump hide content extension version
+      run: |
+        cd hideContentExtension
+        cp manifest.src.json manifest.json
+        jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" manifest.json > manifest.src.json
+    - name: Commit & Push
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        git commit -am "Bump version of hide content to v${{ github.event.inputs.tag }}"
+        git push origin
+
+        git tag hide-content-v${{ github.event.inputs.tag }}
+        git push origin --tags

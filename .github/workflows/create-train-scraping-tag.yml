@@ -1,0 +1,44 @@
+name: Create tag of train scraping extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag without prefix (e.g.: 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT }}
+    - name: Bump train scraping extension version
+      run: |
+        cd trainScrapingExtension
+
+        cp package.json tmp.json
+        jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > package.json
+
+        cp package-lock.json tmp.json
+        jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > package-lock.json
+        rm tmp.json
+
+        cd static
+        cp manifest.json tmp.json
+        jq '.version = $version' --arg version "${{ github.event.inputs.tag }}" tmp.json > manifest.json
+        rm tmp.json
+    - name: Commit & Push
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        git commit -am "Bump version of train scraping to v${{ github.event.inputs.tag }}"
+        git push origin
+
+        git tag train-scraping-v${{ github.event.inputs.tag }}
+        git push origin --tags

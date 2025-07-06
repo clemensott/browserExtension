@@ -1,0 +1,69 @@
+name: Create new release of youtube extension
+
+on: 
+  push:
+    tags:
+    - 'youtube-v*'
+
+jobs:
+  build-youtube-extension:
+    runs-on: ubuntu-latest
+    needs: [build-train-scraping-extension]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    - name: NPM Install
+      run: |
+        cd youTubeExtension
+        npm install
+    - name: Package chrome
+      run: |
+        cd youTubeExtension
+        npm run package:chrome
+        mkdir artifact
+        cp -r dist artifact/chrome
+    - name: Package firefox
+      run: |
+        cd youTubeExtension
+        npm run package:firefox
+    - name: Sign firefox
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        cd youTubeExtension/dist
+        npx web-ext sign --channel=unlisted
+        mv $(find ./web-ext-artifacts -name "*.xpi" -type f) "../artifact/firefox.xpi"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: youtube-extension
+        path: "./youTubeExtension/artifact"
+
+  create-release:
+    name: Create release with artifacts of builds
+    runs-on: ubuntu-latest
+    needs: [build-youtube-extension]
+    permissions:
+      contents: write
+    steps:
+    - name: Download youtube extension
+      uses: actions/download-artifact@v4
+      with:
+        name: youtube-extension
+        path: youtube-extension
+    - name: Archive youtube extension chrome
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: youtube-extension/chrome
+        filename: '../../youtube-extension-chrome.zip'
+    - name: Move youtube extension firefox
+      run: |
+        mv youtube-extension/firefox.xpi ./youtube-extension-firefox.xpi
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "*.zip,*.xpi"
