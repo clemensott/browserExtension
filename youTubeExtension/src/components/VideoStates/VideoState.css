@@ -67,7 +67,7 @@ ytd-rich-item-renderer > .yt-video-user-state-container {
 
 ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container,
 ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container {
-    margin-top: calc(177.78% - var(--yt-video-user-state-collapse-height));
+    margin-top: calc(150% - var(--yt-video-user-state-collapse-height));
 }
 
 ytd-rich-item-renderer:hover > .yt-video-user-state-container,
@@ -80,7 +80,7 @@ ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:hover > .yt-video-user
 ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse,
 ytd-rich-item-renderer[is-shorts-grid]:hover > .yt-video-user-state-container,
 ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
-    margin-top: calc(177.78% - var(--yt-video-user-state-open-height));
+    margin-top: calc(150% - var(--yt-video-user-state-open-height));
     height: initial;
 }
 
