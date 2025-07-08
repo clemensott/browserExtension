@@ -1,6 +1,6 @@
 {
   "name": "youtubeextension",
-  "version": "2.22.5",
+  "version": "2.23.0",
   "description": "A lot of usefull stuff for youtube",
   "main": "content.js",
   "scripts": {
