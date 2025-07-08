@@ -11,19 +11,19 @@ import './FilterRecommendedVideosService.css';
 
 function getChannelName(container) {
     const channelNameElement = container.querySelector(
-        '#metadata > #byline-container > #channel-name > #container > #text-container > #text',
+        '#metadata > #byline-container > #channel-name > #container > #text-container > #text,yt-lockup-metadata-view-model > div > span.yt-core-attributed-string,yt-content-metadata-view-model > div > span.yt-core-attributed-string',
     );
     return channelNameElement ? channelNameElement.innerText : null;
 }
 
 function getIsMusic(container) {
     return !!container.querySelector(
-        '#channel-name > ytd-badge-supported-renderer > div[aria-label="Official Artist Channel"]',
+        '#channel-name > ytd-badge-supported-renderer > div[aria-label="Official Artist Channel"],yt-lockup-metadata-view-model > div span.yt-icon-shape.yt-spec-icon-shape',
     );
 }
 
 function getVideoContainerTitle(container) {
-    const titleElement = container.querySelector('span#video-title');
+    const titleElement = container.querySelector('span#video-title,a.yt-lockup-metadata-view-model-wiz__title');
     return titleElement ? titleElement.innerText : '';
 }
 
@@ -46,7 +46,7 @@ function normalizeDuration(text) {
 }
 
 function getVideoContainerDuration(container) {
-    const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer #text');
+    const durationElement = container.querySelector('ytd-thumbnail-overlay-time-status-renderer #text, yt-thumbnail-view-model div.badge-shape-wiz__text');
     return durationElement ? normalizeDuration(durationElement.innerText) : '';
 }
 
@@ -190,9 +190,9 @@ export default class FilterRecommendedVideosService {
     static getVideoContainers() {
         const domContainer = FilterRecommendedVideosService.getVideoContainersContainer();
         const videoContainers = domContainer && Array.from(domContainer.querySelectorAll(
-            'ytd-compact-video-renderer,ytd-compact-playlist-renderer,ytd-compact-movie-renderer',
+            'ytd-compact-video-renderer,ytd-compact-playlist-renderer,ytd-compact-movie-renderer,yt-lockup-view-model',
         )).map(container => {
-            const { videoId, type } = getVideoIdAndTypeFromContainer(container)
+            const { videoId, type } = getVideoIdAndTypeFromContainer(container);
             return {
                 videoId,
                 channelName: getChannelName(container),

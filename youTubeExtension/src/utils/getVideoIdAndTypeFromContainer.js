@@ -1,5 +1,5 @@
 export default function getVideoIdAndTypeFromContainer(container) {
-    const a = container.querySelector('a#thumbnail,a.reel-item-endpoint');
+    const a = container.querySelector('a#thumbnail,a[href^="/watch?"],a[href^="/shorts/"],a.reel-item-endpoint');
     if (!a) {
         return {
             videoId: null,
@@ -37,10 +37,16 @@ export default function getVideoIdAndTypeFromContainer(container) {
         case 'ytd-reel-item-renderer':
             type = 'short';
             break;
+        case 'yt-lockup-view-model':
+            if (searchParams.has('list')) {
+                type = 'playlist';
+            }
+            break;
         default:
             console.warn('TagName not supported:', container.tagName);
             type = null;
     }
+
     return {
         videoId: searchParams.get('v'),
         type,

@@ -70,7 +70,7 @@ export default function FilterRecommendedVideos({ eventProvider, onFilterChange,
 
     const filter = eventProvider.getFilter();
     const channels = eventProvider.getChannels().sort((a, b) => {
-        return b.count - a.count || a.channelName.localeCompare(b.channelName);
+        return b.count - a.count || a.channelName?.localeCompare(b.channelName);
     });
     const actions = eventProvider.getActions();
 
