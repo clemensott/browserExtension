@@ -11,6 +11,12 @@ export default class ReactRenderer {
         this.beforeSelector = beforeSelector;
 
         this.lastContainer = null;
+        this.renderInfo = null;
+        this.observer = new MutationObserver(() => {
+            if (this.renderInfo && !document.body.contains(this.lastContainer)) {
+                this.render(this.renderInfo.element, this.renderInfo.base);
+            }
+        });
     }
 
     getContainer(base) {
@@ -53,11 +59,16 @@ export default class ReactRenderer {
                 base.appendChild(containerElement);
             }
         }
+
+        this.renderInfo = {element, base};
+        this.observer.observe(containerElement.parentElement, { childList: true })
     }
 
     unmount() {
         if (this.lastContainer) {
             ReactDOM.unmountComponentAtNode(this.lastContainer);
+            this.renderInfo = null;
+            this.observer.disconnect();
         }
     }
 }

@@ -11,10 +11,8 @@ export default class ChannelDomEventHandler extends DomEventHandler {
     }
 
     getElements() {
-        const header = document.querySelector('#channel-container');
         return {
-            header,
-            headerButtons: header && header.querySelector('#inner-header-container > #buttons'),
+            header: document.querySelector('yt-flexible-actions-view-model'),
         };
     }
 
@@ -23,7 +21,6 @@ export default class ChannelDomEventHandler extends DomEventHandler {
             newObj,
             lastObj,
             'header',
-            'headerButtons',
         );
     }
 }

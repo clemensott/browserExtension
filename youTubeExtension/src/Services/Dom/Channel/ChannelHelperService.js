@@ -24,15 +24,15 @@ export default class ChannelHelperService {
     }
 
     onChannelChange({ detail: { currentElements: newContainer, lastElements: lastContainer } }) {  
-        if (lastContainer && lastContainer.headerButtons) {
-            lastContainer.headerButtons.classList.remove('yt-channel-helper-service-inner-header-container');
+        if (lastContainer && lastContainer.header) {
+            lastContainer.header.classList.remove('yt-channel-helper-service-inner-header-container');
         }
-        if (newContainer && newContainer.headerButtons) {
+        if (newContainer && newContainer.header) {
             this.channelHidingRenderer.render(
                 RootElement(ChannelVideoHiding, { service: this.channelVideoHidingService }),
-                newContainer.headerButtons,
+                newContainer.header,
             );
-            newContainer.headerButtons.classList.add('yt-channel-helper-service-inner-header-container');
+            newContainer.header.classList.add('yt-channel-helper-service-inner-header-container');
         } else {
             this.channelHidingRenderer.unmount();
         }
