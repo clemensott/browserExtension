@@ -9,6 +9,13 @@ function getHide(...selector) {
     };
 }
 
+function getRemoveAttributes(selector, ...removeAttributes) {
+    return {
+        selector,
+        removeAttributes,
+    };
+}
+
 function getRemove(selector) {
     return {
         selector,
@@ -23,10 +30,10 @@ function getRemoveClasses(selector, ...removeClasses) {
     };
 }
 
-function getAddClasses(selector, ...removeClasses) {
+function getAddClasses(selector, ...addClasses) {
     return {
         selector,
-        removeClasses,
+        addClasses,
     };
 }
 
@@ -227,6 +234,16 @@ const actionConfigs = [
         getRemove('#iubenda-cs-banner'),
         clearOverflow('html'),
     ],
+    [
+        getRemoveClasses('body', 'cc-scrolling-disabled'),
+        getRemove('#gdpr-blocking-page-overlay'),
+        getHide('#pandectes-banner'),
+    ],
+    [
+        getRemoveAttributes('body', 'data-scroll-locked', 'style'),
+        getHide('#portal-root > div[data-state="open"]'),
+        getHide('#portal-root > div[role="dialog"]'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
@@ -271,10 +288,13 @@ async function handleElement({ element, config }) {
         config.removeClasses.forEach(className => element.classList.remove(className));
     }
     if (config.addClasses) {
-        config.removeClasses.forEach(className => element.classList.add(className));
+        config.addClasses.forEach(className => element.classList.add(className));
     }
     if (config.attributes) {
         Object.entries(config.attributes).forEach(([key, value]) => element.setAttribute(key, value));
+    }
+    if (config.removeAttributes) {
+        config.removeAttributes.forEach(attribute => element.removeAttribute(attribute))
     }
     if (config.remove) {
         element.remove();
