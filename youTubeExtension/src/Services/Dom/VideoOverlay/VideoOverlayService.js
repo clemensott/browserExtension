@@ -114,14 +114,8 @@ export default class VideoOverlayService {
                 additionalClassName: 'yt-video-user-state-watch',
             }));
 
-        const recommendedVideos = Array.from(document.querySelectorAll('#items > ytd-compact-video-renderer'))
-            .map(container => ({
-                container,
-                getVideoId: () => getVideoIdFromVideoContainer(container),
-                additionalClassName: 'yt-video-user-state-list-item',
-            }));
-
         const listVideos = [
+            '#items > ytd-compact-video-renderer',
             '#contents > ytd-compact-video-renderer',
             '#items > ytd-grid-video-renderer',
             '#contents > ytd-rich-item-renderer',
@@ -130,6 +124,7 @@ export default class VideoOverlayService {
             '#items > ytd-playlist-panel-video-renderer',
             '#contents > ytd-playlist-video-renderer',
             '#items > yt-lockup-view-model',
+            '#contents > yt-lockup-view-model',
         ]
             .flatMap(selector => Array.from(document.querySelectorAll(selector)))
             .map(container => ({
