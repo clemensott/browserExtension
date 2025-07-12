@@ -1,6 +1,6 @@
 {
   "name": "YouTube utils extension",
-  "version": "2.23.2",
+  "version": "2.23.3",
   "description": "does some useful stuff on youtube",
   "manifest_version": 3,
   "browser_specific_settings": {
