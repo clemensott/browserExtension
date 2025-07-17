@@ -137,7 +137,6 @@ export default class VideoOverlayService {
             ...watchVideos,
             ...shortWatchVideos,
             ...shortVideos,
-            ...recommendedVideos,
             ...listVideos,
         ];
     }
