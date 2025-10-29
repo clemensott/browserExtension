@@ -84,6 +84,17 @@
     },
     {
       "matches": [
+        "https://www.strav.com/*"
+      ],
+      "js": [ 
+        "strava_content.js"
+      ],
+      "css": [
+        "strava_content.css"
+      ]
+    },
+    {
+      "matches": [
         "http://*/*",
         "https://*/*"
       ],
