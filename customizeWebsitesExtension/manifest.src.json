@@ -1,6 +1,6 @@
 {
   "name": "Customize Websites",
-  "version": "2.23.0",
+  "version": "2.24.0",
   "description": "does usefull stuff on websites",
   "manifest_version": 3,
   "browser_specific_settings": {
@@ -86,7 +86,7 @@
       "matches": [
         "https://www.strav.com/*"
       ],
-      "js": [ 
+      "js": [
         "strava_content.js"
       ],
       "css": [
