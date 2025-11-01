@@ -84,7 +84,7 @@
     },
     {
       "matches": [
-        "https://www.strav.com/*"
+        "https://www.strava.com/*"
       ],
       "js": [
         "strava_content.js"
