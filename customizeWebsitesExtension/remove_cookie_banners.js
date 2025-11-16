@@ -244,6 +244,11 @@ const actionConfigs = [
         getHide('#portal-root > div[data-state="open"]'),
         getHide('#portal-root > div[role="dialog"]'),
     ],
+    [
+        getRemoveAttributes('#wrapper', 'inert'),
+        getRemoveClasses('body', 'has-cookie-banner'),
+        getHide('div[data-component="Cookies/Banner/CookieBannerManager"]'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
