@@ -249,6 +249,9 @@ const actionConfigs = [
         getRemoveClasses('body', 'has-cookie-banner'),
         getHide('div[data-component="Cookies/Banner/CookieBannerManager"]'),
     ],
+    [
+        getRemove('dialog.css-jeavfy[aria-hidden="false"][open]'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
