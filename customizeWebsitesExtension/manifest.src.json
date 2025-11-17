@@ -1,6 +1,6 @@
 {
   "name": "Customize Websites",
-  "version": "2.24.1",
+  "version": "2.25.0",
   "description": "does usefull stuff on websites",
   "manifest_version": 3,
   "browser_specific_settings": {
