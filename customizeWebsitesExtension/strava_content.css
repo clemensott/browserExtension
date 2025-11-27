@@ -1,3 +1,5 @@
+.nav-bar a[href^="/gift"],
+.nav-bar a[href^="/subscribe"],
 #stravaCookieBanner {
     display: none;
 }
