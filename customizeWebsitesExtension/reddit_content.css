@@ -4,6 +4,7 @@ div > div > div.promotedlink {
     display: none;
 }
 
+#data-protection-consent-dialog,
 div[data-adclicklocation="background"] + div:not([class]) > div:not([class]),
 shreddit-ad-post,
 shreddit-comments-page-ad {
