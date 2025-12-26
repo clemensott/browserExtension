@@ -252,6 +252,19 @@ const actionConfigs = [
     [
         getRemove('dialog.css-jeavfy[aria-hidden="false"][open]'),
     ],
+    [
+        getHide('div[consent-skip-blocker="1"]'),
+        clearOverflow('html'),
+        clearOverflow('body'),
+    ],
+    [
+        getHide('#cookie-jar'),
+        getRemoveClasses('#shop', 'disable', 'with-dark'),
+    ],
+    [
+        getHide('#BorlabsCookieBox'),
+        clearOverflow('body'),
+    ],
 ];
 
 const bannerIntervalId = setInterval(() => {
