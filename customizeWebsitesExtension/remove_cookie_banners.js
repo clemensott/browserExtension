@@ -265,6 +265,11 @@ const actionConfigs = [
         getHide('#BorlabsCookieBox'),
         clearOverflow('body'),
     ],
+    [
+        // bahn.de
+        getHide('body > div:nth-child(1)'),
+        clearOverflow('#db-main-navigation'),
+    ]
 ];
 
 const bannerIntervalId = setInterval(() => {
