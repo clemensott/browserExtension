@@ -39,7 +39,7 @@ function getAdditionalData(data) {
         tryIgnore(() => data?.header?.c4TabbedHeaderRenderer?.channelId) ||
         tryIgnore(() => data?.metadata?.channelMetadataRenderer?.externalId) ||
         tryIgnore(() => data?.responseContext?.serviceTrackingParams?.
-            map(s => s.params).flat().find(p => p.key === 'browse_id')?.value);
+            flatMap(s => s.params).find(p => p.key === 'browse_id')?.value);
 
     const channelTitle =
         tryIgnore(() => data?.header?.c4TabbedHeaderRenderer?.title) ||

@@ -5,6 +5,7 @@ export function fromWatchVideo(raw, videoId) {
     if (!Array.isArray(raw)) {
         return null;
     }
+
     const videoSection = raw.map(c => c?.videoPrimaryInfoRenderer).find(Boolean);
     const channelSection = raw.map(c => c?.videoSecondaryInfoRenderer).find(Boolean);
     const commentSection = raw.map(c => c?.itemSectionRenderer).find(Boolean);
@@ -23,8 +24,8 @@ export function fromWatchVideo(raw, videoId) {
                     map(b => b?.segmentedLikeDislikeButtonRenderer?.likeButton?.toggleButtonRenderer?.defaultText?.simpleText).find(Boolean)
             )
         ),
-        comments: parseFormattedInt(commentSection?.header?.map(h => h?.commentsHeaderRenderer).find(Boolean)?.countText?.runs?.
-            map(r => parseInt(r?.text, 10)).find(t => !Number.isNaN(t))),
+        comments: Array.isArray(commentSection?.header) && parseFormattedInt(commentSection?.header?.map(h => h?.commentsHeaderRenderer).find(Boolean)?.countText?.runs?.
+            map(r => parseInt(r?.text, 10)).find(t => !Number.isNaN(t))) || undefined,
     };
 }
 
@@ -156,12 +157,57 @@ export function fromPlaylistVideoRenderer({ playlistVideoRenderer: raw }) {
     };
 }
 
-export function fromLockupViewModel({ lockupViewModel: raw }) {
+export function fromLockupViewModel({ lockupViewModel: raw }, additionalData) {
+    if (!raw) {
+        return null;
+    }
+
+    let channelTitle;
+    let channelId;
+    const channel = raw.metadata?.lockupMetadataViewModel?.image?.avatarStackViewModel?.rendererContext?.commandContext?.onTap?.
+        innertubeCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.
+        listItems?.map(i => i.listItemViewModel).find(Boolean);
+    if (channel) {
+        // collabaration between channels. First one is the main channel
+        channelTitle = channel.title?.content;
+        channelId = channel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId;
+    } else if (additionalData && additionalData.channelTitle && additionalData.channelId) {
+        channelTitle = additionalData.channelTitle;
+        channelId = additionalData.channelId;
+    } else {
+        channelTitle = raw.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.at(0)?.metadataParts?.at(0)?.text?.content;
+        channelId = raw.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId;
+    }
+
+    if (!channelId) {
+        console.log('handle from lockup5:', {
+            channelId,
+            channelTitle,
+            title: raw.metadata?.lockupMetadataViewModel?.title?.content,
+            channel,
+            raw,
+            additionalData
+        })
+    }
     return raw && {
         id: raw.contentId,
         title: raw.metadata?.lockupMetadataViewModel?.title?.content,
-        channelTitle: raw.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows?.at(0)?.metadataParts?.at(0)?.text?.content,
-        channelId: raw.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint?.browseId,
+        channelTitle,
+        channelId,
         duration: parseDuration(raw.contentImage?.thumbnailViewModel?.overlays?.map(o => o?.thumbnailOverlayBadgeViewModel?.thumbnailBadges)?.find(Boolean)?.map(t => t?.thumbnailBadgeViewModel?.text)?.find(Boolean)),
     };
+}
+
+export function fromPlayerMicroformatRenderer({ playerMicroformatRenderer: raw }) {
+    return raw && {
+        id: raw.externalVideoId,
+        title: raw.title?.simpleText,
+        channelTitle: raw.ownerChannelName,
+        channelId: raw.externalChannelId,
+        duration: Number.parseInt(raw.lengthSeconds) || null,
+        views: Number.parseInt(raw.viewCount) || null,
+        likes: Number.parseInt(raw.likeCount) || null,
+        localizedDescription: raw.description?.simpleText,
+        publishedAt: raw.publishDate,
+    }
 }
