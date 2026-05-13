@@ -56,7 +56,8 @@ ytd-compact-video-renderer > .yt-video-user-state-container.yt-video-user-state-
     height: initial;
 }
 
-ytd-rich-item-renderer > .yt-video-user-state-container {
+ytd-rich-item-renderer > .yt-video-user-state-container,
+ytm-shorts-lockup-view-model-v2 > .yt-video-user-state-container {
     position: absolute;
     left: 0;
     top: 0;
@@ -66,7 +67,8 @@ ytd-rich-item-renderer > .yt-video-user-state-container {
 }
 
 ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container,
-ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container {
+ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container,
+ytm-shorts-lockup-view-model-v2 > .yt-video-user-state-container {
     margin-top: calc(150% - var(--yt-video-user-state-collapse-height));
 }
 
@@ -79,7 +81,9 @@ ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-cont
 ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:hover > .yt-video-user-state-container,
 ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer > .yt-video-user-state-container.yt-video-user-state-container-not-collapse,
 ytd-rich-item-renderer[is-shorts-grid]:hover > .yt-video-user-state-container,
-ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
+ytd-rich-item-renderer[is-shorts-grid] > .yt-video-user-state-container.yt-video-user-state-container-not-collapse,
+ytm-shorts-lockup-view-model-v2:hover > .yt-video-user-state-container,
+ytm-shorts-lockup-view-model-v2 > .yt-video-user-state-container.yt-video-user-state-container-not-collapse {
     margin-top: calc(150% - var(--yt-video-user-state-open-height));
     height: initial;
 }
@@ -88,8 +92,8 @@ ytd-video-renderer > .yt-video-user-state-container {
     position: absolute;
     left: 0;
     top: calc(100% - var(--yt-video-user-state-collapse-height));
-    width: 360px;
-    max-width: 48.7%;
+    width: 500px;
+    max-width: 40%;
     height: var(--yt-video-user-state-collapse-height);
 }
 

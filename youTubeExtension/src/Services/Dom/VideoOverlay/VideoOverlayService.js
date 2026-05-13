@@ -106,6 +106,7 @@ export default class VideoOverlayService {
 
         const shortVideos = [
             'ytd-reel-player-overlay-renderer > #actions.style-scope.ytd-reel-player-overlay-renderer',
+            'ytd-reel-player-overlay-renderer > .action-container',
         ]
             .flatMap(selector => Array.from(document.querySelectorAll(selector)))
             .map(container => ({
@@ -125,6 +126,7 @@ export default class VideoOverlayService {
             '#contents > ytd-playlist-video-renderer',
             '#items > yt-lockup-view-model',
             '#contents > yt-lockup-view-model',
+            '.ytGridShelfViewModelGridShelfRow.ytd-item-section-renderer > .ytGridShelfViewModelGridShelfItem > ytm-shorts-lockup-view-model-v2',
         ]
             .flatMap(selector => Array.from(document.querySelectorAll(selector)))
             .map(container => ({
