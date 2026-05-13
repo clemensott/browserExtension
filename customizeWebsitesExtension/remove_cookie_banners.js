@@ -251,6 +251,7 @@ const actionConfigs = [
     ],
     [
         getRemove('dialog.css-jeavfy[aria-hidden="false"][open]'),
+        clearOverflow('body'),
     ],
     [
         getHide('div[consent-skip-blocker="1"]'),
